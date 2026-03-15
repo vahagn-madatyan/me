@@ -146,6 +146,42 @@ const projects = [
     icon: "📈",
   },
   {
+    id: "wheeely",
+    name: "WHEEELY",
+    tagline: "Options Wheel Strategy Engine",
+    category: "FINTECH",
+    accent: "#ffdd00",
+    description: "Python CLI for automated options wheel strategy — sell puts, get assigned, sell covered calls, repeat. Multi-stage screening pipeline with staged filters (cheap Alpaca filters first, then Finnhub fundamentals). BYOK SaaS expansion planned with FMP and ORATS premium data.",
+    stats: [
+      { label: "CLI Commands", value: "3" },
+      { label: "Pipeline", value: "5 Stages" },
+      { label: "Broker", value: "Alpaca" },
+      { label: "Model", value: "BYOK SaaS" },
+    ],
+    tech: ["Python", "Alpaca", "Finnhub", "FMP", "ORATS", "Rich CLI"],
+    status: "IN DEVELOPMENT",
+    phase: 60,
+    icon: "🎰",
+  },
+  {
+    id: "wheel-it-screenr",
+    name: "WHEEL-IT SCREENR",
+    tagline: "Options Screener & Chain Analyzer",
+    category: "FINTECH",
+    accent: "#ff3e3e",
+    description: "Web dashboard for wheel strategy screening. Real-time option chain analysis with put scoring (spread quality, liquidity, premium yield, delta sweet spot, IV level). Filter presets (Finviz Cut 2, Conservative, Aggressive), sector exclusions, and score tooltips with sub-component breakdowns.",
+    stats: [
+      { label: "Score Weights", value: "5" },
+      { label: "Presets", value: "3" },
+      { label: "Chain Data", value: "Massive" },
+      { label: "Filters", value: "12+" },
+    ],
+    tech: ["JavaScript", "Massive.com", "Alpaca", "Finnhub", "HTML/CSS", "Rich Tables"],
+    status: "IN DEVELOPMENT",
+    phase: 50,
+    icon: "📊",
+  },
+  {
     id: "ai-bazar",
     name: "AI BAZAR",
     tagline: "AI M&A Marketplace",
@@ -603,7 +639,7 @@ export default function UnifiedPortfolioDashboard() {
             borderTop: "1px solid rgba(255,255,255,0.06)",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
           }}>
-            <HeaderStat value="11" label="PROJECTS" color="#00e5ff" />
+            <HeaderStat value="13" label="PROJECTS" color="#00e5ff" />
             <HeaderStat value={totalTools} label="TOOLS BUILT" color="#00ff87" />
             <HeaderStat value={totalSkills} label="AI SKILLS" color="#b44dff" />
             <HeaderStat value={domains} label="DOMAINS" color="#ff6b35" />
@@ -750,7 +786,7 @@ export default function UnifiedPortfolioDashboard() {
             gap: "8px",
           }}>
             {[
-              { name: "Python", count: 9, color: "#00e5ff" },
+              { name: "Python", count: 10, color: "#00e5ff" },
               { name: "Docker", count: 6, color: "#00e5ff" },
               { name: "FastMCP", count: 4, color: "#00ff87" },
               { name: "LangGraph", count: 3, color: "#b44dff" },
@@ -763,7 +799,9 @@ export default function UnifiedPortfolioDashboard() {
               { name: "Zabbix", count: 1, color: "#ff3e3e" },
               { name: "LiteLLM", count: 1, color: "#00ff87" },
               { name: "AWS Bedrock", count: 1, color: "#ff6b35" },
-              { name: "Alpaca", count: 1, color: "#00ff87" },
+              { name: "Alpaca", count: 3, color: "#00ff87" },
+              { name: "Finnhub", count: 2, color: "#ffdd00" },
+              { name: "Massive.com", count: 1, color: "#ff3e3e" },
               { name: "TimescaleDB", count: 1, color: "#00e5ff" },
             ].map((tech, i) => (
               <span key={i} style={{

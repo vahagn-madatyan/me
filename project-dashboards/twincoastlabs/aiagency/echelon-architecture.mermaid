@@ -1,0 +1,234 @@
+---
+title: "Echelon — AI Operations Platform for Real Estate"
+// [MermaidChart: 5770971f-005f-4265-ba58-2c63a7b7e85a]
+
+---
+%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#d4a24e', 'primaryTextColor': '#e8eaf0', 'primaryBorderColor': '#d4a24e', 'lineColor': '#5b8cf7', 'secondaryColor': '#1a2744', 'tertiaryColor': '#161b24', 'background': '#07090d', 'mainBkg': '#161b24', 'nodeBorder': '#343d50', 'clusterBkg': '#0f1218', 'clusterBorder': '#222938', 'titleColor': '#d4a24e', 'edgeLabelBackground': '#0f1218', 'noteTextColor': '#7b8399', 'noteBkgColor': '#1a2744', 'noteBorderColor': '#343d50'}}}%%
+
+graph TB
+    subgraph CLIENTS["👤 CLIENT LAYER"]
+        direction LR
+        WEB["🌐 Web Dashboard<br/><i>Next.js 16 + shadcn/ui v4</i>"]
+        CHAT["💬 Agent Chat UI<br/><i>assistant-ui (React)</i>"]
+        MOBILE["📱 Mobile App<br/><i>React Native / Expo</i><br/><i>(Phase 4)</i>"]
+    end
+
+    subgraph GATEWAY["🔐 API GATEWAY & AUTH"]
+        direction LR
+        AUTH["Supabase Auth<br/><i>+ RLS</i>"]
+        RATE["Rate Limiter<br/><i>Per-tenant quotas</i>"]
+        ROUTE["Tenant Router<br/><i>tenant_id propagation</i>"]
+    end
+
+    subgraph CONTROL["🎛️ CONTROL PLANE — Paperclip Fork"]
+        direction LR
+        DASH["Dashboard<br/><i>My AI Team view</i>"]
+        BUDGET["Budget Enforcement<br/><i>Per-agent monthly caps</i>"]
+        GOV["Governance<br/><i>Approval gates</i><br/><i>Audit log</i>"]
+        HEARTBEAT["Heartbeat Scheduler<br/><i>Agent wake/check/act</i>"]
+    end
+
+    subgraph AGENTS["🤖 AGENT ORCHESTRATION LAYER"]
+        direction TB
+
+        subgraph CORE_AGENTS["Phase 1-3: Core Agents (7)"]
+            direction LR
+            SCOUT["⚡ Scout<br/><b>Lead Response</b><br/><i>GPT-4o-mini / Haiku</i>"]
+            ATLAS["🗂️ Atlas<br/><b>Ops & Admin</b><br/><i>GPT-4o-mini / Haiku</i>"]
+            SAGE["📊 Sage<br/><b>Market & Investment</b><br/><i>Sonnet / GPT-4o</i>"]
+            QUILL["✍️ Quill<br/><b>Content & Comms</b><br/><i>Sonnet / GPT-4o</i>"]
+            NURTURE["💬 Nurture<br/><b>Client Relations</b><br/><i>Sonnet / GPT-4o</i>"]
+            SHIELD["🛡️ Shield<br/><b>Compliance & Risk</b><br/><i>Opus / GPT-4.5</i>"]
+            CLOSER["📋 Closer<br/><b>Transaction Coord</b><br/><i>Opus / GPT-4.5</i>"]
+        end
+
+        subgraph FUTURE_AGENTS["Phase 4+: Expansion Agents"]
+            direction LR
+            VAULT["🏦 Vault<br/><b>Investment Analysis</b><br/><i>Phase 4</i>"]
+            SENTINEL["🔭 Sentinel<br/><b>Portfolio Monitor</b><br/><i>Phase 4</i>"]
+            ZONECHECK["🏗️ ZoneCheck<br/><b>Zoning Compliance</b><br/><i>Phase 5</i>"]
+            LEASEINTEL["📑 LeaseIntel<br/><b>Lease Abstraction</b><br/><i>Phase 6</i>"]
+        end
+
+        LANGGRAPH["LangGraph<br/><i>State machine engine</i><br/><i>Durable execution</i>"]
+        CREWAI["CrewAI<br/><i>Agent-to-agent handoffs</i><br/><i>Role-based crews</i>"]
+        DEEP["Deep Agents<br/><i>Complex task planning</i><br/><i>Subagent spawning</i>"]
+    end
+
+    subgraph LLM["🧠 LLM INFRASTRUCTURE"]
+        direction LR
+        LITELLM["LiteLLM Gateway<br/><i>100+ models</i><br/><i>Per-tenant budgets</i><br/><i>Automatic failover</i>"]
+        ROUTELLM["RouteLLM<br/><i>Smart complexity routing</i><br/><i>85% cost reduction</i>"]
+
+        subgraph MODELS["Model Tiers"]
+            direction TB
+            CHEAP["💚 Assistant Tier<br/><i>Haiku · GPT-4o-mini</i><br/><i>Scout · Atlas</i>"]
+            MID["💛 Associate Tier<br/><i>Sonnet · GPT-4o</i><br/><i>Sage · Quill · Nurture</i>"]
+            FRONTIER["💜 Broker Tier<br/><i>Opus · GPT-4.5</i><br/><i>Shield · Closer</i>"]
+        end
+
+        LORAX["LoRAX<br/><i>Multi-LoRA serving</i><br/><i>Enterprise only</i>"]
+        VLLM["vLLM<br/><i>Self-hosted inference</i><br/><i>Enterprise only</i>"]
+    end
+
+    subgraph MEMORY["🧠 MEMORY & KNOWLEDGE"]
+        direction LR
+        LETTA["Letta (MemGPT)<br/><i>Core · Recall · Archival</i><br/><i>Self-editing memory</i>"]
+        MEM0["Mem0<br/><i>Cross-agent shared memory</i><br/><i>Client context flows</i>"]
+        PGVECTOR["pgvector<br/><i>in Supabase Postgres</i><br/><i>$0 · RLS isolation</i>"]
+        HAYSTACK["Haystack<br/><i>RAG pipelines</i><br/><i>MLS · Contracts · Market</i>"]
+    end
+
+    subgraph TOOLS["🔧 TOOL & INTEGRATION LAYER (MCP Servers)"]
+        direction TB
+
+        subgraph RE_MCPS["Real Estate MCP Servers"]
+            direction LR
+            MCP_MLS["mcp-mls<br/><i>RESO Web API</i>"]
+            MCP_FUB["mcp-followupboss<br/><i>CRM</i>"]
+            MCP_KV["mcp-kvcore<br/><i>CRM</i>"]
+            MCP_DOT["mcp-dotloop<br/><i>Transactions</i>"]
+            MCP_SKY["mcp-skyslope<br/><i>Compliance</i>"]
+            MCP_ZIL["mcp-zillow<br/><i>Lead source</i>"]
+        end
+
+        subgraph INFRA_MCPS["Infrastructure MCP Servers"]
+            direction LR
+            MCP_TWILIO["mcp-twilio<br/><i>SMS/Voice</i>"]
+            MCP_CAL["mcp-calendar<br/><i>Google/Outlook</i>"]
+            MCP_MAIL["mcp-email<br/><i>Gmail/Brevo</i>"]
+            MCP_COUNTY["mcp-county-records<br/><i>Permits · Assessor</i>"]
+        end
+
+        COMPOSIO["Composio<br/><i>500+ apps · per-user OAuth</i><br/><i>Token refresh · RBAC</i>"]
+        FIRECRAWL["Firecrawl<br/><i>Web data extraction</i>"]
+        UNSTRUCTURED["Unstructured<br/><i>Document processing</i><br/><i>PDFs · Images · OCR</i>"]
+    end
+
+    subgraph PLATFORM["⚙️ PLATFORM SERVICES"]
+        direction LR
+        STRIPE["Stripe<br/><i>Flat monthly billing</i><br/><i>Usage metering</i>"]
+        LANGSMITH["LangSmith<br/><i>Observability</i><br/><i>Traces · Evals</i>"]
+        LANGFUSE["Langfuse<br/><i>OSS alt (Enterprise)</i><br/><i>Self-hosted</i>"]
+        TRIGGER["Trigger.dev<br/><i>Background jobs</i><br/><i>Scheduled tasks</i>"]
+        N8N["n8n<br/><i>Integration workflows</i><br/><i>Visual builder · 400+ apps</i>"]
+    end
+
+    subgraph INFRA["🏗️ INFRASTRUCTURE"]
+        direction TB
+
+        subgraph EDGE["☁️ Cloudflare Edge"]
+            direction LR
+            CF_PAGES["CF Pages<br/><i>Next.js 16 dashboard</i><br/><i>$0/mo</i>"]
+            CF_TUNNEL["CF Tunnel<br/><i>Encrypted ingress</i><br/><i>No open ports</i>"]
+            CF_R2["CF R2<br/><i>Document + photo storage</i><br/><i>$0 egress</i>"]
+            CF_WAF["CF WAF + DDoS<br/><i>Free protection</i>"]
+        end
+
+        subgraph COMPUTE["🖥️ Hetzner CPX31 + Coolify"]
+            direction LR
+            COOLIFY["Coolify<br/><i>Self-hosted PaaS</i><br/><i>Git-push deploys</i>"]
+            DOCKER["Docker Compose<br/><i>8 containers</i><br/><i>~5GB RAM</i>"]
+            VOLUME["Persistent Volume<br/><i>20GB · survives rebuild</i><br/><i>n8n · Infisical · Letta</i>"]
+        end
+
+        subgraph DATA["🗄️ Supabase (Managed)"]
+            direction LR
+            SUPABASE["Supabase<br/><i>Postgres + RLS</i><br/><i>Auth · Realtime</i><br/><i>Edge Functions</i>"]
+        end
+
+        OPENTOFU["OpenTofu<br/><i>IaC · One-command recovery</i><br/><i>Server + Firewall + Volume</i>"]
+    end
+
+    subgraph SECURITY["🔒 SECURITY & COMPLIANCE"]
+        direction LR
+        RLS["Supabase RLS<br/><i>Row-level isolation</i>"]
+        INFISICAL["Infisical<br/><i>Secrets vault (MIT)</i><br/><i>Self-hosted · $0</i>"]
+        PRESIDIO["Presidio<br/><i>PII detection</i><br/><i>Microsoft OSS</i>"]
+        OWASP["OWASP MCP Top 10<br/><i>MCP security</i>"]
+    end
+
+    %% ─── CONNECTIONS ──────────────────────────────────
+    CLIENTS --> GATEWAY
+    GATEWAY --> CONTROL
+    CONTROL --> AGENTS
+
+    %% Agent orchestration internals
+    LANGGRAPH --> CORE_AGENTS
+    CREWAI --> CORE_AGENTS
+    DEEP --> SAGE
+    DEEP --> CLOSER
+
+    %% Agent-to-agent flows
+    SCOUT -.->|qualifies lead| NURTURE
+    SCOUT -.->|books showing| ATLAS
+    SCOUT -.->|under contract| CLOSER
+    QUILL -.->|content check| SHIELD
+    CLOSER -.->|disclosure check| SHIELD
+
+    %% LLM routing
+    AGENTS --> LITELLM
+    LITELLM --> ROUTELLM
+    ROUTELLM --> MODELS
+    LITELLM --> LORAX
+
+    %% Memory connections
+    AGENTS --> LETTA
+    AGENTS --> MEM0
+    LETTA --> PGVECTOR
+    HAYSTACK --> PGVECTOR
+
+    %% Tool connections
+    AGENTS --> TOOLS
+    COMPOSIO --> RE_MCPS
+    COMPOSIO --> INFRA_MCPS
+
+    %% Platform services
+    AGENTS --> LANGSMITH
+    CONTROL --> STRIPE
+    HEARTBEAT --> TRIGGER
+    N8N --> TOOLS
+
+    %% Infrastructure — Hosting Flow
+    CLIENTS --> CF_WAF
+    CF_WAF --> CF_PAGES
+    CF_WAF --> CF_TUNNEL
+    CF_TUNNEL --> DOCKER
+    COOLIFY --> DOCKER
+    DOCKER --> VOLUME
+    SUPABASE --> RLS
+    PGVECTOR -.->|built-in extension| SUPABASE
+    GATEWAY --> AUTH
+    OPENTOFU -.->|provisions| COMPUTE
+
+    %% Platform → Infrastructure
+    PLATFORM --> DOCKER
+    TOOLS --> DOCKER
+    CF_R2 -.->|document storage| CLOSER
+
+    %% Styling
+    classDef goldNode fill:#1a2744,stroke:#d4a24e,color:#e8eaf0
+    classDef greenNode fill:#0f2920,stroke:#34d399,color:#e8eaf0
+    classDef purpleNode fill:#1f1535,stroke:#a78bfa,color:#e8eaf0
+    classDef cyanNode fill:#0a2530,stroke:#22d3ee,color:#e8eaf0
+    classDef redNode fill:#2a1215,stroke:#f87171,color:#e8eaf0
+    classDef pinkNode fill:#2a1225,stroke:#f472b6,color:#e8eaf0
+    classDef tealNode fill:#0a2525,stroke:#2dd4bf,color:#e8eaf0
+    classDef dimNode fill:#161b24,stroke:#343d50,color:#7b8399,stroke-dasharray: 5 5
+    classDef orangeNode fill:#2a1f0a,stroke:#f59e0b,color:#e8eaf0
+
+    class SCOUT,ATLAS greenNode
+    class SAGE,QUILL,NURTURE cyanNode
+    class SHIELD,CLOSER goldNode
+    class VAULT,SENTINEL,ZONECHECK,LEASEINTEL dimNode
+    class LITELLM,ROUTELLM,LORAX,VLLM goldNode
+    class LETTA,MEM0,PGVECTOR,HAYSTACK purpleNode
+    class MCP_MLS,MCP_FUB,MCP_KV,MCP_DOT,MCP_SKY,MCP_ZIL pinkNode
+    class MCP_TWILIO,MCP_CAL,MCP_MAIL,MCP_COUNTY tealNode
+    class COMPOSIO,FIRECRAWL,UNSTRUCTURED pinkNode
+    class STRIPE,LANGSMITH,LANGFUSE,TRIGGER,N8N tealNode
+    class RLS,INFISICAL,PRESIDIO,OWASP redNode
+    class CF_PAGES,CF_TUNNEL,CF_R2,CF_WAF orangeNode
+    class COOLIFY,DOCKER,VOLUME greenNode
+    class SUPABASE cyanNode
+    class OPENTOFU tealNode

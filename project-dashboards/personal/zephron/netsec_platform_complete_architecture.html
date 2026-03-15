@@ -1,0 +1,660 @@
+<style>
+.tab-bar{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 16px}
+.tab-btn{padding:6px 14px;border-radius:var(--border-radius-md);font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.tab-btn.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.tab-btn:hover:not(.active){background:var(--color-background-secondary)}
+.diagram-pane{display:none}
+.diagram-pane.active{display:block}
+.mermaid-box{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:20px 12px;overflow-x:auto}
+.mermaid-box svg{max-width:100%;height:auto}
+.section-label{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin:20px 0 8px;padding-left:4px}
+.section-label:first-child{margin-top:0}
+</style>
+
+<div class="tab-bar" id="tabs"></div>
+<div id="panes"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+const dark = matchMedia('(prefers-color-scheme:dark)').matches;
+mermaid.initialize({
+  startOnLoad:false,
+  theme:'base',
+  fontFamily:'"Anthropic Sans",system-ui,sans-serif',
+  themeVariables:{
+    darkMode:dark,
+    fontSize:'12px',
+    fontFamily:'"Anthropic Sans",system-ui,sans-serif',
+    lineColor:dark?'#706f68':'#9c9a92',
+    primaryColor:dark?'#1a2a3a':'#E6F1FB',
+    primaryTextColor:dark?'#B5D4F4':'#0C447C',
+    primaryBorderColor:dark?'#385a7a':'#85B7EB',
+    secondaryColor:dark?'#1a3a2a':'#E1F5EE',
+    secondaryTextColor:dark?'#9FE1CB':'#085041',
+    secondaryBorderColor:dark?'#2a6a4a':'#5DCAA5',
+    tertiaryColor:dark?'#2d1a28':'#FBEAF0',
+    tertiaryTextColor:dark?'#F4C0D1':'#72243E',
+    tertiaryBorderColor:dark?'#6a2a4a':'#ED93B1',
+    noteBkgColor:dark?'#2a2a1a':'#FAEEDA',
+    noteTextColor:dark?'#FAC775':'#633806',
+    noteBorderColor:dark?'#6a5a2a':'#EF9F27',
+    textColor:dark?'#c2c0b6':'#3d3d3a',
+    mainBkg:dark?'#1a2a3a':'#E6F1FB',
+    nodeBorder:dark?'#385a7a':'#85B7EB',
+    clusterBkg:dark?'#181c22':'#f5f4f0',
+    clusterBorder:dark?'#3a3a38':'#d3d1c7',
+    edgeLabelBackground:dark?'#181c22':'#f5f4f0',
+  },
+  flowchart:{curve:'basis',padding:12,nodeSpacing:30,rankSpacing:40},
+  er:{layoutDirection:'TB',entityPadding:12}
+});
+
+const tabs = [
+  {id:'full',label:'Full system'},
+  {id:'license',label:'Licensing split'},
+  {id:'agent',label:'Agentic AI'},
+  {id:'alerts',label:'Alerts & incidents'},
+  {id:'data',label:'Data model'},
+  {id:'deploy',label:'Deployment'},
+  {id:'connect',label:'Device connectivity'},
+  {id:'n8n',label:'n8n integration'}
+];
+
+const diagrams = {
+full: [
+{label:'Three-layer architecture with community/enterprise split',code:`graph TB
+  subgraph L1["Layer 1 · Frontend — TanStack Start on Render"]
+    direction LR
+    subgraph CE_UI["community/web · Apache-2.0"]
+      DASH["Dashboard<br/>health scores, inventory"]
+      CHAT["Agent chat<br/>SSE streaming"]
+      TOPO["Topology viewer<br/>auto-discovered maps"]
+      COMPLY_V["Compliance reports<br/>CIS/NIST scoring"]
+    end
+    subgraph EE_UI["enterprise/web · Proprietary"]
+      MSP_D["MSP dashboard<br/>cross-tenant, fleet heatmap"]
+      CUST_P["Customer portal<br/>white-labeled, incidents"]
+      INC_V["Incident console<br/>triage, AI investigation"]
+      FLEET_V["Fleet ops<br/>multi-site parallel"]
+      N8N_V["Workflow builder<br/>n8n embedded"]
+      ADMIN["Admin panel<br/>RBAC, billing, branding"]
+    end
+  end
+
+  subgraph L2["Layer 2 · Backend — Single FastAPI Python 3.12+"]
+    direction LR
+    subgraph CE_API["community/api · Apache-2.0"]
+      AUTH_B["Auth · JWT + API keys"]
+      ROUTES["API routes<br/>sites, devices, health"]
+      SCHED["APScheduler<br/>health 2am, backup 3am"]
+      SVCS["Core services<br/>health, compliance,<br/>backup, topology"]
+    end
+    subgraph EE_API["enterprise/ · Proprietary"]
+      AUTH_E["RBAC + SSO + tenancy"]
+      ALERT_P["Alert pipeline<br/>ingest → dedup → correlate"]
+      INC_M["Incident manager<br/>lifecycle + SLA"]
+      FLEET_S["Fleet ops engine"]
+      BILLING["Stripe metering"]
+      REPORTS["Report engine<br/>white-label PDFs"]
+      WL["White-label engine"]
+      CONN_M["Connector manager<br/>WebSocket hub"]
+      N8N_B["n8n bridge<br/>webhook callbacks"]
+      NOTIFY["Notifications<br/>Slack, Teams, PagerDuty"]
+    end
+  end
+
+  subgraph L3["Layer 3 · Agentic Workflow — LangGraph"]
+    direction LR
+    PLAN["Planner<br/>RAG → pgvector<br/>skill matching"]
+    EXEC["Executor<br/>MCP tool calls via<br/>langchain-mcp-adapters"]
+    REV["Reviewer<br/>safety tier check<br/>audit log + response"]
+  end
+
+  subgraph MCP["MCP Servers · 52 total · Apache-2.0"]
+    direction LR
+    NC["NetClaw fork · 46<br/>pyATS, Meraki, NetBox,<br/>ACI, ISE, AWS×6, GCP×4,<br/>Grafana 75+, Prometheus,<br/>F5, Juniper, +30 more"]
+    NEW["New builds · 5<br/>Prisma Access, CF ZT,<br/>OPNsense, Palo Alto,<br/>Juniper Mist"]
+    ZBX_M["Zabbix MCP · 1<br/>40+ tools, hosts,<br/>items, triggers,<br/>problems, discovery"]
+  end
+
+  subgraph DATA["Data layer"]
+    direction LR
+    PG["PostgreSQL 16 + pgvector<br/>Neon cloud / Docker on-prem"]
+    S3["Backblaze B2 / MinIO<br/>configs, reports, credentials"]
+    N8N_S["n8n · Docker profile<br/>optional, MSP tier"]
+  end
+
+  subgraph MON["Monitoring · Zabbix Docker profile"]
+    ZBX_SVR["Zabbix server<br/>SNMP, agents, ICMP"]
+  end
+
+  subgraph INFRA["Infrastructure"]
+    direction LR
+    DEVICES["On-prem devices<br/>Cisco, Juniper, Palo Alto,<br/>Arista, F5, OPNsense"]
+    CLOUD_M["Cloud-managed<br/>Meraki, Prisma, CF ZT,<br/>ThousandEyes, AWS, GCP"]
+  end
+
+  L1 -->|"HTTPS"| L2
+  L2 --> L3
+  PLAN --> EXEC --> REV
+  L3 -->|"stdio / HTTP"| MCP
+  L2 --> DATA
+  MCP --> INFRA
+  ZBX_M --> ZBX_SVR
+  ZBX_SVR -.->|"webhook alerts"| ALERT_P
+  ZBX_SVR -.->|"SNMP/agent"| DEVICES
+  CONN_M -.->|"WebSocket · Phase 3+"| DEVICES`}
+],
+
+license: [
+{label:'Repository structure — four directories, three LICENSE files',code:`graph TB
+  subgraph REPO["netsec-platform/ · single monorepo"]
+    direction TB
+    subgraph COMMUNITY["community/ · Apache-2.0"]
+      direction TB
+      C_API["api/<br/>• Single-tenant FastAPI<br/>• JWT auth, single user<br/>• Sites, devices, health CRUD<br/>• Agent endpoints<br/>• APScheduler jobs<br/>• SQLAlchemy + Alembic"]
+      C_AGENT["agent/<br/>• LangGraph graph definition<br/>• Planner / Executor / Reviewer<br/>• Skill loader + pgvector RAG<br/>• MCP bridge manager<br/>• LLM client config"]
+      C_WEB["web/<br/>• TanStack Start + shadcn/ui<br/>• Dashboard + health scores<br/>• Agent chat with SSE<br/>• Topology viewer<br/>• Config diff browser<br/>• Compliance reports"]
+      C_DC["docker-compose.yml<br/>• Full working 3-site deploy<br/>• PostgreSQL + MinIO<br/>• No license key needed"]
+    end
+
+    subgraph ENTERPRISE["enterprise/ · Proprietary source-available"]
+      direction TB
+      E_TEN["tenancy/<br/>tenant_id isolation on all queries"]
+      E_MSP["msp/<br/>MSP portal routes + UI pages"]
+      E_CUST["customer/<br/>Customer self-service portal"]
+      E_INC["incidents/<br/>Alert pipeline + lifecycle<br/>+ AI auto-investigation<br/>+ SLA tracking"]
+      E_FLEET["fleet/<br/>Parallel multi-site ops"]
+      E_RBAC["rbac/<br/>Roles, permissions, SSO/SAML"]
+      E_BILL["billing/<br/>Stripe metering + license validation"]
+      E_WL["whitelabel/<br/>Logo, colors, domain per MSP"]
+      E_RPT["reports/<br/>White-label PDF generation"]
+      E_CONN["connector/<br/>Site connector agent<br/>--mode connector"]
+      E_N8N["n8n-nodes/ + workflows/<br/>Custom nodes, 8 templates"]
+    end
+
+    subgraph SKILLS["skills/ · Apache-2.0"]
+      direction LR
+      S1["device-automation/ · 18"]
+      S2["domain-ops/ · 9"]
+      S3["vendor-specific/ · 30+"]
+      S4["cloud/ · 8"]
+      S5["observability/ · 4+"]
+      S6["utilities/ · 16"]
+    end
+
+    subgraph SERVERS["servers/ · Apache-2.0"]
+      direction LR
+      SRV1["prisma-access-mcp/"]
+      SRV2["cloudflare-zt-mcp/"]
+      SRV3["opnsense-mcp/"]
+      SRV4["paloalto-mcp/"]
+      SRV5["mist-mcp/"]
+    end
+  end
+
+  ENTERPRISE -->|"imports from"| COMMUNITY
+  COMMUNITY -.-x|"never imports"| ENTERPRISE`},
+{label:'Community vs paid feature matrix',code:`graph LR
+  subgraph FREE["Community edition · free forever"]
+    F1["3 sites, unlimited devices"]
+    F2["Full LangGraph agent"]
+    F3["All 52 MCP servers"]
+    F4["All 120+ skills"]
+    F5["Config backup + diff"]
+    F6["Health dashboard + scores"]
+    F7["Compliance scanning"]
+    F8["Topology discovery"]
+    F9["Agent chat"]
+    F10["Docker Compose deploy"]
+    F11["Any LLM · Claude, GPT, Ollama"]
+  end
+
+  subgraph PAID["Paid tiers · license key required"]
+    P_E["Essential $49/mo · 10 sites<br/>+ drift detection<br/>+ Zabbix integration<br/>+ Slack/Teams alerts"]
+    P_P["Professional $149/mo · 50 sites<br/>+ AI troubleshooting<br/>+ config deployment<br/>+ incident management<br/>+ CVE scanning<br/>+ site connector"]
+    P_X["Enterprise $599/mo · 250 sites<br/>+ fleet parallel ops<br/>+ RBAC / SSO<br/>+ n8n workflows<br/>+ Grafana/Prometheus<br/>+ API access"]
+    P_M["MSP $199-799/mo + per-tenant<br/>+ multi-tenant<br/>+ customer portal<br/>+ white-label reports<br/>+ SLA tracking<br/>+ AI post-mortems"]
+  end
+
+  FREE -.->|"upgrade"| P_E
+  P_E -.-> P_P -.-> P_X
+  P_P -.->|"add MSP"| P_M`}
+],
+
+agent: [
+{label:'LangGraph agent flow — planner, executor, reviewer with MCP tools',code:`graph TB
+  Q["User query<br/>'Why is Chicago site slow?'"]
+  AUTH["FastAPI middleware<br/>validate JWT → extract tenant<br/>→ check tier → load context"]
+
+  subgraph LANGGRAPH["LangGraph stateful graph · checkpoints to PostgreSQL"]
+    direction TB
+    PLAN["Planner node<br/>─────────<br/>1. RAG query → pgvector<br/>   match skills to query<br/>2. Load SKILL.md content<br/>3. Build execution plan<br/>4. Select MCP servers<br/>5. Determine safety tier"]
+
+    EXEC["Executor node<br/>─────────<br/>1. pyATS MCP → show processes cpu<br/>   via SSH to core-rtr-01<br/>2. pyATS MCP → show ip route summary<br/>   via SSH to core-rtr-01<br/>3. Meraki MCP → getDeviceUplink<br/>   via REST API<br/>4. Zabbix MCP → item history<br/>   CPU last 4 hours<br/>5. ThousandEyes MCP → path viz"]
+
+    REV["Reviewer node<br/>─────────<br/>1. Validate: all Tier 1 read-only ✓<br/>2. Log to audit trail<br/>3. Synthesize diagnosis<br/>4. Format response<br/>5. Stream via SSE"]
+  end
+
+  subgraph LLM["LLM · Claude via ChatAnthropic"]
+    CLAUDE["Reasoning + synthesis<br/>swap GPT/Ollama via config<br/>LiteLLM gateway Phase 2-3"]
+  end
+
+  subgraph RAG["pgvector · skill retrieval"]
+    VEC["120+ skill embeddings<br/>cosine similarity search<br/>→ matched SKILL.md injected<br/>   into agent context"]
+  end
+
+  subgraph TOOLS["MCP tool results"]
+    T1["pyATS: CPU 87%"]
+    T2["pyATS: 12,450 routes"]
+    T3["Meraki: WAN1 latency 145ms"]
+    T4["Zabbix: spike at 14:22"]
+    T5["ThousandEyes: congestion hop 7"]
+  end
+
+  RESP["SSE streaming response<br/>─────────<br/>Chicago site slow due to:<br/>1. High CPU on core-rtr-01 87%<br/>2. Route table growth 12,450<br/>3. WAN latency 145ms on Meraki<br/>4. ISP congestion at hop 7<br/>Recommend: check route leak,<br/>contact ISP"]
+
+  Q --> AUTH --> PLAN
+  PLAN --> EXEC --> REV --> RESP
+  PLAN -.-> CLAUDE
+  REV -.-> CLAUDE
+  PLAN -.-> VEC
+  EXEC --> T1 & T2 & T3 & T4 & T5`},
+{label:'Safety tier enforcement',code:`graph LR
+  subgraph T1["Tier 1 · read-only · AUTO"]
+    T1_OPS["show commands · API GETs<br/>metric queries · compliance<br/>topology · backup read<br/>CVE lookups · health checks"]
+  end
+  subgraph T2["Tier 2 · write · HUMAN APPROVAL"]
+    T2_OPS["Config deployment<br/>firewall rules · ACL changes<br/>DNS updates · cert rotation<br/>ACI policy · ISE quarantine"]
+    T2_FLOW["Agent proposes → human reviews<br/>→ approves/rejects → execute<br/>→ verify → rollback if failed"]
+  end
+  subgraph T3["Tier 3 · auto write · VALIDATED"]
+    T3_OPS["Tag updates · report gen<br/>backup triggers<br/>metric annotations"]
+  end
+  QUERY["User query"] --> CHECK{"Planner:<br/>which tier?"}
+  CHECK -->|"read"| T1
+  CHECK -->|"write"| T2
+  CHECK -->|"low-risk auto"| T3
+  T1 --> AUDIT["Audit trail · PostgreSQL"]
+  T2 --> AUDIT
+  T3 --> AUDIT`}
+],
+
+alerts: [
+{label:'Alert ingestion pipeline → incident creation → AI investigation',code:`graph TB
+  subgraph SRC["Alert sources"]
+    direction LR
+    Z["Zabbix webhook"]
+    G["Grafana webhook"]
+    MK["Meraki alerts"]
+    PR["Prisma events"]
+    CW["CloudWatch SNS"]
+    PY["pyATS scheduled"]
+    DR["Drift detection"]
+    GN["Generic webhook"]
+  end
+
+  subgraph PIPE["Processing pipeline"]
+    direction TB
+    ING["1 Ingest<br/>POST /webhooks/alerts/*"]
+    NRM["2 Normalize<br/>→ tenant, site, device,<br/>source, severity, title,<br/>dedup_key, timestamp"]
+    DDP["3 Dedup<br/>same key within 15min<br/>→ suppress"]
+    COR["4 Correlate<br/>group by site +<br/>5min window"]
+    UPG["5 Severity upgrade<br/>3+ related alerts<br/>→ bump severity"]
+    RTE["6 Route<br/>site → tenant → MSP<br/>+ tier check"]
+  end
+
+  DEC{"severity >= HIGH<br/>AND tier >= Professional?"}
+
+  subgraph YES_PATH["Create incident"]
+    direction TB
+    CRT["Create incident record<br/>status: OPEN<br/>link alert_ids<br/>set SLA target"]
+    AI["AI auto-investigation<br/>─────────<br/>LangGraph agent:<br/>1. Zabbix MCP: host + trends<br/>2. pyATS MCP: show commands<br/>3. Platform MCP: uplink status<br/>→ diagnosis + recommendations<br/>→ store in incident.investigation"]
+    NOT["Notify stakeholders<br/>─────────<br/>CRITICAL: page + Slack + email<br/>HIGH: Slack + portal update"]
+  end
+
+  subgraph NO_PATH["Log only"]
+    LOG["Log alert to DB<br/>include in next report"]
+  end
+
+  SRC --> ING --> NRM --> DDP --> COR --> UPG --> RTE --> DEC
+  DEC -->|"yes"| CRT --> AI --> NOT
+  DEC -->|"no"| LOG`},
+{label:'Incident lifecycle',code:`graph LR
+  OPEN["OPEN<br/>incident created<br/>SLA timer starts"]
+  INV["INVESTIGATING<br/>engineer assigned<br/>or AI investigating"]
+  IDENT["IDENTIFIED<br/>root cause found"]
+  FIX["FIX IN PROGRESS<br/>remediation underway"]
+  RESOLVED["RESOLVED<br/>confirmed fixed<br/>SLA timer stops"]
+  PM["POST-MORTEM<br/>AI drafts RCA<br/>engineer reviews<br/>publish to customer"]
+
+  OPEN --> INV --> IDENT --> FIX --> RESOLVED --> PM
+
+  INV -.->|"each transition:<br/>timeline logged<br/>portal updated<br/>stakeholders notified<br/>SLA tracked"| IDENT`}
+],
+
+data: [
+{label:'PostgreSQL data model — MSP → tenant → site → device → alerts → incidents',code:`erDiagram
+  MSP_ORG ||--o{ TENANT : manages
+  TENANT ||--o{ SITE : has
+  SITE ||--o{ DEVICE : contains
+  SITE ||--o{ HEALTH_SNAPSHOT : tracked_by
+  TENANT ||--o{ ALERT : receives
+  SITE ||--o{ ALERT : originates
+  TENANT ||--o{ INCIDENT : experiences
+  SITE ||--o{ INCIDENT : occurs_at
+  INCIDENT ||--o{ INCIDENT_EVENT : timeline
+
+  MSP_ORG {
+    uuid id PK
+    string name
+    string license_key
+    string tier
+    jsonb branding
+    jsonb billing_config
+  }
+
+  TENANT {
+    uuid id PK
+    uuid msp_id FK
+    string name
+    string contact_email
+    string sla_tier
+    jsonb settings
+  }
+
+  SITE {
+    uuid id PK
+    uuid tenant_id FK
+    string name
+    string address
+    string timezone
+    integer health_score
+    timestamp last_scan
+  }
+
+  DEVICE {
+    uuid id PK
+    uuid site_id FK
+    string hostname
+    string vendor
+    string model
+    string os_version
+    string credentials_ref
+    integer compliance_score
+  }
+
+  ALERT {
+    uuid id PK
+    uuid tenant_id FK
+    uuid site_id FK
+    uuid device_id FK
+    string source
+    string severity
+    text title
+    jsonb raw_payload
+    string dedup_key
+    string status
+  }
+
+  INCIDENT {
+    uuid id PK
+    uuid tenant_id FK
+    uuid site_id FK
+    string severity
+    string status
+    text title
+    jsonb investigation
+    uuid assigned_to
+    timestamp sla_target
+    boolean sla_breached
+    jsonb post_mortem
+  }
+
+  INCIDENT_EVENT {
+    uuid id PK
+    uuid incident_id FK
+    string event_type
+    string actor
+    text description
+    jsonb metadata
+  }
+
+  HEALTH_SNAPSHOT {
+    uuid id PK
+    uuid site_id FK
+    integer overall_score
+    jsonb details
+  }`}
+],
+
+deploy: [
+{label:'Four deployment models — cloud SaaS, on-prem, developer, SaaS + connector',code:`graph TB
+  subgraph M1["Cloud SaaS · Render"]
+    direction TB
+    R_F["TanStack Start<br/>Render static · free"]
+    R_B["FastAPI + LangGraph<br/>Render Docker · $7/mo"]
+    R_DB["Neon PostgreSQL<br/>+ pgvector · free tier"]
+    R_S3["Backblaze B2<br/>$6/TB"]
+    R_CF["Cloudflare<br/>DNS + CDN · free"]
+    R_N["n8n<br/>Render Docker · MSP profile"]
+  end
+
+  subgraph M2["On-prem Docker"]
+    direction TB
+    D_CMD["docker compose up -d"]
+    D_STACK["app: FastAPI + LangGraph<br/>frontend: TanStack Start<br/>db: pgvector/pgvector:pg16<br/>storage: MinIO<br/>─────────<br/>--profile monitoring → Zabbix<br/>--profile msp → n8n"]
+  end
+
+  subgraph M3["Developer local"]
+    direction TB
+    DEV["git clone + docker compose up<br/>─────────<br/>Community edition<br/>No license needed<br/>3 sites, all MCPs, all skills"]
+  end
+
+  subgraph M4["SaaS + site connector · Phase 3+"]
+    direction LR
+    SAAS["Cloud SaaS<br/>on Render"]
+    CONN["Site connector<br/>at customer site<br/>─────────<br/>docker run netsec<br/>  --mode connector<br/>  --site-token TOKEN<br/>─────────<br/>outbound WSS only<br/>no inbound FW rules"]
+    DEV_HW["Customer devices<br/>SSH / NETCONF<br/>same LAN"]
+    SAAS <-->|"WebSocket"| CONN
+    CONN --> DEV_HW
+  end`},
+{label:'Docker Compose profiles',code:`graph LR
+  subgraph CORE["Core · always running"]
+    APP["app<br/>FastAPI + LangGraph<br/>port 8000"]
+    FE["frontend<br/>TanStack Start<br/>port 3000"]
+    DB["db<br/>pgvector/pgvector:pg16"]
+    STORE["storage<br/>MinIO<br/>ports 9000, 9001"]
+  end
+
+  subgraph MON["--profile monitoring"]
+    ZS["zabbix-server<br/>zabbix-server-pgsql:7.0"]
+    ZW["zabbix-web<br/>nginx-pgsql:7.0<br/>port 8080"]
+    ZD["zabbix-db<br/>postgres:16"]
+    ZS --> ZD
+    ZS --> ZW
+  end
+
+  subgraph MSP["--profile msp"]
+    N8N["n8n<br/>n8nio/n8n<br/>port 5678"]
+  end
+
+  APP --> DB
+  APP --> STORE
+  APP -.-> ZS
+  APP -.-> N8N`}
+],
+
+connect: [
+{label:'Phase 1-2: on-prem direct · Phase 3+: site connector pattern',code:`graph TB
+  subgraph PH12["Phase 1-2 · On-prem Docker · direct access"]
+    direction LR
+    DC1["Docker Compose stack<br/>FastAPI + LangGraph + pyATS<br/>running on customer server"]
+    DEV1["Cisco IOS-XE<br/>Juniper JunOS<br/>Palo Alto PAN-OS<br/>F5, OPNsense, Arista"]
+    DC1 -->|"SSH / NETCONF<br/>same LAN"| DEV1
+  end
+
+  subgraph PH3["Phase 3+ · SaaS + Site connector"]
+    direction TB
+    subgraph CLOUD["Our SaaS · Render"]
+      API3["FastAPI backend<br/>connector manager<br/>task queue"]
+    end
+    subgraph CUST_NET["Customer network"]
+      CONN3["Site connector<br/>─────────<br/>Same Docker image<br/>docker run netsec<br/>  --mode connector<br/>  --site-token TOKEN<br/>─────────<br/>Runs pyATS + MCP locally<br/>Returns results upstream"]
+      DEV3["Devices<br/>routers, switches,<br/>firewalls, APs"]
+      CONN3 -->|"SSH / NETCONF<br/>same LAN"| DEV3
+    end
+    API3 <-->|"Outbound WebSocket<br/>from customer side<br/>no inbound FW rules"| CONN3
+  end
+
+  subgraph CLOUD_MGMT["Cloud-managed · always direct HTTPS"]
+    direction LR
+    MER["Meraki<br/>REST API"]
+    PRI["Prisma Access<br/>REST API"]
+    CFZ["Cloudflare ZT<br/>REST API"]
+    TE["ThousandEyes<br/>REST API"]
+    AWS3["AWS<br/>boto3 SDK"]
+    GCP3["GCP<br/>google-cloud SDK"]
+  end
+
+  subgraph ALT["Alternative · Cloudflare Tunnel"]
+    CFT["Customer runs cloudflared<br/>creates outbound tunnel<br/>our SaaS reaches devices<br/>through CF network"]
+  end`},
+{label:'Device automation by vendor and protocol',code:`graph LR
+  subgraph SSH_NETCONF["SSH / NETCONF · pyATS + vendor MCPs"]
+    CISCO["Cisco IOS-XE, NX-OS, IOS-XR<br/>pyATS MCP · 100+ Genie parsers"]
+    JUN["Juniper JunOS<br/>JunOS MCP · PyEZ / NETCONF"]
+    PALO["Palo Alto PAN-OS<br/>Palo Alto MCP · XML API"]
+    F5_D["F5 BIG-IP<br/>F5 MCP · iControl REST"]
+    OPN["OPNsense<br/>OPNsense MCP · REST API"]
+    ARI["Arista EOS<br/>CVP MCP · CloudVision REST"]
+  end
+
+  subgraph REST_API["REST API / HTTPS · cloud-managed MCPs"]
+    MER_D["Meraki · 804 endpoints"]
+    PRI_D["Prisma Access · pan-scm-sdk"]
+    CFZ_D["Cloudflare ZT · CF API"]
+    TE_D["ThousandEyes · TE API"]
+    AWS_D["AWS × 6 MCPs · boto3"]
+    GCP_D["GCP × 4 MCPs · google-cloud"]
+    ZBX_D["Zabbix · Zabbix API<br/>40+ tools · SNMP/agent"]
+  end
+
+  AGENT["LangGraph agent<br/>via langchain-mcp-adapters"] --> SSH_NETCONF
+  AGENT --> REST_API`}
+],
+
+n8n: [
+{label:'n8n calls LangGraph via custom nodes · LangGraph does the thinking',code:`graph TB
+  subgraph N8N["n8n · business process engine · MSP tier"]
+    direction TB
+    TRIG["Triggers<br/>cron schedules<br/>webhooks<br/>manual start"]
+    WF["Workflow logic<br/>IF/THEN branches<br/>loops over tenants<br/>error handling"]
+    ACT["Business actions<br/>create tickets<br/>send emails<br/>post to Slack<br/>generate invoices"]
+    TRIG --> WF --> ACT
+  end
+
+  subgraph NODES["@netsec/n8n-nodes · custom package"]
+    N_H["Health check node"]
+    N_C["Compliance scan node"]
+    N_T["Troubleshoot node"]
+    N_B["Config backup node"]
+    N_D["Config deploy node"]
+    N_F["Fleet operation node"]
+    N_I["Create incident node"]
+    N_Z["Zabbix query node"]
+  end
+
+  subgraph API["FastAPI agent endpoints"]
+    E1["POST /api/agent/health-check"]
+    E2["POST /api/agent/compliance-scan"]
+    E3["POST /api/agent/troubleshoot"]
+    E4["POST /api/agent/config-backup"]
+    E5["POST /api/agent/config-deploy"]
+    E6["POST /api/agent/fleet-operation"]
+    E7["POST /api/incidents"]
+    E8["POST /api/agent/zabbix-query"]
+  end
+
+  subgraph LG["LangGraph agent<br/>Planner → Executor → Reviewer<br/>MCP tool calls, AI reasoning"]
+    AGENT_N["Returns structured results"]
+  end
+
+  WF --> NODES
+  N_H --> E1
+  N_C --> E2
+  N_T --> E3
+  N_B --> E4
+  N_D --> E5
+  N_F --> E6
+  N_I --> E7
+  N_Z --> E8
+  E1 & E2 & E3 & E4 & E5 & E6 & E8 --> LG
+  LG -->|"results"| WF`},
+{label:'Pre-built workflow templates',code:`graph LR
+  subgraph TEMPLATES["Pre-built n8n templates · proprietary · MSP tier"]
+    T1["Daily health sweep<br/>cron 6am → each site<br/>→ IF critical → incident + page"]
+    T2["Weekly compliance<br/>cron Sunday → each tenant<br/>→ PDF report → email"]
+    T3["Customer onboarding<br/>webhook → create tenant<br/>→ add devices → Zabbix setup<br/>→ discovery → welcome email"]
+    T4["Alert escalation<br/>webhook → create incident<br/>→ page on-call → IF no ack<br/>15min → escalate"]
+    T5["Config drift response<br/>webhook → get drift details<br/>→ create change request<br/>→ assign → SLA timer"]
+    T6["Zabbix alert handler<br/>Zabbix webhook → normalize<br/>→ dedup → route<br/>→ IF critical → AI investigate"]
+    T7["Change window executor<br/>cron → deploy queued configs<br/>→ verify → IF fail<br/>→ rollback → notify"]
+    T8["Monthly billing<br/>cron 1st → each tenant<br/>→ usage data → invoice prep"]
+  end`}
+]
+};
+
+const tabBar = document.getElementById('tabs');
+const panesEl = document.getElementById('panes');
+
+tabs.forEach((t,i) => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (i===0?' active':'');
+  btn.textContent = t.label;
+  btn.onclick = () => {
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.diagram-pane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pane-'+t.id).classList.add('active');
+  };
+  tabBar.appendChild(btn);
+
+  const pane = document.createElement('div');
+  pane.id = 'pane-'+t.id;
+  pane.className = 'diagram-pane'+(i===0?' active':'');
+
+  diagrams[t.id].forEach((d,j) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.textContent = d.label;
+    pane.appendChild(lbl);
+
+    const box = document.createElement('div');
+    box.className = 'mermaid-box';
+    const target = document.createElement('div');
+    target.id = 'mermaid-'+t.id+'-'+j;
+    box.appendChild(target);
+    pane.appendChild(box);
+  });
+
+  panesEl.appendChild(pane);
+});
+
+async function renderAll() {
+  for (const t of tabs) {
+    for (let j = 0; j < diagrams[t.id].length; j++) {
+      const el = document.getElementById('mermaid-'+t.id+'-'+j);
+      if (el) {
+        try {
+          const {svg} = await mermaid.render('svg-'+t.id+'-'+j, diagrams[t.id][j].code);
+          el.innerHTML = svg;
+        } catch(e) {
+          el.innerHTML = '<p style="color:var(--color-text-danger);font-size:13px">Render error: '+e.message+'</p>';
+        }
+      }
+    }
+  }
+}
+renderAll();
+</script>

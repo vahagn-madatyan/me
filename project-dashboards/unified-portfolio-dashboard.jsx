@@ -218,6 +218,24 @@ const projects = [
     icon: "🏠",
   },
   {
+    id: "lumon",
+    name: "LUMON",
+    tagline: "AI Coding Agent Orchestration",
+    category: "DEVELOPER TOOLS",
+    accent: "#00e5ff",
+    description: "Mission Control dashboard for orchestrating multiple AI coding agents (Claude Code, Codex CLI) in parallel. React UI with xterm.js terminals, tmux bridge for session management, wave scheduler, Git worktree isolation per agent, and Tailscale-based remote access with MagicDNS.",
+    stats: [
+      { label: "Agent Types", value: "2" },
+      { label: "Bridges", value: "tmux + GSD" },
+      { label: "DB", value: "SQLite" },
+      { label: "Access", value: "Tailscale" },
+    ],
+    tech: ["Node.js", "React", "xterm.js", "tmux", "SQLite", "Tailscale", "WebSocket"],
+    status: "IN DEVELOPMENT",
+    phase: 55,
+    icon: "🎛️",
+  },
+  {
     id: "cyber-research",
     name: "CYBER RESEARCH",
     tagline: "Agentic AI Market Intelligence",
@@ -639,7 +657,7 @@ export default function UnifiedPortfolioDashboard() {
             borderTop: "1px solid rgba(255,255,255,0.06)",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
           }}>
-            <HeaderStat value="13" label="PROJECTS" color="#00e5ff" />
+            <HeaderStat value="14" label="PROJECTS" color="#00e5ff" />
             <HeaderStat value={totalTools} label="TOOLS BUILT" color="#00ff87" />
             <HeaderStat value={totalSkills} label="AI SKILLS" color="#b44dff" />
             <HeaderStat value={domains} label="DOMAINS" color="#ff6b35" />

@@ -69,10 +69,10 @@ const projects = [
     tech: ["React", "Node.js", "Python", "PostgreSQL", "Redis", "ML Pipeline"], status: "PLANNING", phase: 20, icon: "🏪",
   },
   {
-    id: "echelon", name: "ECHELON", tagline: "AI Real Estate Operations", category: "PROPTECH", accent: "#f80",
-    description: "AI operations team for real estate agencies. Specialized agents like Scout (lead response <60s vs industry 15+ hrs). Deep MLS/CRM integrations with flat monthly pricing.",
-    stats: [{ label: "Response Time", value: "<60s" }, { label: "Industry Avg", value: "15+ hrs" }, { label: "Lead Agent", value: "Scout" }, { label: "Pricing", value: "Flat/mo" }],
-    tech: ["Python", "LangChain", "MLS API", "CRM APIs", "Twilio", "React"], status: "PLANNING", phase: 25, icon: "🏠",
+    id: "echelon", name: "ECHELON", tagline: "AI Operations Platform for Real Estate", category: "PROPTECH", accent: "#f80",
+    description: "Vertical AI ops platform with 7 specialized agents (Scout, Sage, Quill, Closer, Nurture, Atlas, Shield). Built on Paperclip fork with heartbeat coordination, LangGraph state machines, CrewAI personas, and Letta persistent memory. MCP servers for Follow Up Boss, KvCore, Dotloop CRM integrations.",
+    stats: [{ label: "AI Agents", value: "7" }, { label: "Response", value: "<60s" }, { label: "Pricing", value: "$149-899" }, { label: "Memory", value: "3-Tier" }],
+    tech: ["Paperclip", "LangGraph", "CrewAI", "Letta", "LiteLLM", "Supabase", "Next.js", "Stripe"], status: "PLANNING", phase: 25, icon: "🏠",
   },
   {
     id: "lumon", name: "LUMON", tagline: "AI Coding Agent Orchestration", category: "DEVELOPER TOOLS", accent: "#0fa",
@@ -86,13 +86,49 @@ const projects = [
     stats: [{ label: "Problem Areas", value: "10" }, { label: "Total VC", value: "$6.3B+" }, { label: "Top Area", value: "SOC Auto" }, { label: "Coverage", value: "Full Stack" }],
     tech: ["Market Analysis", "VC Data", "Competitive Intel", "Radar Charts", "Bubble Maps"], status: "COMPLETE", phase: 100, icon: "🔬",
   },
+  {
+    id: "vps-automator", name: "VPS AUTOMATOR", tagline: "Hetzner AX102 AI Dev Factory", category: "INFRASTRUCTURE", accent: "#08f",
+    description: "Complete infrastructure automation for security-hardened AI dev server. Hetzner AX102 (Ryzen 9 7950X3D, 128GB DDR5, 2×1.92TB NVMe) in Helsinki. Tailscale-only access, no public SSH. Runs 20+ autonomous AI coding agents via tmux, Coolify for container management, Ollama for local LLMs.",
+    stats: [{ label: "CPU", value: "7950X3D" }, { label: "RAM", value: "128GB" }, { label: "Agents", value: "20+" }, { label: "Access", value: "Tailscale" }],
+    tech: ["Ubuntu 24.04", "Tailscale", "Docker", "Coolify", "Ollama", "tmux", "UFW", "Fail2ban"], status: "COMPLETE", phase: 95, icon: "🖥️",
+  },
+  {
+    id: "inkpulse", name: "INKPULSE", tagline: "Multi-Tenant Tattoo Studio SaaS", category: "SAAS", accent: "#f33",
+    description: "Complete booking and operations platform for tattoo studios. Multi-tenant with per-studio isolation, public booking interface, admin dashboards, consent workflows with PDF generation, and Stripe Connect for studio payments.",
+    stats: [{ label: "Framework", value: "Next.js 16" }, { label: "Auth", value: "Supabase" }, { label: "Payments", value: "Stripe" }, { label: "ORM", value: "Drizzle" }],
+    tech: ["Next.js 16", "Supabase", "Drizzle ORM", "Stripe Connect", "React Server Components"], status: "IN DEVELOPMENT", phase: 40, icon: "🎨",
+  },
+  {
+    id: "intraday-trading", name: "INTRADAY TRADING", tagline: "Morning Breakout & Dip-Buy Automation", category: "FINTECH", accent: "#0fa",
+    description: "Automated day trading system combining 9 intraday strategies (ORB, VWAP Reclaim, Gap & Go, RSI Mean Reversion, Bull Flag, Red to Green, ABCD Pattern). Risk management, backtesting with walk-forward analysis, Monte Carlo simulation, and live Alpaca execution.",
+    stats: [{ label: "Strategies", value: "9" }, { label: "Backtest", value: "VectorBT" }, { label: "Broker", value: "Alpaca" }, { label: "Validation", value: "Monte Carlo" }],
+    tech: ["Python", "Lumibot", "Polygon.io", "Alpaca", "Redis", "TimescaleDB", "VectorBT"], status: "ARCHITECTURE", phase: 35, icon: "⚡",
+  },
+  {
+    id: "reverse-eng-ai", name: "REVERSE ENG AI", tagline: "AI-Powered Malware Analysis", category: "CYBERSECURITY", accent: "#f33",
+    description: "Market opportunity analysis for unified AI reverse engineering workstation. Addresses 450K+ daily new malware samples, $10B RE market, 4.8M unfilled cybersecurity positions. Maps competitive landscape (Binary Ninja, Ghidra, IDA Pro, RevEng.AI, Intezer) and MCP-based agentic systems.",
+    stats: [{ label: "Market", value: "$10B" }, { label: "Daily Malware", value: "450K+" }, { label: "Talent Gap", value: "4.8M" }, { label: "Competitors", value: "5+" }],
+    tech: ["Ghidra", "IDA Pro", "Binary Ninja", "GhidraMCP", "Ollama", "LLM4Decompile"], status: "RESEARCH", phase: 20, icon: "🔬",
+  },
+  {
+    id: "scalp-hft", name: "SCALP/HFT", tagline: "Sub-Second Scalping Framework Research", category: "FINTECH", accent: "#f80",
+    description: "Research into building multi-asset sub-second scalping systems. NautilusTrader (Rust+Python) as core engine, hftbacktest for queue position modeling, CCXT for 109+ crypto exchanges, ZeroMQ IPC at 33µs latency / 584K msg/sec.",
+    stats: [{ label: "Core Engine", value: "Nautilus" }, { label: "Exchanges", value: "109+" }, { label: "Latency", value: "33µs" }, { label: "Throughput", value: "584K/s" }],
+    tech: ["NautilusTrader", "Rust", "Python", "hftbacktest", "CCXT", "ZeroMQ", "orjson"], status: "RESEARCH", phase: 15, icon: "🏎️",
+  },
+  {
+    id: "polyagents", name: "POLYAGENTS", tagline: "LLM-Powered Prediction Market Trading", category: "FINTECH", accent: "#08f",
+    description: "Autonomous Polymarket trading system with 6 pipelines: Batch, Continuous, Crypto, BTC Arbitrage, Sports Pre-Game, and In-Game. Two-stage LLM analysis (blind superforecaster → market-aware trade decision). ChromaDB RAG, real-time sports WebSocket, on-chain USDC execution, and file-locked cross-process budget coordination.",
+    stats: [{ label: "Pipelines", value: "6" }, { label: "LLM Stages", value: "2" }, { label: "Connectors", value: "8" }, { label: "Budget Split", value: "70/30" }],
+    tech: ["Python", "OpenAI", "Polymarket CLOB", "ChromaDB", "WebSocket", "Web3", "Docker", "asyncio"], status: "IN DEVELOPMENT", phase: 50, icon: "🎲",
+  },
 ];
 
 const categoryColors = {
   CYBERSECURITY: "#0fa", "OFFENSIVE SECURITY": "#f33", "NETWORK SECURITY": "#f80",
   "CLOUD SECURITY": "#08f", "NETWORK AUTOMATION": "#0fa", "AI INFRASTRUCTURE": "#0fa",
   "DEVELOPER TOOLS": "#08f", FINTECH: "#0fa", MARKETPLACE: "#08f",
-  PROPTECH: "#f80", RESEARCH: "#0fa",
+  PROPTECH: "#f80", RESEARCH: "#0fa", INFRASTRUCTURE: "#08f", SAAS: "#f33",
 };
 
 const statusConfig = {
@@ -476,10 +512,10 @@ const LandingPage = ({ onEnter }) => {
         transition: "all 0.6s ease",
       }}>
         {[
-          { val: "14", label: "NODES" },
+          { val: "20", label: "NODES" },
           { val: "400+", label: "TOOLS" },
           { val: "120+", label: "SKILLS" },
-          { val: "8", label: "SECTORS" },
+          { val: "10", label: "SECTORS" },
         ].map((s, i) => (
           <div key={i} style={{
             padding: "12px 24px",
@@ -528,7 +564,7 @@ const LandingPage = ({ onEnter }) => {
           marginTop: "24px", fontSize: "0.45rem", fontFamily: mono,
           color: "rgba(0,255,170,0.15)", letterSpacing: "2px",
         }}>
-          CYBERSECURITY • FINTECH • AI AGENTS • DEVTOOLS • PROPTECH
+          CYBERSECURITY • FINTECH • AI AGENTS • DEVTOOLS • INFRA • SAAS
         </div>
       </div>
 
@@ -773,7 +809,7 @@ const ProjectsView = ({ onBack }) => {
 
         <div style={{ display: "flex", gap: "24px" }}>
           {[
-            { val: "14", label: "NODES", color: "#0fa" },
+            { val: "20", label: "NODES", color: "#0fa" },
             { val: "400+", label: "TOOLS", color: "#08f" },
             { val: "120+", label: "SKILLS", color: "#f80" },
           ].map((s, i) => (
@@ -873,13 +909,15 @@ const ProjectsView = ({ onBack }) => {
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
           {[
-            { name: "Python", count: 10 }, { name: "Docker", count: 6 }, { name: "FastMCP", count: 4 },
-            { name: "LangGraph", count: 3 }, { name: "React", count: 4 }, { name: "MCP Protocol", count: 5 },
-            { name: "PostgreSQL", count: 3 }, { name: "Alpaca", count: 3 }, { name: "TypeScript", count: 2 },
+            { name: "Python", count: 12 }, { name: "Docker", count: 7 }, { name: "Alpaca", count: 5 },
+            { name: "FastMCP", count: 4 }, { name: "React", count: 4 }, { name: "MCP Protocol", count: 5 },
+            { name: "LangGraph", count: 4 }, { name: "Supabase", count: 2 }, { name: "Next.js", count: 2 },
+            { name: "PostgreSQL", count: 3 }, { name: "Tailscale", count: 2 }, { name: "TypeScript", count: 2 },
             { name: "FastAPI", count: 2 }, { name: "ClickHouse", count: 2 }, { name: "Finnhub", count: 2 },
-            { name: "Node.js", count: 2 }, { name: "Zabbix", count: 1 }, { name: "LiteLLM", count: 1 },
-            { name: "AWS Bedrock", count: 1 }, { name: "Massive.com", count: 1 }, { name: "Tailscale", count: 1 },
-            { name: "tmux", count: 1 }, { name: "TimescaleDB", count: 1 },
+            { name: "Node.js", count: 2 }, { name: "TimescaleDB", count: 2 }, { name: "Lumibot", count: 2 },
+            { name: "Redis", count: 1 }, { name: "Rust", count: 1 }, { name: "Coolify", count: 1 },
+            { name: "Stripe", count: 2 }, { name: "Ollama", count: 2 }, { name: "tmux", count: 2 },
+            { name: "VectorBT", count: 1 }, { name: "ZeroMQ", count: 1 }, { name: "Ghidra", count: 1 },
           ].map((t, i) => (
             <span key={i} style={{
               padding: `${3 + t.count}px ${8 + t.count * 2}px`,

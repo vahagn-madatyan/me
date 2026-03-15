@@ -1,0 +1,93 @@
+---
+title: "Agentic Security Portfolio — Closed-Loop Architecture"
+---
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0d1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#484f58', 'secondaryColor': '#161b22', 'tertiaryColor': '#0d1117', 'edgeLabelBackground': '#0d1117', 'clusterBkg': '#0d111799', 'clusterBorder': '#30363d'}}}%%
+
+graph TB
+    subgraph OFFENSE["⚔️ 0xpwn — Autonomous Pentesting"]
+        direction TB
+        O_RECON["🔍 Reconnaissance Agent<br/><i>Asset discovery, port scanning,<br/>service enumeration</i>"]
+        O_VULN["🎯 Vulnerability Discovery Agent<br/><i>CVE correlation, fuzzing,<br/>config analysis</i>"]
+        O_EXPLOIT["💥 Exploit Chaining Agent<br/><i>Privilege escalation,<br/>lateral movement, PoC generation</i>"]
+        O_REPORT["📋 Findings & Evidence Agent<br/><i>Attack paths, risk scoring,<br/>remediation guidance</i>"]
+
+        O_RECON --> O_VULN --> O_EXPLOIT --> O_REPORT
+    end
+
+    subgraph GOVERNANCE["🛡️ PolicyFoundry — Firewall Policy Management"]
+        direction TB
+        G_INGEST["📡 Log Ingestion<br/><i>Vector → VRL normalization<br/>Palo Alto / AWS SG / Fortinet</i>"]
+        G_ANALYZE["🧠 Traffic Analysis Agent<br/><i>Pattern detection, anomaly scoring,<br/>flow baseline modeling</i>"]
+        G_POLICY["📜 Policy Generation Agent<br/><i>Intent → vendor-neutral rules,<br/>conflict detection, optimization</i>"]
+        G_DEPLOY["🚀 Rule Deployment Agent<br/><i>Dry-run → apply → verify,<br/>rollback on failure</i>"]
+
+        G_INGEST --> G_ANALYZE --> G_POLICY --> G_DEPLOY
+    end
+
+    subgraph DETECTION["👁️ UEBA Agent — Insider Threat Detection"]
+        direction TB
+        D_BASELINE["📊 Behavioral Baseline Agent<br/><i>User/entity activity modeling,<br/>peer group analysis</i>"]
+        D_ANOMALY["⚡ Anomaly Detection Agent<br/><i>Deviation scoring, lateral movement,<br/>data exfiltration patterns</i>"]
+        D_CONTEXT["🔗 Context Enrichment Agent<br/><i>HR data correlation, role changes,<br/>access pattern analysis</i>"]
+        D_ALERT["🔔 Risk Scoring & Alert Agent<br/><i>Prioritized insider risk alerts,<br/>evidence packaging</i>"]
+
+        D_BASELINE --> D_ANOMALY --> D_CONTEXT --> D_ALERT
+    end
+
+    subgraph RESPONSE["🚨 IR Agent — Incident Response Orchestration"]
+        direction TB
+        R_TRIAGE["🏥 Triage Agent<br/><i>Severity classification,<br/>blast radius assessment</i>"]
+        R_CONTAIN["🔒 Containment Agent<br/><i>Network isolation, account lockdown,<br/>process termination</i>"]
+        R_FORENSIC["🔬 Forensics Agent<br/><i>Timeline reconstruction,<br/>artifact collection, IOC extraction</i>"]
+        R_RECOVER["♻️ Recovery Agent<br/><i>Service restoration, patch validation,<br/>post-incident hardening</i>"]
+
+        R_TRIAGE --> R_CONTAIN --> R_FORENSIC --> R_RECOVER
+    end
+
+    %% Cross-tool intelligence flows
+    O_REPORT -- "Attack paths<br/>inform rules" --> G_POLICY
+    G_ANALYZE -- "Traffic anomalies<br/>feed baselines" --> D_BASELINE
+    D_ALERT -- "Insider alerts<br/>trigger response" --> R_TRIAGE
+    R_FORENSIC -- "IOCs inform<br/>next pentest scope" --> O_RECON
+    R_RECOVER -- "Hardening rules<br/>pushed to firewall" --> G_DEPLOY
+
+    subgraph SHARED["🔄 Shared Intelligence Layer"]
+        direction LR
+        S_TELEMETRY["📡 Unified Telemetry Bus<br/><i>Kafka / in-memory channel</i>"]
+        S_KNOWLEDGE["🧩 Knowledge Graph<br/><i>Assets, identities, rules,<br/>vulnerabilities, incidents</i>"]
+        S_LLM["🤖 LLM Abstraction<br/><i>LiteLLM → Claude / GPT / Ollama</i>"]
+        S_AUDIT["📝 Event-Sourced Audit Log<br/><i>Immutable, every action,<br/>compliance-ready</i>"]
+    end
+
+    OFFENSE -.-> S_TELEMETRY
+    GOVERNANCE -.-> S_TELEMETRY
+    DETECTION -.-> S_TELEMETRY
+    RESPONSE -.-> S_TELEMETRY
+
+    S_TELEMETRY -.-> S_KNOWLEDGE
+    S_KNOWLEDGE -.-> S_LLM
+    S_LLM -.-> S_AUDIT
+
+    subgraph INFRA["⚙️ Infrastructure"]
+        direction LR
+        I_CLI["CLI Tier<br/><i>Go binary + SQLite + DuckDB<br/>+ Ollama</i>"]
+        I_CLOUD["Cloud Tier<br/><i>ClickHouse + Kafka + S3<br/>+ Bedrock / AI Gateway</i>"]
+        I_GUI["Web GUI<br/><i>TypeScript + Next.js<br/>+ tRPC</i>"]
+    end
+
+    SHARED -.-> INFRA
+
+    %% Styling
+    classDef offense fill:#1a0a0a,stroke:#ff3366,stroke-width:2px,color:#ff9999
+    classDef governance fill:#0a1a0f,stroke:#00ff88,stroke-width:2px,color:#88ffbb
+    classDef detection fill:#0f0a1a,stroke:#aa66ff,stroke-width:2px,color:#cc99ff
+    classDef response fill:#1a0f0a,stroke:#ff9500,stroke-width:2px,color:#ffcc88
+    classDef shared fill:#0a0f1a,stroke:#00bbff,stroke-width:2px,color:#88ddff
+    classDef infra fill:#111318,stroke:#484f58,stroke-width:1px,color:#8b949e
+
+    class O_RECON,O_VULN,O_EXPLOIT,O_REPORT offense
+    class G_INGEST,G_ANALYZE,G_POLICY,G_DEPLOY governance
+    class D_BASELINE,D_ANOMALY,D_CONTEXT,D_ALERT detection
+    class R_TRIAGE,R_CONTAIN,R_FORENSIC,R_RECOVER response
+    class S_TELEMETRY,S_KNOWLEDGE,S_LLM,S_AUDIT shared
+    class I_CLI,I_CLOUD,I_GUI infra

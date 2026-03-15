@@ -1,0 +1,129 @@
+%%{init: {'theme': 'dark', 'themeVariables': {'primaryColor': '#1a1a2e', 'primaryTextColor': '#e0e0e0', 'primaryBorderColor': '#00d4ff', 'lineColor': '#00d4ff', 'secondaryColor': '#16213e', 'tertiaryColor': '#0f3460', 'fontFamily': 'monospace'}}}%%
+
+graph TB
+    subgraph PHASE1["⏰ PRE-MARKET SCANNER — 6:00–9:25 AM ET"]
+        direction TB
+        CRON1["⚙️ Cron Job Trigger<br/>6:00 AM ET"]
+        POLY_SNAP["📡 Polygon.io<br/>get_snapshot_all()"]
+        TV_SCREEN["📊 TradingView Screener<br/>premarket_gappers"]
+        FILTERS["🔍 FILTER ENGINE<br/>━━━━━━━━━━━━━━━<br/>Gap ≥ 4%<br/>Price > $3<br/>Pre-mkt Vol > 50K<br/>Mkt Cap > $50M<br/>Float < 50M ★"]
+        REDIS_PM["🔴 Redis Cache<br/>SADD premarket_gappers<br/>+ candidate metadata"]
+
+        CRON1 --> POLY_SNAP
+        CRON1 --> TV_SCREEN
+        POLY_SNAP --> FILTERS
+        TV_SCREEN --> FILTERS
+        FILTERS --> REDIS_PM
+    end
+
+    subgraph PHASE2["🤖 TRADING BOT — 9:25 AM–3:50 PM ET"]
+        direction TB
+        LUMI["🚀 Lumibot Engine<br/>sleeptime=30S"]
+
+        subgraph LIFECYCLE["Lumibot Lifecycle Methods"]
+            direction TB
+            BMO["before_market_opens()<br/>Load Redis candidates<br/>Calc ATR, VWAP baselines"]
+            OTI["on_trading_iteration()<br/>Every 30 seconds<br/>━━━━━━━━━━━━━━━<br/>1. Fetch 1-min bars<br/>2. Compute indicators<br/>3. Detect signals<br/>4. Risk validation<br/>5. Submit orders"]
+            BMC["before_market_closes()<br/>Flatten all positions<br/>Cancel open orders"]
+        end
+
+        LUMI --> BMO
+        LUMI --> OTI
+        LUMI --> BMC
+    end
+
+    subgraph SIGNALS["📈 SIGNAL DETECTION ENGINE"]
+        direction TB
+        ORB["🔓 ORB Strategy<br/>━━━━━━━━━━━━━━━<br/>15-min opening range<br/>Breakout + VWAP confirm<br/>+ Volume confirm<br/>+ NR7 filter"]
+        VWAP_R["📊 VWAP Reclaim<br/>━━━━━━━━━━━━━━━<br/>Price crosses above VWAP<br/>Volume expansion<br/>First touch only"]
+        DIP["📉 Dip Reversal<br/>━━━━━━━━━━━━━━━<br/>RSI(2) < 10 reversal<br/>9 EMA pullback<br/>Volume contraction→expansion"]
+        GAP["🚀 Gap & Go<br/>━━━━━━━━━━━━━━━<br/>Gap ≥ 4% + catalyst<br/>First pullback entry<br/>New high confirmation"]
+        FLAG["🏁 Bull Flag<br/>━━━━━━━━━━━━━━━<br/>Pole + consolidation<br/>Declining volume<br/>Breakout above flag"]
+    end
+
+    subgraph RISK["🛡️ RISK MANAGEMENT PIPELINE"]
+        direction TB
+        GATE1["🏦 ACCOUNT GATE<br/>━━━━━━━━━━━━━━━<br/>Daily P&L < -3% → halt<br/>Daily P&L < -2% → reduce 50%<br/>Consecutive losses < 3"]
+        GATE2["📏 POSITION SIZING<br/>━━━━━━━━━━━━━━━<br/>shares = (equity × 1%) ÷<br/>(entry - stop)<br/>Half-Kelly ceiling<br/>Max 20% per position"]
+        GATE3["🔗 CORRELATION CHECK<br/>━━━━━━━━━━━━━━━<br/>30-day rolling Pearson<br/>ρ > 0.70 = correlated<br/>Sector cap 30% equity<br/>Max 5-8 open positions"]
+        GATE4["✅ ORDER VALIDATION<br/>━━━━━━━━━━━━━━━<br/>Stop-loss required<br/>R:R ≥ 2:1<br/>Spread < 0.5%<br/>Sufficient liquidity"]
+
+        GATE1 --> GATE2
+        GATE2 --> GATE3
+        GATE3 --> GATE4
+    end
+
+    subgraph EXEC["⚡ EXECUTION LAYER"]
+        direction TB
+        ALPACA_API["🦙 Alpaca API<br/>OrderClass.BRACKET"]
+        BRACKET["📋 Bracket Order<br/>━━━━━━━━━━━━━━━<br/>Entry: Limit/Market<br/>TP: TakeProfitRequest<br/>SL: StopLossRequest<br/>TIF: DAY"]
+        TRAIL["📐 Trailing Stop<br/>━━━━━━━━━━━━━━━<br/>TrailingStopOrderRequest<br/>Server-side execution<br/>trail_percent or trail_price"]
+        STREAM["🔌 WebSocket Stream<br/>TradingStream<br/>Fill confirmation<br/>P&L updates → Redis"]
+
+        ALPACA_API --> BRACKET
+        ALPACA_API --> TRAIL
+        BRACKET --> STREAM
+        TRAIL --> STREAM
+    end
+
+    subgraph MONITOR["📊 MONITORING & LOGGING"]
+        direction TB
+        TELEGRAM["📱 Telegram Bot<br/>Trade alerts<br/>Daily P&L summary<br/>Error notifications"]
+        TSDB["🗄️ TimescaleDB<br/>Trade journal<br/>P&L history<br/>Strategy performance"]
+        DASH["📈 Dashboard<br/>React + Recharts<br/>Live P&L<br/>Open positions"]
+    end
+
+    subgraph SAFETY["🔒 SAFETY NET — 3:55 PM ET"]
+        direction TB
+        CRON2["⚙️ Independent Cron<br/>3:55 PM ET"]
+        FLAT["close_all_positions()<br/>cancel_orders=True"]
+
+        CRON2 --> FLAT
+    end
+
+    subgraph BACKTEST["🧪 BACKTESTING PIPELINE"]
+        direction TB
+        POLY_HIST["📡 Polygon.io<br/>1-min historical bars"]
+        VBT["⚡ VectorBT<br/>Fast parameter scan<br/>NumPy vectorized"]
+        LUMI_BT["🔬 Lumibot Backtest<br/>PolygonDataBacktesting<br/>Realistic costs"]
+        WFA["📊 Walk-Forward<br/>6mo train / 3mo test<br/>Rolling windows<br/>WFE > 0.4"]
+        MONTE["🎲 Monte Carlo<br/>1000 reshuffles<br/>95th pctl drawdown<br/>Fragility test"]
+        PAPER["📝 Alpaca Paper<br/>100+ live trades<br/>Before real capital"]
+
+        POLY_HIST --> VBT
+        VBT --> LUMI_BT
+        LUMI_BT --> WFA
+        WFA --> MONTE
+        MONTE --> PAPER
+    end
+
+    %% Main flow connections
+    REDIS_PM -.->|"candidates"| BMO
+    OTI -->|"signal detected"| SIGNALS
+    SIGNALS -->|"raw signal"| RISK
+    GATE4 -->|"validated order"| EXEC
+    STREAM -->|"fills + P&L"| MONITOR
+    STREAM -.->|"Redis HINCRBYFLOAT"| GATE1
+    FLAT -.->|"failsafe"| ALPACA_API
+
+    %% Backtest to Live
+    PAPER -.->|"validated strategy"| LUMI
+
+    %% Styling
+    classDef phase1 fill:#0d1b2a,stroke:#00d4ff,stroke-width:2px,color:#e0e0e0
+    classDef phase2 fill:#1b2838,stroke:#00ff88,stroke-width:2px,color:#e0e0e0
+    classDef signals fill:#2d1b4e,stroke:#b388ff,stroke-width:2px,color:#e0e0e0
+    classDef risk fill:#3d1212,stroke:#ff6b6b,stroke-width:2px,color:#e0e0e0
+    classDef exec fill:#1a3a1a,stroke:#69f0ae,stroke-width:2px,color:#e0e0e0
+    classDef monitor fill:#3e2723,stroke:#ffab40,stroke-width:2px,color:#e0e0e0
+    classDef safety fill:#4a0000,stroke:#ff1744,stroke-width:2px,color:#e0e0e0
+    classDef backtest fill:#0d2137,stroke:#40c4ff,stroke-width:2px,color:#e0e0e0
+
+    class CRON1,POLY_SNAP,TV_SCREEN,FILTERS,REDIS_PM phase1
+    class LUMI,BMO,OTI,BMC phase2
+    class ORB,VWAP_R,DIP,GAP,FLAG signals
+    class GATE1,GATE2,GATE3,GATE4 risk
+    class ALPACA_API,BRACKET,TRAIL,STREAM exec
+    class TELEGRAM,TSDB,DASH monitor
+    class CRON2,FLAT safety
+    class POLY_HIST,VBT,LUMI_BT,WFA,MONTE,PAPER backtest

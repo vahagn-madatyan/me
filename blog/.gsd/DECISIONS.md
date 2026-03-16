@@ -17,3 +17,6 @@
 | D009 | M001 | scope | Architecture gallery | Launch blocker | Central to brand as architect — not a follow-up feature | No |
 | D010 | M001 | convention | Project data source | Static TypeScript data file with GitHub URLs | Simpler than build-time API calls, no rate limit issues | Yes — if live GitHub data needed |
 | D011 | project | arch | Milestone sequence | Build (M001) → Deploy (M002) → Distribute (M003) | Nothing to deploy without a site, nothing to distribute without a live URL | No |
+| D012 | S01 | convention | ThemeToggle selectors | data-* attributes instead of IDs | Component renders in both desktop and mobile nav — duplicate IDs break getElementById | No |
+| D013 | S01 | convention | Client JS handler binding | onclick assignment + astro:after-swap re-init | Auto-replaces on re-init, prevents handler stacking during page transitions | No |
+| D014 | S01 | convention | Dark mode init placement | is:inline script in BaseLayout <head> | Must run synchronously before first paint to prevent FOUC | No |

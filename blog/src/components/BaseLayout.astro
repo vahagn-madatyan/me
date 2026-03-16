@@ -1,0 +1,46 @@
+---
+import BaseHead from './BaseHead.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+}
+
+const { title, description, image } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <BaseHead title={title} description={description} {...(image ? { image } : {})} />
+    <!-- Inline dark mode init — runs before first paint to prevent FOUC -->
+    <script is:inline>
+      (function() {
+        var theme = localStorage.getItem('theme');
+        var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) document.documentElement.classList.add('dark');
+      })();
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col font-body">
+    <Header />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  /* Theme transition — only added after user clicks toggle, not on initial load */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 0.2s ease, color 0.15s ease, border-color 0.2s ease !important;
+  }
+</style>

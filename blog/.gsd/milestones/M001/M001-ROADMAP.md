@@ -53,7 +53,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Foundation & Design System** `risk:medium` `depends:[]`
+- [x] **S01: Foundation & Design System** `risk:medium` `depends:[]`
   > After this: Dark-themed site skeleton with Tailwind v4, header with nav links, footer with social links, dark mode toggle with persistence, responsive layout — all visible in dev server.
 
 - [ ] **S02: Blog Engine** `risk:medium` `depends:[S01]`

@@ -6,13 +6,13 @@ This file is the explicit capability and coverage contract for the project.
 
 ### R001 — Tailwind v4 Design System
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Dark-first design system using Tailwind CSS v4 with custom theme — teal/cyan primary, slate secondary, orange accent, Inter body font, JetBrains Mono code font, class-based dark mode
 - Why it matters: Visual identity and consistency across all pages
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: Build output contains all custom theme tokens; design tokens resolve in dev server; dark variant compiles correctly. Validated in S01.
 - Notes: Tailwind v4 uses Vite plugin, `@import "tailwindcss"`, `@custom-variant dark`
 
 ### R002 — Responsive Mobile-First Layout
@@ -193,13 +193,13 @@ This file is the explicit capability and coverage contract for the project.
 
 ### R018 — Dark Mode Toggle
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Dark mode toggle with localStorage persistence, system preference detection on first load, smooth transition, no FOUC
 - Why it matters: Dark-first design is core to the identity
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: Three-state toggle persists across pages, respects system preference, no FOUC. Verified with browser testing in S01.
 - Notes: Tailwind v4 `@custom-variant dark` with class strategy
 
 ### R019 — 404 Page
@@ -331,7 +331,7 @@ This file is the explicit capability and coverage contract for the project.
 
 | ID | Class | Status | Primary owner | Supporting | Proof |
 |---|---|---|---|---|---|
-| R001 | core-capability | active | M001/S01 | none | unmapped |
+| R001 | core-capability | validated | M001/S01 | none | S01 build + dev server |
 | R002 | quality-attribute | active | M001/S01 | all | unmapped |
 | R003 | primary-user-loop | active | M001/S07 | M001/S02,S05 | unmapped |
 | R004 | core-capability | active | M001/S02 | none | unmapped |
@@ -348,7 +348,7 @@ This file is the explicit capability and coverage contract for the project.
 | R015 | launchability | active | M001/S03 | none | unmapped |
 | R016 | launchability | active | M001/S03 | M001/S01 | unmapped |
 | R017 | launchability | active | M001/S03 | none | unmapped |
-| R018 | core-capability | active | M001/S01 | none | unmapped |
+| R018 | core-capability | validated | M001/S01 | none | S01 browser testing |
 | R019 | launchability | active | M001/S07 | none | unmapped |
 | R020 | quality-attribute | active | M001/S01 | all | unmapped |
 | R021 | operability | active | M002 | none | unmapped |
@@ -363,7 +363,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 26
+- Active requirements: 24
 - Mapped to slices: 26
-- Validated: 0
+- Validated: 2 (R001, R018)
 - Unmapped active requirements: 0

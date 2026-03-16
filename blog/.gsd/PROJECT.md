@@ -10,16 +10,18 @@ A polished, fast, SEO-optimized personal site that establishes vahagn.dev as the
 
 ## Current State
 
-Fresh Astro 6 blog starter template. MDX and sitemap integrations wired. Zod-validated content collection for blog posts with minimal frontmatter. No Tailwind, no custom design, no real pages beyond default blog list and placeholder posts. Sharp installed for image processing.
+Foundation complete. Tailwind v4 design system integrated with full D003 design tokens (teal/cyan primary, slate secondary, orange accent). Dark-first site skeleton with responsive header (nav links, mobile hamburger), footer (social links, copyright, RSS), and three-state dark mode toggle with localStorage persistence and no FOUC. All pages render through BaseLayout. Inter + JetBrains Mono fonts loaded via Fontsource. Build passes with zero errors. Blog content is still sample/placeholder posts from starter template.
 
 ## Architecture / Key Patterns
 
 - **Framework:** Astro 6 (static SSG, zero-JS default, islands for interactive bits)
-- **Styling:** Tailwind CSS v4 via Vite plugin (to be added)
+- **Styling:** Tailwind CSS v4 via `@tailwindcss/vite` — all design tokens in `@theme` block in `src/styles/global.css`
 - **Content:** Markdown/MDX content collections with Zod schema validation
 - **Code highlighting:** Shiki (built into Astro) with dual themes
 - **OG images:** Satori + Sharp for build-time generation
-- **Dark mode:** Class-based toggle with `@custom-variant dark` (Tailwind v4) + localStorage
+- **Dark mode:** Class-based toggle with `@custom-variant dark` (Tailwind v4) + localStorage, inline init script in `<head>`
+- **Layout:** BaseLayout is the single HTML shell — all pages pass title/description/image as props
+- **Client JS:** Module `<script>` tags with init function + `astro:after-swap` listener for page transition support
 - **Deployment target:** Cloudflare Pages (M002)
 
 ## Capability Contract
@@ -28,6 +30,6 @@ See `.gsd/REQUIREMENTS.md` for the explicit capability contract, requirement sta
 
 ## Milestone Sequence
 
-- [ ] M001: The Site — Full vahagn.dev with design system, all pages, blog engine, SEO, dark mode
+- 🔄 M001: The Site — Full vahagn.dev with design system, all pages, blog engine, SEO, dark mode (S01 complete, S02-S07 remaining)
 - [ ] M002: Deployment — Cloudflare Pages setup, custom domain, DNS, build pipeline, analytics
 - [ ] M003: Distribution & Growth — Newsletter integration, cross-posting tooling, audience building

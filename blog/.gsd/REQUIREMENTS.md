@@ -26,61 +26,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Newsletter CTA is visual-only until M003
 
-### R006 — Individual `/blog/tag/[tag]` archive pages for each tag, plus tag filtering on blog listing
-- Class: primary-user-loop
-- Status: active
-- Description: Individual `/blog/tag/[tag]` archive pages for each tag, plus tag filtering on blog listing
-- Why it matters: Content discoverability by topic
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: M001/S02
-- Validation: unmapped
-- Notes: Tags defined in frontmatter
-
-### R008 — Auto-generated TOC from h2/h3 headings, sticky sidebar on desktop, scroll-spy active link highlighting, only for posts >1000 words
-- Class: primary-user-loop
-- Status: active
-- Description: Auto-generated TOC from h2/h3 headings, sticky sidebar on desktop, scroll-spy active link highlighting, only for posts >1000 words
-- Why it matters: Long-form technical content needs navigation
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Requires client-side JS for scroll-spy (Astro island)
-
-### R009 — Shiki syntax highlighting with dual themes (github-dark/github-light matching dark mode), copy button on code blocks
-- Class: core-capability
-- Status: active
-- Description: Shiki syntax highlighting with dual themes (github-dark/github-light matching dark mode), copy button on code blocks
-- Why it matters: Core to technical blog readability
-- Source: user
-- Primary owning slice: M001/S02
-- Supporting slices: M001/S04 (copy button)
-- Validation: Shiki dual themes (github-dark/github-light) via CSS variables confirmed — 98 --shiki-dark spans in mastering-typescript-patterns. Dark mode CSS swap rules in global.css. Copy button deferred to S04. Proof: scripts/verify-s02.sh checks 1. Partially validated in S02 (copy button pending S04).
-- Notes: Shiki built into Astro, copy button needs client JS. Dual themes validated in S02, copy button is S04 scope.
-
-### R010 — Related posts section at bottom of blog posts, based on shared tags
-- Class: primary-user-loop
-- Status: active
-- Description: Related posts section at bottom of blog posts, based on shared tags
-- Why it matters: Keeps readers engaged, reduces bounce rate
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Tag-based matching
-
-### R011 — Share buttons for X, LinkedIn, Dev.to on individual blog posts
-- Class: primary-user-loop
-- Status: active
-- Description: Share buttons for X, LinkedIn, Dev.to on individual blog posts
-- Why it matters: Enables content distribution from the post itself
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: none
-- Validation: unmapped
-- Notes: URL-based share links, no third-party JS needed
-
 ### R012 — Projects page at /work with grid of project cards showing image, title, description, tech stack badges, GitHub link, with category filtering (security, AI, networking, trading)
 - Class: core-capability
 - Status: active
@@ -237,6 +182,17 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: Paginated listing at /blog/ uses Astro paginate() with pageSize 10. BlogCard grid with reading time renders on listing page. Proof: dist/blog/index.html exists with cards. scripts/verify-s02.sh checks 3-4. Validated in S02.
 - Notes: Uses Astro's built-in `paginate()` in `getStaticPaths`
 
+### R006 — Individual `/blog/tag/[tag]` archive pages for each tag, plus tag filtering on blog listing
+- Class: primary-user-loop
+- Status: validated
+- Description: Individual `/blog/tag/[tag]` archive pages for each tag, plus tag filtering on blog listing
+- Why it matters: Content discoverability by topic
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: M001/S02
+- Validation: 9 tag archive pages generated at /blog/tag/[tag]/ with paginated routes (pageSize 10). Tag pills in BlogCard and BlogPost are navigable <a> links pointing to correct archive routes. Draft tags excluded from production. Proof: scripts/verify-s04.sh checks [Tag Archives] + [Tag Pill Links] (4 checks). Validated in S04.
+- Notes: Tags defined in frontmatter
+
 ### R007 — Reading time estimate displayed on blog listing and post header (200 words/min, rounded to nearest minute)
 - Class: primary-user-loop
 - Status: validated
@@ -247,6 +203,50 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: none
 - Validation: Reading time (200 WPM, Math.ceil, min 1) displayed on both blog cards and post headers. Proof: grep 'min read' matches in listing and all post HTML. scripts/verify-s02.sh checks 5, 10-11. Validated in S02.
 - Notes: Calculated from Markdown body at build time
+
+### R008 — Auto-generated TOC from h2/h3 headings, sticky sidebar on desktop, scroll-spy active link highlighting, only for posts >1000 words
+- Class: primary-user-loop
+- Status: validated
+- Description: Auto-generated TOC from h2/h3 headings, sticky sidebar on desktop, scroll-spy active link highlighting, only for posts >1000 words
+- Why it matters: Long-form technical content needs navigation
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: none
+- Validation: TOC auto-generated from h2/h3 headings via Astro render() destructuring. Sticky sidebar on desktop (lg:grid-cols-[1fr_250px]). Scroll-spy via IntersectionObserver with rootMargin for sticky header offset. Only appears on posts with readingTime >= 5 AND headings. Short posts remain single-column. scroll-margin-top: 5rem on prose headings. Proof: scripts/verify-s04.sh checks [Table of Contents] + [TOC Absent on Short Post] (6 checks). Scroll-spy runtime behavior requires UAT. Validated in S04.
+- Notes: Requires client-side JS for scroll-spy (Astro island)
+
+### R009 — Shiki syntax highlighting with dual themes (github-dark/github-light matching dark mode), copy button on code blocks
+- Class: core-capability
+- Status: validated
+- Description: Shiki syntax highlighting with dual themes (github-dark/github-light matching dark mode), copy button on code blocks
+- Why it matters: Core to technical blog readability
+- Source: user
+- Primary owning slice: M001/S02
+- Supporting slices: M001/S04 (copy button)
+- Validation: Shiki dual themes (github-dark/github-light) via CSS variables confirmed in S02. Copy button added in S04: self-activating script island finds all .astro-code blocks, wraps in container, injects absolute-positioned copy button with navigator.clipboard.writeText() and "Copied!" feedback. Proof: scripts/verify-s02.sh check 1 (Shiki) + scripts/verify-s04.sh check [Copy Button] (1 check). Fully validated across S02 + S04.
+- Notes: Shiki built into Astro, copy button needs client JS. Dual themes validated in S02, copy button is S04 scope.
+
+### R010 — Related posts section at bottom of blog posts, based on shared tags
+- Class: primary-user-loop
+- Status: validated
+- Description: Related posts section at bottom of blog posts, based on shared tags
+- Why it matters: Keeps readers engaged, reduces bounce rate
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: none
+- Validation: RelatedPosts component shows up to 3 tag-matched posts (scored by overlap count, then date). Excludes current post and drafts. Renders compact cards (title, date, reading time). Returns empty fragment when no tag matches. Proof: scripts/verify-s04.sh checks [Related Posts] (2 checks) — section present on tagged posts, absent on tagless posts. Validated in S04.
+- Notes: Tag-based matching
+
+### R011 — Share buttons for X, LinkedIn, Dev.to on individual blog posts
+- Class: primary-user-loop
+- Status: validated
+- Description: Share buttons for X, LinkedIn, Dev.to on individual blog posts
+- Why it matters: Enables content distribution from the post itself
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: none
+- Validation: ShareButtons component renders X (twitter.com/intent/tweet), LinkedIn (linkedin.com/sharing/share-offsite), and Dev.to (dev.to/new?prefill=...) share links. All target="_blank" rel="noopener noreferrer" with SVG icons and aria-labels. URL-based, no third-party JS. Proof: scripts/verify-s04.sh checks [Share Buttons] (3 checks). Validated in S04.
+- Notes: URL-based share links, no third-party JS needed
 
 ### R015 — Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
 - Class: launchability
@@ -338,12 +338,12 @@ This file is the explicit capability and coverage contract for the project.
 | R003 | primary-user-loop | active | M001/S07 | M001/S02, M001/S05 | unmapped |
 | R004 | core-capability | validated | M001/S02 | none | Extended schema with tags, featured, draft, canonicalURL builds successfully with all 8 posts. All frontmatter fields validated by Zod at build time. Proof: npm run build zero errors + scripts/verify-s02.sh checks 1-2. Validated in S02. |
 | R005 | primary-user-loop | validated | M001/S02 | none | Paginated listing at /blog/ uses Astro paginate() with pageSize 10. BlogCard grid with reading time renders on listing page. Proof: dist/blog/index.html exists with cards. scripts/verify-s02.sh checks 3-4. Validated in S02. |
-| R006 | primary-user-loop | active | M001/S04 | M001/S02 | unmapped |
+| R006 | primary-user-loop | validated | M001/S04 | M001/S02 | 9 tag archive pages generated at /blog/tag/[tag]/ with paginated routes (pageSize 10). Tag pills in BlogCard and BlogPost are navigable <a> links pointing to correct archive routes. Draft tags excluded from production. Proof: scripts/verify-s04.sh checks [Tag Archives] + [Tag Pill Links] (4 checks). Validated in S04. |
 | R007 | primary-user-loop | validated | M001/S02 | none | Reading time (200 WPM, Math.ceil, min 1) displayed on both blog cards and post headers. Proof: grep 'min read' matches in listing and all post HTML. scripts/verify-s02.sh checks 5, 10-11. Validated in S02. |
-| R008 | primary-user-loop | active | M001/S04 | none | unmapped |
-| R009 | core-capability | active | M001/S02 | M001/S04 (copy button) | Shiki dual themes (github-dark/github-light) via CSS variables confirmed — 98 --shiki-dark spans in mastering-typescript-patterns. Dark mode CSS swap rules in global.css. Copy button deferred to S04. Proof: scripts/verify-s02.sh checks 1. Partially validated in S02 (copy button pending S04). |
-| R010 | primary-user-loop | active | M001/S04 | none | unmapped |
-| R011 | primary-user-loop | active | M001/S04 | none | unmapped |
+| R008 | primary-user-loop | validated | M001/S04 | none | TOC auto-generated from h2/h3 headings via Astro render() destructuring. Sticky sidebar on desktop (lg:grid-cols-[1fr_250px]). Scroll-spy via IntersectionObserver with rootMargin for sticky header offset. Only appears on posts with readingTime >= 5 AND headings. Short posts remain single-column. scroll-margin-top: 5rem on prose headings. Proof: scripts/verify-s04.sh checks [Table of Contents] + [TOC Absent on Short Post] (6 checks). Scroll-spy runtime behavior requires UAT. Validated in S04. |
+| R009 | core-capability | validated | M001/S02 | M001/S04 (copy button) | Shiki dual themes (github-dark/github-light) via CSS variables confirmed in S02. Copy button added in S04: self-activating script island finds all .astro-code blocks, wraps in container, injects absolute-positioned copy button with navigator.clipboard.writeText() and "Copied!" feedback. Proof: scripts/verify-s02.sh check 1 (Shiki) + scripts/verify-s04.sh check [Copy Button] (1 check). Fully validated across S02 + S04. |
+| R010 | primary-user-loop | validated | M001/S04 | none | RelatedPosts component shows up to 3 tag-matched posts (scored by overlap count, then date). Excludes current post and drafts. Renders compact cards (title, date, reading time). Returns empty fragment when no tag matches. Proof: scripts/verify-s04.sh checks [Related Posts] (2 checks) — section present on tagged posts, absent on tagless posts. Validated in S04. |
+| R011 | primary-user-loop | validated | M001/S04 | none | ShareButtons component renders X (twitter.com/intent/tweet), LinkedIn (linkedin.com/sharing/share-offsite), and Dev.to (dev.to/new?prefill=...) share links. All target="_blank" rel="noopener noreferrer" with SVG icons and aria-labels. URL-based, no third-party JS. Proof: scripts/verify-s04.sh checks [Share Buttons] (3 checks). Validated in S04. |
 | R012 | core-capability | active | M001/S05 | none | unmapped |
 | R013 | launchability | active | M001/S06 | none | unmapped |
 | R014 | differentiator | active | M001/S06 | none | unmapped |
@@ -365,7 +365,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 18
-- Mapped to slices: 18
-- Validated: 8 (R001, R004, R005, R007, R015, R016, R017, R018)
+- Active requirements: 13
+- Mapped to slices: 13
+- Validated: 13 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R015, R016, R017, R018)
 - Unmapped active requirements: 0

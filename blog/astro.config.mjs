@@ -8,7 +8,18 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://vahagn.dev',
-	integrations: [mdx(), sitemap()],
+	integrations: [
+		mdx(),
+		sitemap({
+			serialize(item) {
+				if (item.url.includes('/blog/')) {
+					item.changefreq = 'weekly';
+					item.priority = 0.8;
+				}
+				return item;
+			},
+		}),
+	],
 	markdown: {
 		shikiConfig: {
 			themes: {

@@ -64,7 +64,7 @@
   - Verify: `npm run build`, inspect `dist/blog/building-a-developer-blog/index.html` for JSON-LD, `og:image` pointing to `/og/`, `article:published_time`, canonical URL. Check a non-blog page (e.g., `dist/index.html`) still works without the new props.
   - Done when: Blog post HTML contains valid JSON-LD BlogPosting schema, `og:image` pointing to generated PNG, article OG tags, and correct canonical URL. Non-blog pages render unchanged.
 
-- [ ] **T03: Update RSS with categories, add robots.txt, configure sitemap, write verification** `est:20m`
+- [x] **T03: Update RSS with categories, add robots.txt, configure sitemap, write verification** `est:20m`
   - Why: Completes R017 (RSS categories, robots.txt, sitemap config) and creates the comprehensive verification script that proves the entire slice works.
   - Files: `src/pages/rss.xml.js`, `public/robots.txt`, `astro.config.mjs`, `scripts/verify-s03.sh`
   - Do: Update `rss.xml.js` to map post tags into RSS `categories` array. Create `public/robots.txt` with User-agent/Allow/Sitemap directives pointing to `https://vahagn.dev/sitemap-index.xml`. Add `serialize` function to sitemap integration in `astro.config.mjs` to set blog URLs with higher changefreq. Write `scripts/verify-s03.sh` covering all slice deliverables plus S01/S02 regression.

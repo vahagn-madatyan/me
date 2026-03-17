@@ -14,6 +14,11 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// Extended fields (S02) — all optional/defaulted so existing posts don't break
+			tags: z.array(z.string()).default([]),
+			featured: z.boolean().default(false),
+			draft: z.boolean().default(false),
+			canonicalURL: z.string().url().optional(),
 		}),
 });
 

@@ -7,6 +7,9 @@
 /* Class-based dark mode (D002) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Typography plugin (S02) — Tailwind v4 CSS-first plugin loading */
+@plugin "@tailwindcss/typography";
+
 /* Design tokens (D003): dark-first, teal/cyan primary, slate secondary, orange accent */
 @theme {
   /* Primary — teal/cyan */
@@ -83,5 +86,28 @@
   /* Selection colors */
   ::selection {
     @apply bg-primary-500/30 text-secondary-900 dark:text-secondary-100;
+  }
+
+  /* Shiki dual-theme code blocks (S02) — CSS variable approach via defaultColor: false */
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+
+  html.dark .astro-code,
+  html.dark .astro-code span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
+
+  /* Code block base styling */
+  .astro-code {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    font-family: var(--font-code);
   }
 }

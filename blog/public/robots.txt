@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vahagn.dev/sitemap-index.xml

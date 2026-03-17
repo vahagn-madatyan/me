@@ -94,3 +94,11 @@ Complete R017 (RSS categories, robots.txt, sitemap config) and write the compreh
 - `public/robots.txt` — new static file with robots directives and sitemap reference
 - `astro.config.mjs` — sitemap integration with serialize config (if API supports it)
 - `scripts/verify-s03.sh` — new comprehensive verification script, all checks passing
+
+## Observability Impact
+
+- **RSS categories:** `grep -o '<category>' dist/rss.xml | wc -l` — counts category elements; 0 means tags aren't mapping
+- **Robots.txt:** `cat dist/robots.txt` — should show User-agent, Allow, Sitemap directives; missing file means `public/robots.txt` wasn't created
+- **Sitemap config:** `grep -E 'weekly|0\.8' dist/sitemap-0.xml` — confirms serialize config applied; absence means serialize callback isn't running
+- **Verification script:** `bash scripts/verify-s03.sh` — 29 checks covering all S03 deliverables plus S01/S02 regression; any failure exits non-zero with explicit ✗ marker
+- **Failure shapes:** RSS with no `<category>` → tags field empty or not mapped; robots.txt missing from dist → file not in `public/`; sitemap without changefreq → serialize API incompatibility

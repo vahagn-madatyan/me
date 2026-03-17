@@ -62,7 +62,7 @@ This milestone is complete only when all are true:
 - [x] **S03: SEO & OG Images** `risk:high` `depends:[S02]`
   > After this: Auto-generated OG images from post metadata, JSON-LD structured data on blog posts, Twitter Card meta tags, canonical URLs, updated RSS feed, robots.txt — verifiable in page source and build output.
 
-- [ ] **S04: Blog Reading Experience** `risk:medium` `depends:[S02]`
+- [x] **S04: Blog Reading Experience** `risk:medium` `depends:[S02]`
   > After this: Long posts have sticky TOC with scroll-spy, related posts appear at bottom, share buttons for X/LinkedIn/Dev.to, code blocks have copy button, tag archive pages at /blog/tag/[tag] — all interactive in dev server.
 
 - [ ] **S05: Projects Page** `risk:low` `depends:[S01]`

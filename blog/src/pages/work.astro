@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../components/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/projects';
+
+const categories = ['all', ...new Set(projects.map((p) => p.category))] as const;
+---
+
+<BaseLayout title="Work — Vahagn Grigoryan" description="Projects and experiments in security, AI, networking, and trading.">
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+      Work
+    </h1>
+    <p class="mt-3 text-secondary-600 dark:text-secondary-400 leading-relaxed">
+      Open-source projects and technical experiments I've built or contributed to.
+    </p>
+
+    <!-- Category filter buttons -->
+    <div class="mt-8 flex flex-wrap gap-2 mb-8">
+      {categories.map((cat) => (
+        <button
+          data-filter={cat}
+          class:list={[
+            'rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer',
+            cat === 'all'
+              ? 'bg-primary-500 text-white'
+              : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-400 dark:hover:bg-secondary-700',
+          ]}
+        >
+          {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </button>
+      ))}
+    </div>
+
+    <!-- Project grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="projects-grid">
+      {projects.map((project) => (
+        <div data-category={project.category}>
+          <ProjectCard
+            title={project.title}
+            description={project.description}
+            category={project.category}
+            techStack={project.techStack}
+            githubUrl={project.githubUrl}
+            liveUrl={project.liveUrl}
+            image={project.image}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const ACTIVE_CLASSES = ['bg-primary-500', 'text-white'];
+  const INACTIVE_CLASSES = [
+    'bg-secondary-100', 'text-secondary-600', 'hover:bg-secondary-200',
+    'dark:bg-secondary-800', 'dark:text-secondary-400', 'dark:hover:bg-secondary-700',
+  ];
+
+  function initFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+
+    function setActive(btn: HTMLButtonElement) {
+      buttons.forEach((b) => {
+        ACTIVE_CLASSES.forEach((c) => b.classList.remove(c));
+        INACTIVE_CLASSES.forEach((c) => b.classList.add(c));
+      });
+      INACTIVE_CLASSES.forEach((c) => btn.classList.remove(c));
+      ACTIVE_CLASSES.forEach((c) => btn.classList.add(c));
+    }
+
+    function filterCards(category: string) {
+      cards.forEach((card) => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    // Set "All" active on init, show all cards
+    const allBtn = document.querySelector<HTMLButtonElement>('[data-filter="all"]');
+    if (allBtn) setActive(allBtn);
+    filterCards('all');
+
+    // Bind click handlers via onclick (safe for HMR + view transitions)
+    buttons.forEach((btn) => {
+      btn.onclick = () => {
+        const category = btn.dataset.filter ?? 'all';
+        setActive(btn);
+        filterCards(category);
+      };
+    });
+  }
+
+  initFilter();
+  document.addEventListener('astro:after-swap', initFilter);
+</script>

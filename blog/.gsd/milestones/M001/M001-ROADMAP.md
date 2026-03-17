@@ -65,7 +65,7 @@ This milestone is complete only when all are true:
 - [x] **S04: Blog Reading Experience** `risk:medium` `depends:[S02]`
   > After this: Long posts have sticky TOC with scroll-spy, related posts appear at bottom, share buttons for X/LinkedIn/Dev.to, code blocks have copy button, tag archive pages at /blog/tag/[tag] — all interactive in dev server.
 
-- [ ] **S05: Projects Page** `risk:low` `depends:[S01]`
+- [x] **S05: Projects Page** `risk:low` `depends:[S01]`
   > After this: /work page shows project cards with GitHub links, tech stack badges, category filtering — visible in dev server with sample project data.
 
 - [ ] **S06: About & Architecture** `risk:low` `depends:[S01]`

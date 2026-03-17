@@ -26,17 +26,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Newsletter CTA is visual-only until M003
 
-### R012 — Projects page at /work with grid of project cards showing image, title, description, tech stack badges, GitHub link, with category filtering (security, AI, networking, trading)
-- Class: core-capability
-- Status: active
-- Description: Projects page at /work with grid of project cards showing image, title, description, tech stack badges, GitHub link, with category filtering (security, AI, networking, trading)
-- Why it matters: Showcases real work and technical breadth
-- Source: user
-- Primary owning slice: M001/S05
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Projects are real GitHub repos
-
 ### R013 — About page with bio covering all roles, current focus areas, contact links (email, GitHub, LinkedIn, X), and skills/tech stack section
 - Class: launchability
 - Status: active
@@ -248,6 +237,17 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: ShareButtons component renders X (twitter.com/intent/tweet), LinkedIn (linkedin.com/sharing/share-offsite), and Dev.to (dev.to/new?prefill=...) share links. All target="_blank" rel="noopener noreferrer" with SVG icons and aria-labels. URL-based, no third-party JS. Proof: scripts/verify-s04.sh checks [Share Buttons] (3 checks). Validated in S04.
 - Notes: URL-based share links, no third-party JS needed
 
+### R012 — Projects page at /work with grid of project cards showing image, title, description, tech stack badges, GitHub link, with category filtering (security, AI, networking, trading)
+- Class: core-capability
+- Status: validated
+- Description: Projects page at /work with grid of project cards showing image, title, description, tech stack badges, GitHub link, with category filtering (security, AI, networking, trading)
+- Why it matters: Showcases real work and technical breadth
+- Source: user
+- Primary owning slice: M001/S05
+- Supporting slices: none
+- Validation: /work page renders responsive 2-column grid of 6 project cards across 4 categories (security, AI, networking, trading). Each card shows title, description, tech stack badges (rounded-full pills), and GitHub link. Client-side category filter with 5 buttons (All + 4 categories) toggles card visibility via data-category attributes. Dark mode styling on all elements. Proof: npm run build zero errors + scripts/verify-s05.sh 19/19 checks passed. Validated in S05.
+- Notes: Projects are real GitHub repos
+
 ### R015 — Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
 - Class: launchability
 - Status: validated
@@ -344,7 +344,7 @@ This file is the explicit capability and coverage contract for the project.
 | R009 | core-capability | validated | M001/S02 | M001/S04 (copy button) | Shiki dual themes (github-dark/github-light) via CSS variables confirmed in S02. Copy button added in S04: self-activating script island finds all .astro-code blocks, wraps in container, injects absolute-positioned copy button with navigator.clipboard.writeText() and "Copied!" feedback. Proof: scripts/verify-s02.sh check 1 (Shiki) + scripts/verify-s04.sh check [Copy Button] (1 check). Fully validated across S02 + S04. |
 | R010 | primary-user-loop | validated | M001/S04 | none | RelatedPosts component shows up to 3 tag-matched posts (scored by overlap count, then date). Excludes current post and drafts. Renders compact cards (title, date, reading time). Returns empty fragment when no tag matches. Proof: scripts/verify-s04.sh checks [Related Posts] (2 checks) — section present on tagged posts, absent on tagless posts. Validated in S04. |
 | R011 | primary-user-loop | validated | M001/S04 | none | ShareButtons component renders X (twitter.com/intent/tweet), LinkedIn (linkedin.com/sharing/share-offsite), and Dev.to (dev.to/new?prefill=...) share links. All target="_blank" rel="noopener noreferrer" with SVG icons and aria-labels. URL-based, no third-party JS. Proof: scripts/verify-s04.sh checks [Share Buttons] (3 checks). Validated in S04. |
-| R012 | core-capability | active | M001/S05 | none | unmapped |
+| R012 | core-capability | validated | M001/S05 | none | /work page renders responsive 2-column grid of 6 project cards across 4 categories (security, AI, networking, trading). Each card shows title, description, tech stack badges (rounded-full pills), and GitHub link. Client-side category filter with 5 buttons (All + 4 categories) toggles card visibility via data-category attributes. Dark mode styling on all elements. Proof: npm run build zero errors + scripts/verify-s05.sh 19/19 checks passed. Validated in S05. |
 | R013 | launchability | active | M001/S06 | none | unmapped |
 | R014 | differentiator | active | M001/S06 | none | unmapped |
 | R015 | launchability | validated | M001/S03 | none | 7 non-draft posts generate 1200×630 PNG OG images in dist/og/ via Satori + Sharp. Draft posts excluded. Dimensions confirmed via Sharp metadata. Proof: scripts/verify-s03.sh checks [1] (7 checks). Validated in S03. |
@@ -365,7 +365,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 13
-- Mapped to slices: 13
-- Validated: 13 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R015, R016, R017, R018)
+- Active requirements: 12
+- Mapped to slices: 12
+- Validated: 14 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R012, R015, R016, R017, R018)
 - Unmapped active requirements: 0

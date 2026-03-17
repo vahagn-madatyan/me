@@ -20,3 +20,7 @@
 | D012 | S01 | convention | ThemeToggle selectors | data-* attributes instead of IDs | Component renders in both desktop and mobile nav — duplicate IDs break getElementById | No |
 | D013 | S01 | convention | Client JS handler binding | onclick assignment + astro:after-swap re-init | Auto-replaces on re-init, prevents handler stacking during page transitions | No |
 | D014 | S01 | convention | Dark mode init placement | is:inline script in BaseLayout <head> | Must run synchronously before first paint to prevent FOUC | No |
+| D015 | M001/S02 | convention | Shiki dual-theme output mode | defaultColor: false with CSS variable swap rules in global.css | Outputs --shiki-light/--shiki-dark CSS variables on each span instead of inline colors, enabling theme switching without JS | No |
+| D016 | M001/S02 | convention | Reading time calculation approach | Build-time computation from post.body in page route, passed as prop to layout | Avoids runtime cost — reading time is static per post, computed via getReadingTime() in getStaticPaths/render | No |
+| D017 | M001/S02 | convention | Blog pagination route strategy | [...page].astro rest param with paginate() — page 1 = /blog/, page 2 = /blog/2/ | Clean root URL for page 1, individual posts use [slug].astro (non-rest) to avoid route conflicts | No |
+| D018 | M001/S02 | convention | Draft post filtering strategy | import.meta.env.PROD ternary in pages, unconditional in RSS | Drafts visible in dev for authoring but excluded from production builds and RSS feed | Yes — if Astro adds native draft support |

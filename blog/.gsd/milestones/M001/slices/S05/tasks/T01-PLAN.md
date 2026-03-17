@@ -47,6 +47,12 @@ Create the TypeScript data file defining the `Project` interface and sample proj
 - Manually inspect that `src/data/projects.ts` exports the interface and array
 - Manually inspect that `ProjectCard.astro` has all visual elements: title, description, badges, GitHub link
 
+## Observability Impact
+
+- **Build-time signal:** `npx astro check` covers type safety of the new `Project` interface and `ProjectCard.astro` props. Type errors in either file surface immediately.
+- **Inspection surface:** `src/data/projects.ts` is a pure data file — future agents inspect it by reading the exported `projects` array length and category coverage. No runtime logging needed.
+- **Failure visibility:** If `ProjectCard.astro` has a rendering error, it will surface as an Astro build error with file/line reference. No silent failures possible — the component is statically rendered.
+
 ## Inputs
 
 - `src/components/BlogCard.astro` — reference for card visual patterns (rounded-2xl, ring, hover, dark mode, badge styling)

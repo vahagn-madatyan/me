@@ -34,7 +34,7 @@
 
 ## Tasks
 
-- [ ] **T01: Create project data file and ProjectCard component** `est:30m`
+- [x] **T01: Create project data file and ProjectCard component** `est:30m`
   - Why: Establishes the data model and reusable card component — the boundary contract S07 depends on
   - Files: `src/data/projects.ts`, `src/components/ProjectCard.astro`
   - Do: Define TypeScript `Project` interface with title, description, category (union type), techStack (string[]), githubUrl, liveUrl?, image?. Create 4-6 sample projects across all 4 categories. Build ProjectCard following BlogCard's visual structure — rounded-2xl, ring border, group hover, dark mode variants, tech stack as small pill badges, GitHub icon link, optional live URL link.
@@ -47,6 +47,13 @@
   - Do: Create work page wrapped in BaseLayout, import project data, render category filter buttons (All + 4 categories) above a responsive grid (`grid-cols-1 sm:grid-cols-2`) of ProjectCards. Each card wrapper gets `data-category` attribute. Filter uses vanilla JS island pattern: init function sets "All" active, click handlers toggle `hidden` on non-matching cards and update active button styling. Add `astro:after-swap` listener for view transition re-init. Write `scripts/verify-s05.sh` with build output checks.
   - Verify: `npm run build` zero errors, `bash scripts/verify-s05.sh` all checks pass
   - Done when: `/work` renders in dev server with working category filter, responsive grid, dark mode styling, and verification script passes
+
+## Observability / Diagnostics
+
+- **Build-time signals:** `npm run build` emits zero errors; `npx astro check` reports no type errors on new files. Build output includes `/work/index.html` with expected markup.
+- **Inspection surfaces:** `scripts/verify-s05.sh` validates build output for all structural elements (cards, badges, links, filter buttons, data-category attributes, dark mode classes, responsive grid classes, filter script with `astro:after-swap`).
+- **Runtime failure visibility:** Category filter uses vanilla JS — if script fails to load or execute, all cards remain visible (graceful degradation). No hidden state on initial render. Console errors from filter script indicate wiring failure.
+- **Redaction constraints:** No secrets or user data in this slice — sample project data uses placeholder GitHub URLs.
 
 ## Files Likely Touched
 

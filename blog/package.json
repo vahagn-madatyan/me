@@ -23,5 +23,9 @@
     "satori": "^0.25.0",
     "sharp": "^0.34.3",
     "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "typescript": "^5.9.3"
   }
 }

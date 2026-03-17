@@ -68,7 +68,7 @@ This milestone is complete only when all are true:
 - [x] **S05: Projects Page** `risk:low` `depends:[S01]`
   > After this: /work page shows project cards with GitHub links, tech stack badges, category filtering — visible in dev server with sample project data.
 
-- [ ] **S06: About & Architecture** `risk:low` `depends:[S01]`
+- [x] **S06: About & Architecture** `risk:low` `depends:[S01]`
   > After this: /about page with bio, skills, and contact links; /architecture page with diagram gallery and lightbox — visible in dev server.
 
 - [ ] **S07: Homepage & Polish** `risk:low` `depends:[S02,S05]`

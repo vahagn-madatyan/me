@@ -26,7 +26,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build about page with bio, skills grid, and contact links** `est:30m`
+- [x] **T01: Build about page with bio, skills grid, and contact links** `est:30m`
   - Why: Replaces existing placeholder in `about.astro` with full content — bio, focus areas, skills/tech stack, and contact links. Closes R013.
   - Files: `src/pages/about.astro`
   - Do: Replace placeholder content with structured sections: hero/intro with name and role, bio paragraphs covering all roles (architect, engineer), current focus areas list, skills/tech stack grid organized by category, and contact links section using the same social URLs from Footer.astro (GitHub: vahagn-grigoryan, LinkedIn: vahagn-grigoryan, X: vahagn_dev). Add an email link. Use Tailwind design tokens (`text-primary-*`, `bg-secondary-*`, etc.) and `dark:` variants. Keep BaseLayout wrapper intact.
@@ -39,6 +39,16 @@
   - Do: (1) Create `src/data/architectures.ts` with TypeScript interface (`title`, `description`, `domain`, `image`, `problemSolved`, `techDecisions: string[]`) and 4-6 sample entries across different domains. Use placeholder image paths (`/diagrams/*.png`). (2) Create `src/components/Lightbox.astro` using native `<dialog>` element — client JS handles open (triggered by `data-lightbox-src` click), close (button, Escape, backdrop click), and `astro:after-swap` cleanup. Use fixed dark backdrop (`bg-black/80`) regardless of theme. (3) Create `src/pages/architecture.astro` following `work.astro` pattern exactly: import data → derive domains via `Set` → render filter buttons + card grid. Cards show title, description, domain badge, tech decisions list, and clickable image area that triggers lightbox. Filter JS uses same `data-filter`/`data-category` + `ACTIVE_CLASSES`/`INACTIVE_CLASSES` pattern from work.astro. (4) Write `scripts/verify-s06.sh` checking build output for both about and architecture pages.
   - Verify: `npm run build` succeeds; `bash scripts/verify-s06.sh` passes all checks; architecture filter toggles cards in dev server; lightbox opens and closes correctly
   - Done when: `/architecture` renders diagram gallery with working domain filter and lightbox; `bash scripts/verify-s06.sh` passes; `npm run build` zero errors
+
+## Observability / Diagnostics
+
+- **Build verification:** `npm run build` must exit 0; both `/about/index.html` and `/architecture/index.html` must exist in `dist/`
+- **Structural verification:** `bash scripts/verify-s06.sh` checks build output for required content markers (bio text, skills section, social hrefs, filter buttons, dialog element, dark mode classes)
+- **Runtime inspection:** Dev server pages at `/about` and `/architecture` — visually inspect sections render, links work, filter toggles visibility, lightbox opens/closes
+- **Failure visibility:** Build errors surface as non-zero exit code with Astro error output. Missing content markers cause `verify-s06.sh` to report specific check failures with descriptive messages.
+- **Dark mode:** Toggle via theme button in nav — all sections must switch correctly. Inspect for missing `dark:` variants by checking build HTML for `dark:` class presence.
+- **Accessibility:** Social links must have `aria-label` attributes; lightbox dialog must be keyboard-dismissable (Escape)
+- **Redaction:** No secrets or sensitive data on these pages — all content is public-facing
 
 ## Files Likely Touched
 

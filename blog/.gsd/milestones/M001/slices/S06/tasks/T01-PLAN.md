@@ -57,6 +57,13 @@ Design tokens are in `src/styles/global.css` `@theme` block. Use `text-primary-*
   - X: `https://x.com/vahagn_dev` (SVG viewBox `0 0 24 24`)
 - Design tokens in `src/styles/global.css` `@theme` block — use `text-primary-400`, `bg-secondary-900`, `text-accent-500`, etc.
 
+## Observability Impact
+
+- **Signals changed:** Build output gains `/about/index.html` with full page content (bio, skills grid, contact links) replacing previous placeholder. Page weight increases from ~1KB placeholder to full content page.
+- **Inspection surface:** `npm run build` → check `dist/about/index.html` exists and contains expected content markers (name, skills categories, social link hrefs). Dev server at `/about` for visual verification.
+- **Failure visibility:** Missing design tokens or broken Tailwind classes cause build warnings or unstyled sections visible in dev server. Missing `dark:` variants show as broken dark mode on visual inspection. Broken link hrefs visible in build HTML grep.
+- **No runtime JS:** This is a static content page — no client-side scripts, no async flows, no error paths to monitor.
+
 ## Expected Output
 
 - `src/pages/about.astro` — full about page with bio, focus areas, skills grid, and contact links. No placeholder text remains. Dark mode and responsive layout working.

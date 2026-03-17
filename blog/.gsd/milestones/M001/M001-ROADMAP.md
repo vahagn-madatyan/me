@@ -59,7 +59,7 @@ This milestone is complete only when all are true:
 - [x] **S02: Blog Engine** `risk:medium` `depends:[S01]`
   > After this: Blog listing with pagination (10/page), individual post pages with extended frontmatter, Shiki syntax highlighting (dual themes), and reading time — visible in dev server with sample posts.
 
-- [ ] **S03: SEO & OG Images** `risk:high` `depends:[S02]`
+- [x] **S03: SEO & OG Images** `risk:high` `depends:[S02]`
   > After this: Auto-generated OG images from post metadata, JSON-LD structured data on blog posts, Twitter Card meta tags, canonical URLs, updated RSS feed, robots.txt — verifiable in page source and build output.
 
 - [ ] **S04: Blog Reading Experience** `risk:medium` `depends:[S02]`

@@ -92,3 +92,10 @@ Create the `/work` page that imports project data, renders a category filter and
 
 - `src/pages/work.astro` — new page with category filter, responsive project grid, client JS island
 - `scripts/verify-s05.sh` — new build verification script (~10 checks)
+
+## Observability Impact
+
+- **New build artifact:** `dist/work/index.html` — existence confirms the page compiles. Absence after `npm run build` means the page file is broken or missing.
+- **Verification script:** `scripts/verify-s05.sh` checks 19 structural signals in build output (filter buttons, data-category attributes, dark mode classes, responsive grid, view transition support). Run after any change to the work page or ProjectCard component.
+- **Client-side filter failures:** If the filter JS fails to load or execute, all 6 cards remain visible (graceful degradation). No cards will be hidden on initial render. Console errors from the filter script indicate a wiring bug.
+- **Future agent inspection:** To check filter correctness, run the dev server and evaluate JS in the browser — click each `[data-filter]` button and verify `[data-category]` wrappers toggle `hidden` class correctly.

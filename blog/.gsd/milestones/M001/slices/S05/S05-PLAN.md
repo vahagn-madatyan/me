@@ -41,7 +41,7 @@
   - Verify: `npx astro check` passes with no type errors on new files
   - Done when: `src/data/projects.ts` exports both the `Project` interface and `projects` array, and `ProjectCard.astro` renders a single project with all visual elements
 
-- [ ] **T02: Build work page with category filter and verification script** `est:40m`
+- [x] **T02: Build work page with category filter and verification script** `est:40m`
   - Why: Delivers the user-visible /work page with interactive category filtering — the core of R012
   - Files: `src/pages/work.astro`, `scripts/verify-s05.sh`
   - Do: Create work page wrapped in BaseLayout, import project data, render category filter buttons (All + 4 categories) above a responsive grid (`grid-cols-1 sm:grid-cols-2`) of ProjectCards. Each card wrapper gets `data-category` attribute. Filter uses vanilla JS island pattern: init function sets "All" active, click handlers toggle `hidden` on non-matching cards and update active button styling. Add `astro:after-swap` listener for view transition re-init. Write `scripts/verify-s05.sh` with build output checks.

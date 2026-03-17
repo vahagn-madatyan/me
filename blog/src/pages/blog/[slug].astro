@@ -4,12 +4,16 @@ import BlogPost from '../../layouts/BlogPost.astro';
 import { getReadingTime } from '../../utils/reading-time';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
+  const posts = await getCollection('blog');
+  const filtered = posts.filter((post) =>
+    import.meta.env.PROD ? !post.data.draft : true
+  );
+  return filtered.map((post) => ({
+    params: { slug: post.id },
+    props: post,
+  }));
 }
+
 type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
@@ -18,5 +22,5 @@ const readingTime = getReadingTime(post.body ?? '');
 ---
 
 <BlogPost {...post.data} readingTime={readingTime}>
-	<Content />
+  <Content />
 </BlogPost>

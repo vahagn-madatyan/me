@@ -26,28 +26,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Newsletter CTA is visual-only until M003
 
-### R013 — About page with bio covering all roles, current focus areas, contact links (email, GitHub, LinkedIn, X), and skills/tech stack section
-- Class: launchability
-- Status: active
-- Description: About page with bio covering all roles, current focus areas, contact links (email, GitHub, LinkedIn, X), and skills/tech stack section
-- Why it matters: Personal brand identity
-- Source: user
-- Primary owning slice: M001/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: none
-
-### R014 — Architecture gallery at /architecture with grid of diagram images, title, context, problem solved, tech decisions. Lightbox/modal for full-size viewing. Filterable by domain.
-- Class: differentiator
-- Status: active
-- Description: Architecture gallery at /architecture with grid of diagram images, title, context, problem solved, tech decisions. Lightbox/modal for full-size viewing. Filterable by domain.
-- Why it matters: Central to Vahagn's brand as an architect — launch blocker
-- Source: user
-- Primary owning slice: M001/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Unique differentiator page
-
 ### R019 — Custom 404 page matching site design
 - Class: launchability
 - Status: active
@@ -248,6 +226,28 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: /work page renders responsive 2-column grid of 6 project cards across 4 categories (security, AI, networking, trading). Each card shows title, description, tech stack badges (rounded-full pills), and GitHub link. Client-side category filter with 5 buttons (All + 4 categories) toggles card visibility via data-category attributes. Dark mode styling on all elements. Proof: npm run build zero errors + scripts/verify-s05.sh 19/19 checks passed. Validated in S05.
 - Notes: Projects are real GitHub repos
 
+### R013 — About page with bio covering all roles, current focus areas, contact links (email, GitHub, LinkedIn, X), and skills/tech stack section
+- Class: launchability
+- Status: validated
+- Description: About page with bio covering all roles, current focus areas, contact links (email, GitHub, LinkedIn, X), and skills/tech stack section
+- Why it matters: Personal brand identity
+- Source: user
+- Primary owning slice: M001/S06
+- Supporting slices: none
+- Validation: About page with bio (3 paragraphs), 4 focus area cards, 32-item skills grid across 4 categories (Languages, Frameworks, Infrastructure, Tools), and 4 contact links (GitHub, LinkedIn, X, Email) with SVG icons and aria-labels. 199 dark: class instances. Proof: npm run build zero errors + scripts/verify-s06.sh checks 1-10 (about page: existence, bio text, skills, GitHub/LinkedIn/X links, nav, footer, dark mode). Validated in S06.
+- Notes: none
+
+### R014 — Architecture gallery at /architecture with grid of diagram images, title, context, problem solved, tech decisions. Lightbox/modal for full-size viewing. Filterable by domain.
+- Class: differentiator
+- Status: validated
+- Description: Architecture gallery at /architecture with grid of diagram images, title, context, problem solved, tech decisions. Lightbox/modal for full-size viewing. Filterable by domain.
+- Why it matters: Central to Vahagn's brand as an architect — launch blocker
+- Source: user
+- Primary owning slice: M001/S06
+- Supporting slices: none
+- Validation: Architecture gallery at /architecture with 6 diagram entries across 4 domains (distributed-systems, security, data-pipeline, infrastructure). Filterable domain buttons derived dynamically from data via Set. Cards show title, description, domain badge, problem solved, tech decisions. Native dialog lightbox with data-lightbox-src triggers, Escape/backdrop close. 191 dark: class instances. Proof: npm run build zero errors + scripts/verify-s06.sh checks 11-19 (architecture page: existence, data-filter, data-category, dialog, data-lightbox-src, nav, footer, dark mode). Validated in S06.
+- Notes: Unique differentiator page
+
 ### R015 — Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
 - Class: launchability
 - Status: validated
@@ -345,8 +345,8 @@ This file is the explicit capability and coverage contract for the project.
 | R010 | primary-user-loop | validated | M001/S04 | none | RelatedPosts component shows up to 3 tag-matched posts (scored by overlap count, then date). Excludes current post and drafts. Renders compact cards (title, date, reading time). Returns empty fragment when no tag matches. Proof: scripts/verify-s04.sh checks [Related Posts] (2 checks) — section present on tagged posts, absent on tagless posts. Validated in S04. |
 | R011 | primary-user-loop | validated | M001/S04 | none | ShareButtons component renders X (twitter.com/intent/tweet), LinkedIn (linkedin.com/sharing/share-offsite), and Dev.to (dev.to/new?prefill=...) share links. All target="_blank" rel="noopener noreferrer" with SVG icons and aria-labels. URL-based, no third-party JS. Proof: scripts/verify-s04.sh checks [Share Buttons] (3 checks). Validated in S04. |
 | R012 | core-capability | validated | M001/S05 | none | /work page renders responsive 2-column grid of 6 project cards across 4 categories (security, AI, networking, trading). Each card shows title, description, tech stack badges (rounded-full pills), and GitHub link. Client-side category filter with 5 buttons (All + 4 categories) toggles card visibility via data-category attributes. Dark mode styling on all elements. Proof: npm run build zero errors + scripts/verify-s05.sh 19/19 checks passed. Validated in S05. |
-| R013 | launchability | active | M001/S06 | none | unmapped |
-| R014 | differentiator | active | M001/S06 | none | unmapped |
+| R013 | launchability | validated | M001/S06 | none | About page with bio (3 paragraphs), 4 focus area cards, 32-item skills grid across 4 categories (Languages, Frameworks, Infrastructure, Tools), and 4 contact links (GitHub, LinkedIn, X, Email) with SVG icons and aria-labels. 199 dark: class instances. Proof: npm run build zero errors + scripts/verify-s06.sh checks 1-10 (about page: existence, bio text, skills, GitHub/LinkedIn/X links, nav, footer, dark mode). Validated in S06. |
+| R014 | differentiator | validated | M001/S06 | none | Architecture gallery at /architecture with 6 diagram entries across 4 domains (distributed-systems, security, data-pipeline, infrastructure). Filterable domain buttons derived dynamically from data via Set. Cards show title, description, domain badge, problem solved, tech decisions. Native dialog lightbox with data-lightbox-src triggers, Escape/backdrop close. 191 dark: class instances. Proof: npm run build zero errors + scripts/verify-s06.sh checks 11-19 (architecture page: existence, data-filter, data-category, dialog, data-lightbox-src, nav, footer, dark mode). Validated in S06. |
 | R015 | launchability | validated | M001/S03 | none | 7 non-draft posts generate 1200×630 PNG OG images in dist/og/ via Satori + Sharp. Draft posts excluded. Dimensions confirmed via Sharp metadata. Proof: scripts/verify-s03.sh checks [1] (7 checks). Validated in S03. |
 | R016 | launchability | validated | M001/S03 | M001/S01 (BaseHead) | JSON-LD BlogPosting schema on blog posts with title, description, datePublished, author, keywords. og:image and twitter:image point to generated /og/{slug}.png. article:published_time and article:tag OG tags present. Canonical URL with frontmatter override support. Non-blog pages have og:type=website with no JSON-LD. Proof: scripts/verify-s03.sh checks [2-4] (9 checks). Validated in S03. |
 | R017 | launchability | validated | M001/S03 | none | RSS feed includes <category> elements from post tags (10+ across 7 posts). robots.txt has User-agent/Allow/Sitemap directives. Sitemap serialize config applies weekly changefreq and 0.8 priority to blog URLs. Proof: scripts/verify-s03.sh checks [5-7] (10 checks). Validated in S03. |
@@ -365,7 +365,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 12
-- Mapped to slices: 12
-- Validated: 14 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R012, R015, R016, R017, R018)
+- Active requirements: 10
+- Mapped to slices: 10
+- Validated: 16 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R016, R017, R018)
 - Unmapped active requirements: 0

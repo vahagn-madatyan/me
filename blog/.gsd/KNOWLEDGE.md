@@ -32,3 +32,8 @@ Recurring gotchas, non-obvious rules, and useful patterns discovered during exec
 - **Context:** S02 added `@plugin "@tailwindcss/typography"` to `src/styles/global.css` but didn't install the npm package.
 - **Detail:** Build fails with `Can't resolve '@tailwindcss/typography'`. Fix: `npm install @tailwindcss/typography`.
 - **Gotcha:** This is a gap from S02 that surfaces as a build error in any subsequent task.
+
+## K007: Nested template literals break esbuild in Astro frontmatter
+- **Context:** Astro components using backtick-inside-backtick template literals in the frontmatter `---` block.
+- **Detail:** esbuild (used by Vite/Astro) fails to parse nested template literals like `` `outer ${encodeURIComponent(`inner ${var}`)}` ``. The error is a cryptic `Syntax error "\"` pointing at the line.
+- **Fix:** Use string concatenation instead: `"prefix" + var + "suffix"` for the inner expression, then wrap in the outer template literal or also concatenate.

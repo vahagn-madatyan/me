@@ -111,3 +111,10 @@ Create three components — RelatedPosts, ShareButtons, and CopyButton — and w
 - `src/layouts/BlogPost.astro` — updated with all three components integrated
 - `src/pages/blog/[slug].astro` — updated to pass allPosts, currentSlug, currentTags to layout
 - Build output: share URLs, related post links, and copy button scripts in post HTML
+
+## Observability Impact
+
+- **Share button URLs:** Inspect `href` attributes in build output with `grep 'twitter.com/intent\|linkedin.com/sharing\|dev.to/new' dist/blog/*/index.html`. Malformed URLs (bad encoding, missing params) are visible as garbled `href` values. At runtime, broken share links result in 404s on the target platform — no local error surface.
+- **Related posts rendering:** `grep -c 'Related Posts' dist/blog/*/index.html` shows which posts render the section. Posts with `tags: []` should return 0 matches. Posts sharing tags should return 1. A mismatch indicates tag scoring or draft-filtering bugs.
+- **Copy button script presence:** `grep -l 'navigator.clipboard' dist/blog/*/index.html` confirms the CopyButton island is injected. At runtime, `navigator.clipboard.writeText` failures surface as console errors (only on insecure origins — test on `localhost` which is a secure context). The button shows "Error" text for 2 seconds on clipboard failure.
+- **Draft leakage in related posts:** If a draft post appears in RelatedPosts output, `grep -o 'href="/blog/[^"]*"' dist/blog/*/index.html | sort -u` will list it — compare against `ls dist/blog/` to detect drafts that shouldn't be linked.

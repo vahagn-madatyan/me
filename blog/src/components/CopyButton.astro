@@ -1,0 +1,84 @@
+<!-- Self-activating script island: adds copy buttons to all code blocks -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const codeBlocks = document.querySelectorAll('.astro-code');
+
+    codeBlocks.forEach((codeEl) => {
+      // Wrap in a relative container if not already wrapped
+      const parent = codeEl.parentElement;
+      let wrapper;
+      if (parent && parent.classList.contains('code-block-wrapper')) {
+        wrapper = parent;
+      } else {
+        wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        wrapper.style.position = 'relative';
+        codeEl.parentNode?.insertBefore(wrapper, codeEl);
+        wrapper.appendChild(codeEl);
+      }
+
+      // Create the copy button
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', 'Copy code to clipboard');
+      btn.className = 'copy-btn';
+      wrapper.appendChild(btn);
+
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(codeEl.textContent || '');
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        } catch {
+          btn.textContent = 'Error';
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+          }, 2000);
+        }
+      });
+    });
+  });
+</script>
+
+<style is:global>
+  .code-block-wrapper {
+    position: relative;
+  }
+
+  .code-block-wrapper .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+    z-index: 10;
+  }
+
+  .code-block-wrapper:hover .copy-btn {
+    opacity: 1;
+  }
+
+  .code-block-wrapper .copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .code-block-wrapper .copy-btn.copied {
+    background-color: rgba(34, 197, 94, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(34, 197, 94, 0.5);
+  }
+</style>

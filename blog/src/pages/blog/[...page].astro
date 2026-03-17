@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../components/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getReadingTime } from '../../utils/reading-time';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths({ paginate }) {
+  const posts = await getCollection('blog');
+  const filtered = posts.filter((post) =>
+    import.meta.env.PROD ? !post.data.draft : true
+  );
+  const sorted = filtered.sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+  return paginate(sorted, { pageSize: 10 });
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title={`Blog — ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+  <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl mb-8">
+      Blog
+    </h1>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {page.data.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          description={post.data.description}
+          pubDate={post.data.pubDate}
+          heroImage={post.data.heroImage}
+          tags={post.data.tags}
+          readingTime={getReadingTime(post.body ?? '')}
+          slug={post.id}
+        />
+      ))}
+    </div>
+
+    {(page.url.prev || page.url.next) && (
+      <nav class="mt-10 flex items-center justify-between border-t border-secondary-200 pt-6 dark:border-secondary-800" aria-label="Blog pagination">
+        {page.url.prev ? (
+          <a
+            href={page.url.prev}
+            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
+          >
+            &larr; Previous
+          </a>
+        ) : (
+          <span />
+        )}
+        <span class="text-sm text-secondary-500 dark:text-secondary-400">
+          Page {page.currentPage} of {page.lastPage}
+        </span>
+        {page.url.next ? (
+          <a
+            href={page.url.next}
+            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
+          >
+            Next &rarr;
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    )}
+  </div>
+</BaseLayout>

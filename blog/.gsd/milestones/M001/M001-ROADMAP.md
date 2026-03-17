@@ -56,7 +56,7 @@ This milestone is complete only when all are true:
 - [x] **S01: Foundation & Design System** `risk:medium` `depends:[]`
   > After this: Dark-themed site skeleton with Tailwind v4, header with nav links, footer with social links, dark mode toggle with persistence, responsive layout — all visible in dev server.
 
-- [ ] **S02: Blog Engine** `risk:medium` `depends:[S01]`
+- [x] **S02: Blog Engine** `risk:medium` `depends:[S01]`
   > After this: Blog listing with pagination (10/page), individual post pages with extended frontmatter, Shiki syntax highlighting (dual themes), and reading time — visible in dev server with sample posts.
 
 - [ ] **S03: SEO & OG Images** `risk:high` `depends:[S02]`

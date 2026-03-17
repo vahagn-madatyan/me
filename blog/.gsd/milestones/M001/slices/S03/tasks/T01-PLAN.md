@@ -55,6 +55,13 @@ Create two files: a template helper (`og-template.ts`) that builds Satori elemen
 - `node -e "require('sharp')('dist/og/building-a-developer-blog.png').metadata().then(m => console.log(m.width, m.height))"` — outputs `1200 630`
 - `file dist/og/building-a-developer-blog.png` — confirms PNG format
 
+## Observability Impact
+
+- **Build-time signals:** OG image generation errors surface as `npm run build` failures with Satori/Sharp stack traces pointing to `src/pages/og/[slug].png.ts`. The endpoint's try/catch around Sharp conversion logs errors to stderr before returning 500.
+- **Inspection surfaces:** `ls dist/og/*.png` lists generated images; `file dist/og/<slug>.png` confirms PNG format; Sharp metadata check confirms 1200×630 dimensions. Visual inspection of generated PNGs validates branding/layout.
+- **Failure visibility:** Missing fonts → Satori throws at build time with "Failed to load font" message. Invalid element tree → Satori throws with node-specific error. Sharp conversion failure → caught, logged, 500 response (build still completes but output is missing for that slug). Missing `display: 'flex'` → Satori silently misrenders (visual-only, no error).
+- **Future agent inspection:** Run `ls dist/og/*.png | wc -l` to confirm count matches non-draft posts. Run Sharp metadata check on any PNG to verify dimensions. If count is wrong, check `src/content/blog/` for draft status changes.
+
 ## Inputs
 
 - `src/content.config.ts` — blog collection schema (tags, featured, draft, canonicalURL fields from S02)

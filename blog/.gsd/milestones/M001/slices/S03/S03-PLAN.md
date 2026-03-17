@@ -50,7 +50,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build OG image pipeline with Satori + Sharp** `est:45m`
+- [x] **T01: Build OG image pipeline with Satori + Sharp** `est:45m`
   - Why: Retires the milestone's key risk (D005) — proves Satori renders OG images at build time with WOFF fonts and Sharp converts to PNG. Self-contained and independently verifiable.
   - Files: `src/pages/og/[slug].png.ts`, `src/utils/og-template.ts`, `package.json`
   - Do: Install `satori`. Create `og-template.ts` helper that builds a Satori element tree (object API, not JSX) from post metadata — dark background, teal/cyan branding, title, description, tags, site URL, 1200×630. Create `[slug].png.ts` static endpoint with `getStaticPaths()` enumerating non-draft posts and `GET()` rendering Satori → Sharp → PNG Response. Load Atkinson WOFF fonts via `fs.readFileSync` with `import.meta.url` resolution. Wrap Sharp conversion in try/catch.

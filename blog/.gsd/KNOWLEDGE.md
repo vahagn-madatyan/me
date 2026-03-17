@@ -17,3 +17,18 @@ Recurring gotchas, non-obvious rules, and useful patterns discovered during exec
 ## K003: Blog schema backward compatibility requires `.default()` or `.optional()` on all new fields
 - **Context:** 5 existing blog posts have none of the extended frontmatter fields.
 - **Detail:** Astro's content layer validates every post against the schema at build time. Any required field without a default causes a build error for posts missing that field.
+
+## K004: Satori element trees require explicit `display: 'flex'` on every container
+- **Context:** Satori OG image generation with object API.
+- **Detail:** Satori does not infer layout — every element that has children must have `display: 'flex'` in its style. Without it, children silently stack incorrectly or disappear. Raw strings cannot be direct children of flex containers; wrap them in explicit elements.
+- **Gotcha:** No error is thrown — the image just renders wrong. Visual inspection of generated PNGs is the only way to catch layout issues.
+
+## K005: Font loading in Astro static endpoints requires import.meta.url resolution
+- **Context:** `src/pages/og/[slug].png.ts` loading WOFF fonts from `public/fonts/`.
+- **Detail:** `fs.readFileSync` with relative paths resolves from CWD, which differs between dev and build. Use `fileURLToPath(new URL('../../../', import.meta.url))` to get the project root reliably.
+- **Gotcha:** Satori only supports WOFF1 fonts, not WOFF2. The `public/fonts/` directory has both `.woff` files — use those, not any `.woff2` variants.
+
+## K006: @tailwindcss/typography plugin was referenced but not installed
+- **Context:** S02 added `@plugin "@tailwindcss/typography"` to `src/styles/global.css` but didn't install the npm package.
+- **Detail:** Build fails with `Can't resolve '@tailwindcss/typography'`. Fix: `npm install @tailwindcss/typography`.
+- **Gotcha:** This is a gap from S02 that surfaces as a build error in any subsequent task.

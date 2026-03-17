@@ -1,0 +1,56 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import { getReadingTime, formatReadingTime } from '../utils/reading-time';
+
+interface Props {
+  currentSlug: string;
+  currentTags: string[];
+  allPosts: CollectionEntry<'blog'>[];
+}
+
+const { currentSlug, currentTags, allPosts } = Astro.props;
+
+// No related posts when the current post has no tags
+const related = currentTags.length === 0
+  ? []
+  : allPosts
+      .filter((post) => post.id !== currentSlug)
+      .filter((post) => (import.meta.env.PROD ? !post.data.draft : true))
+      .map((post) => {
+        const sharedCount = post.data.tags?.filter((t) => currentTags.includes(t)).length ?? 0;
+        return { post, sharedCount };
+      })
+      .filter(({ sharedCount }) => sharedCount > 0)
+      .sort((a, b) => {
+        // Primary: more shared tags first
+        if (b.sharedCount !== a.sharedCount) return b.sharedCount - a.sharedCount;
+        // Secondary: newer posts first
+        return b.post.data.pubDate.getTime() - a.post.data.pubDate.getTime();
+      })
+      .slice(0, 3)
+      .map(({ post }) => post);
+---
+
+{related.length > 0 && (
+  <section class="mt-12 border-t border-secondary-200 pt-8 dark:border-secondary-800">
+    <h2 class="mb-6 text-xl font-bold text-secondary-900 dark:text-secondary-100">Related Posts</h2>
+    <div class="grid gap-4 sm:grid-cols-3">
+      {related.map((post) => (
+        <a
+          href={`/blog/${post.id}/`}
+          class="group rounded-xl bg-secondary-50 p-4 transition-colors hover:bg-secondary-100 dark:bg-secondary-800/50 dark:hover:bg-secondary-800"
+        >
+          <h3 class="text-sm font-semibold text-secondary-900 transition-colors group-hover:text-primary-600 dark:text-secondary-100 dark:group-hover:text-primary-400">
+            {post.data.title}
+          </h3>
+          <div class="mt-2 flex items-center gap-1.5 text-xs text-secondary-500 dark:text-secondary-400">
+            <FormattedDate date={post.data.pubDate} />
+            <span aria-hidden="true">&middot;</span>
+            <span>{formatReadingTime(getReadingTime(post.body ?? ''))}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

@@ -19,8 +19,21 @@ type Props = CollectionEntry<'blog'>;
 const post = Astro.props;
 const { Content } = await render(post);
 const readingTime = getReadingTime(post.body ?? '');
+
+// Fetch all posts for related-posts component
+const allPosts = await getCollection('blog');
+const filteredPosts = allPosts
+  .filter((p) => (import.meta.env.PROD ? !p.data.draft : true))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
-<BlogPost {...post.data} readingTime={readingTime} slug={post.id}>
+<BlogPost
+  {...post.data}
+  readingTime={readingTime}
+  slug={post.id}
+  allPosts={filteredPosts}
+  currentSlug={post.id}
+  currentTags={post.data.tags}
+>
   <Content />
 </BlogPost>

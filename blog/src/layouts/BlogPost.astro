@@ -3,17 +3,39 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../components/BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import RelatedPosts from '../components/RelatedPosts.astro';
+import CopyButton from '../components/CopyButton.astro';
 import { formatReadingTime } from '../utils/reading-time';
 
 type Props = CollectionEntry<'blog'>['data'] & {
   readingTime: number;
   slug?: string;
+  allPosts?: CollectionEntry<'blog'>[];
+  currentSlug?: string;
+  currentTags?: string[];
 };
 
-const { title, description, pubDate, updatedDate, heroImage, tags = [], readingTime, canonicalURL, slug } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  tags = [],
+  readingTime,
+  canonicalURL,
+  slug,
+  allPosts = [],
+  currentSlug,
+  currentTags = [],
+} = Astro.props;
 
 // Derive slug from page URL if not passed explicitly
 const derivedSlug = slug || Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+
+// Construct full post URL for share buttons
+const fullUrl = new URL('/blog/' + derivedSlug + '/', Astro.site || 'https://vahagn.dev').toString();
 ---
 
 <BaseLayout
@@ -67,9 +89,16 @@ const derivedSlug = slug || Astro.url.pathname.replace(/^\/blog\//, '').replace(
         </div>
       )}
       <hr class="mt-6 border-secondary-200 dark:border-secondary-800" />
+      <ShareButtons url={fullUrl} title={title} />
     </div>
     <div class="prose prose-secondary dark:prose-invert max-w-none text-secondary-700 dark:text-secondary-300 leading-relaxed">
       <slot />
     </div>
+    <RelatedPosts
+      currentSlug={currentSlug || derivedSlug}
+      currentTags={currentTags}
+      allPosts={allPosts}
+    />
   </article>
+  <CopyButton />
 </BaseLayout>

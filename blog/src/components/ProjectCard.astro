@@ -1,0 +1,81 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  category: "security" | "ai" | "networking" | "trading";
+  techStack: string[];
+  githubUrl: string;
+  liveUrl?: string;
+  image?: string;
+}
+
+const { title, description, techStack, githubUrl, liveUrl } = Astro.props;
+---
+
+<article
+  class="group rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:bg-secondary-900 dark:ring-secondary-800 dark:hover:ring-primary-700"
+>
+  <div class="p-5 sm:p-6">
+    <h3 class="text-lg font-semibold leading-snug tracking-tight text-secondary-900 dark:text-secondary-100">
+      {title}
+    </h3>
+
+    <p class="mt-2 text-sm leading-relaxed text-secondary-600 dark:text-secondary-400">
+      {description}
+    </p>
+
+    {techStack.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {techStack.map((tech) => (
+          <span class="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+            {tech}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <div class="mt-4 flex items-center gap-4">
+      <a
+        href={githubUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 text-sm text-secondary-500 transition-colors hover:text-primary-500 dark:text-secondary-400 dark:hover:text-primary-400"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          class="size-4"
+          aria-hidden="true"
+        >
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+        Source
+      </a>
+
+      {liveUrl && (
+        <a
+          href={liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 text-sm text-secondary-500 transition-colors hover:text-primary-500 dark:text-secondary-400 dark:hover:text-primary-400"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="size-4"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM4.332 8.027a6.012 6.012 0 0 1 1.912-2.706C6.512 5.73 6.974 6.633 7.272 7.7a12.67 12.67 0 0 0-2.94.327ZM10 16c-.553 0-1.234-.473-1.846-1.544-.39-.684-.71-1.527-.93-2.477a12.584 12.584 0 0 1 5.552 0c-.22.95-.54 1.793-.93 2.477C11.234 15.527 10.553 16 10 16Zm3.11-5.98a14.562 14.562 0 0 0-6.22 0 14.346 14.346 0 0 1 0-4.04 14.562 14.562 0 0 1 6.22 0 14.346 14.346 0 0 1 0 4.04ZM12.728 7.7c.298-1.067.76-1.97 1.028-2.379a6.012 6.012 0 0 1 1.912 2.706 12.67 12.67 0 0 0-2.94-.327ZM10 4c.553 0 1.234.473 1.846 1.544.39.684.71 1.527.93 2.477a12.584 12.584 0 0 0-5.552 0c.22-.95.54-1.793.93-2.477C8.766 4.473 9.447 4 10 4Zm5.668 5.973a6.012 6.012 0 0 1-1.912 2.706c-.268-.41-.73-1.312-1.028-2.379a12.67 12.67 0 0 0 2.94.327v-.654Zm-11.336 0v.654a12.67 12.67 0 0 0 2.94-.327c-.298 1.067-.76 1.97-1.028 2.379a6.012 6.012 0 0 1-1.912-2.706Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Live
+        </a>
+      )}
+    </div>
+  </div>
+</article>

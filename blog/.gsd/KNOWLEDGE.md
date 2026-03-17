@@ -37,3 +37,8 @@ Recurring gotchas, non-obvious rules, and useful patterns discovered during exec
 - **Context:** Astro components using backtick-inside-backtick template literals in the frontmatter `---` block.
 - **Detail:** esbuild (used by Vite/Astro) fails to parse nested template literals like `` `outer ${encodeURIComponent(`inner ${var}`)}` ``. The error is a cryptic `Syntax error "\"` pointing at the line.
 - **Fix:** Use string concatenation instead: `"prefix" + var + "suffix"` for the inner expression, then wrap in the outer template literal or also concatenate.
+
+## K008: Reading-time function strips code blocks — prose word count is what matters for thresholds
+- **Context:** TOC visibility threshold uses `readingTime >= 5` (5 min at 200 WPM = 1000 prose words).
+- **Detail:** The `getReadingTime()` utility strips code fences, inline code, images, and Markdown syntax before counting words. A post with 1300 total words but heavy code examples may only have 400 prose words → 2 min read. When targeting a specific reading-time threshold, count prose words after stripping, not raw word count.
+- **Gotcha:** `wc -w` on the markdown file reports total words including code blocks. The actual reading time will be much lower for code-heavy posts.

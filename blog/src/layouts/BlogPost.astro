@@ -6,6 +6,7 @@ import FormattedDate from '../components/FormattedDate.astro';
 import ShareButtons from '../components/ShareButtons.astro';
 import RelatedPosts from '../components/RelatedPosts.astro';
 import CopyButton from '../components/CopyButton.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import { formatReadingTime } from '../utils/reading-time';
 
 type Props = CollectionEntry<'blog'>['data'] & {
@@ -14,6 +15,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
   allPosts?: CollectionEntry<'blog'>[];
   currentSlug?: string;
   currentTags?: string[];
+  headings?: Array<{ depth: number; slug: string; text: string }>;
 };
 
 const {
@@ -29,6 +31,7 @@ const {
   allPosts = [],
   currentSlug,
   currentTags = [],
+  headings = [],
 } = Astro.props;
 
 // Derive slug from page URL if not passed explicitly
@@ -36,6 +39,10 @@ const derivedSlug = slug || Astro.url.pathname.replace(/^\/blog\//, '').replace(
 
 // Construct full post URL for share buttons
 const fullUrl = new URL('/blog/' + derivedSlug + '/', Astro.site || 'https://vahagn.dev').toString();
+
+// Show TOC only for long posts with headings
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = tocHeadings.length > 0 && readingTime >= 5;
 ---
 
 <BaseLayout
@@ -48,57 +55,117 @@ const fullUrl = new URL('/blog/' + derivedSlug + '/', Astro.site || 'https://vah
   slug={derivedSlug}
   {...(canonicalURL ? { canonicalOverride: canonicalURL } : {})}
 >
-  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-    {heroImage && (
-      <div class="mb-8">
-        <Image
-          width={1020}
-          height={510}
-          src={heroImage}
-          alt=""
-          class="w-full rounded-xl"
+  {showToc ? (
+    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:grid lg:grid-cols-[1fr_250px] lg:gap-8">
+      <article>
+        {heroImage && (
+          <div class="mb-8">
+            <Image
+              width={1020}
+              height={510}
+              src={heroImage}
+              alt=""
+              class="w-full rounded-xl"
+            />
+          </div>
+        )}
+        <div class="mb-8 text-center">
+          <div class="flex items-center justify-center gap-1.5 text-sm text-secondary-500 dark:text-secondary-400 mb-3">
+            <FormattedDate date={pubDate} />
+            <span aria-hidden="true">&middot;</span>
+            <span>{formatReadingTime(readingTime)}</span>
+          </div>
+          {updatedDate && (
+            <p class="text-sm text-secondary-500 dark:text-secondary-400 italic mb-3">
+              Last updated on <FormattedDate date={updatedDate} />
+            </p>
+          )}
+          <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+            {title}
+          </h1>
+          {description && (
+            <p class="mt-3 text-lg text-secondary-600 dark:text-secondary-400">
+              {description}
+            </p>
+          )}
+          {tags.length > 0 && (
+            <div class="mt-4 flex flex-wrap justify-center gap-2">
+              {tags.map((tag) => (
+                <a href={"/blog/tag/" + tag + "/"} class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 transition-colors hover:bg-primary-200 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800">
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )}
+          <hr class="mt-6 border-secondary-200 dark:border-secondary-800" />
+          <ShareButtons url={fullUrl} title={title} />
+        </div>
+        <div class="prose prose-secondary dark:prose-invert max-w-none text-secondary-700 dark:text-secondary-300 leading-relaxed">
+          <slot />
+        </div>
+        <RelatedPosts
+          currentSlug={currentSlug || derivedSlug}
+          currentTags={currentTags}
+          allPosts={allPosts}
         />
+      </article>
+      <div class="hidden lg:block">
+        <TableOfContents headings={headings} />
       </div>
-    )}
-    <div class="mb-8 text-center">
-      <div class="flex items-center justify-center gap-1.5 text-sm text-secondary-500 dark:text-secondary-400 mb-3">
-        <FormattedDate date={pubDate} />
-        <span aria-hidden="true">&middot;</span>
-        <span>{formatReadingTime(readingTime)}</span>
-      </div>
-      {updatedDate && (
-        <p class="text-sm text-secondary-500 dark:text-secondary-400 italic mb-3">
-          Last updated on <FormattedDate date={updatedDate} />
-        </p>
-      )}
-      <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
-        {title}
-      </h1>
-      {description && (
-        <p class="mt-3 text-lg text-secondary-600 dark:text-secondary-400">
-          {description}
-        </p>
-      )}
-      {tags.length > 0 && (
-        <div class="mt-4 flex flex-wrap justify-center gap-2">
-          {tags.map((tag) => (
-            <a href={"/blog/tag/" + tag + "/"} class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 transition-colors hover:bg-primary-200 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800">
-              {tag}
-            </a>
-          ))}
+    </div>
+  ) : (
+    <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      {heroImage && (
+        <div class="mb-8">
+          <Image
+            width={1020}
+            height={510}
+            src={heroImage}
+            alt=""
+            class="w-full rounded-xl"
+          />
         </div>
       )}
-      <hr class="mt-6 border-secondary-200 dark:border-secondary-800" />
-      <ShareButtons url={fullUrl} title={title} />
-    </div>
-    <div class="prose prose-secondary dark:prose-invert max-w-none text-secondary-700 dark:text-secondary-300 leading-relaxed">
-      <slot />
-    </div>
-    <RelatedPosts
-      currentSlug={currentSlug || derivedSlug}
-      currentTags={currentTags}
-      allPosts={allPosts}
-    />
-  </article>
+      <div class="mb-8 text-center">
+        <div class="flex items-center justify-center gap-1.5 text-sm text-secondary-500 dark:text-secondary-400 mb-3">
+          <FormattedDate date={pubDate} />
+          <span aria-hidden="true">&middot;</span>
+          <span>{formatReadingTime(readingTime)}</span>
+        </div>
+        {updatedDate && (
+          <p class="text-sm text-secondary-500 dark:text-secondary-400 italic mb-3">
+            Last updated on <FormattedDate date={updatedDate} />
+          </p>
+        )}
+        <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+          {title}
+        </h1>
+        {description && (
+          <p class="mt-3 text-lg text-secondary-600 dark:text-secondary-400">
+            {description}
+          </p>
+        )}
+        {tags.length > 0 && (
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            {tags.map((tag) => (
+              <a href={"/blog/tag/" + tag + "/"} class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 transition-colors hover:bg-primary-200 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800">
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
+        <hr class="mt-6 border-secondary-200 dark:border-secondary-800" />
+        <ShareButtons url={fullUrl} title={title} />
+      </div>
+      <div class="prose prose-secondary dark:prose-invert max-w-none text-secondary-700 dark:text-secondary-300 leading-relaxed">
+        <slot />
+      </div>
+      <RelatedPosts
+        currentSlug={currentSlug || derivedSlug}
+        currentTags={currentTags}
+        allPosts={allPosts}
+      />
+    </article>
+  )}
   <CopyButton />
 </BaseLayout>

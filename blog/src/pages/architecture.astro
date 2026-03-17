@@ -1,0 +1,160 @@
+---
+import BaseLayout from '../components/BaseLayout.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { architectures } from '../data/architectures';
+
+const domains = ['all', ...new Set(architectures.map((a) => a.domain))] as const;
+
+function domainLabel(domain: string): string {
+  return domain === 'all'
+    ? 'All'
+    : domain
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+}
+---
+
+<BaseLayout title="Architecture — Vahagn Grigoryan" description="Architecture diagrams, system design decisions, and technical deep-dives.">
+  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+      Architecture
+    </h1>
+    <p class="mt-3 text-secondary-600 dark:text-secondary-400 leading-relaxed">
+      System designs and architecture decisions from real projects — the diagrams behind the decisions.
+    </p>
+
+    <!-- Domain filter buttons -->
+    <div class="mt-8 flex flex-wrap gap-2 mb-8">
+      {domains.map((domain) => (
+        <button
+          data-filter={domain}
+          class:list={[
+            'rounded-full px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer',
+            domain === 'all'
+              ? 'bg-primary-500 text-white'
+              : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-400 dark:hover:bg-secondary-700',
+          ]}
+        >
+          {domainLabel(domain)}
+        </button>
+      ))}
+    </div>
+
+    <!-- Architecture card grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="architecture-grid">
+      {architectures.map((arch) => (
+        <div data-category={arch.domain}>
+          <article
+            class="group rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:bg-secondary-900 dark:ring-secondary-800 dark:hover:ring-primary-700 overflow-hidden"
+          >
+            {/* Clickable image area */}
+            <div
+              data-lightbox-src={arch.image}
+              data-lightbox-alt={arch.title}
+              class="relative cursor-pointer overflow-hidden bg-secondary-100 dark:bg-secondary-800"
+            >
+              <div class="flex h-40 items-center justify-center text-secondary-400 dark:text-secondary-600">
+                <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V4.5a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v15a1.5 1.5 0 001.5 1.5z" />
+                </svg>
+              </div>
+              <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10 dark:group-hover:bg-white/5">
+                <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-secondary-700 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 dark:bg-secondary-800/90 dark:text-secondary-300">
+                  View diagram
+                </span>
+              </div>
+            </div>
+
+            <div class="p-5 sm:p-6">
+              {/* Domain badge */}
+              <span class="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                {domainLabel(arch.domain)}
+              </span>
+
+              <h3 class="mt-2 text-lg font-semibold leading-snug tracking-tight text-secondary-900 dark:text-secondary-100">
+                {arch.title}
+              </h3>
+
+              <p class="mt-2 text-sm leading-relaxed text-secondary-600 dark:text-secondary-400">
+                {arch.description}
+              </p>
+
+              {/* Problem solved */}
+              <div class="mt-3">
+                <p class="text-xs font-semibold tracking-wider uppercase text-secondary-400 dark:text-secondary-500">
+                  Problem Solved
+                </p>
+                <p class="mt-1 text-sm leading-relaxed text-secondary-500 dark:text-secondary-400">
+                  {arch.problemSolved}
+                </p>
+              </div>
+
+              {/* Tech decisions */}
+              {arch.techDecisions.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-1.5">
+                  {arch.techDecisions.map((tech) => (
+                    <span class="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <Lightbox />
+</BaseLayout>
+
+<script>
+  const ACTIVE_CLASSES = ['bg-primary-500', 'text-white'];
+  const INACTIVE_CLASSES = [
+    'bg-secondary-100', 'text-secondary-600', 'hover:bg-secondary-200',
+    'dark:bg-secondary-800', 'dark:text-secondary-400', 'dark:hover:bg-secondary-700',
+  ];
+
+  function initFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+
+    function setActive(btn: HTMLButtonElement) {
+      buttons.forEach((b) => {
+        ACTIVE_CLASSES.forEach((c) => b.classList.remove(c));
+        INACTIVE_CLASSES.forEach((c) => b.classList.add(c));
+      });
+      INACTIVE_CLASSES.forEach((c) => btn.classList.remove(c));
+      ACTIVE_CLASSES.forEach((c) => btn.classList.add(c));
+    }
+
+    function filterCards(category: string) {
+      cards.forEach((card) => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    // Set "All" active on init, show all cards
+    const allBtn = document.querySelector<HTMLButtonElement>('[data-filter="all"]');
+    if (allBtn) setActive(allBtn);
+    filterCards('all');
+
+    // Bind click handlers via onclick (safe for HMR + view transitions)
+    buttons.forEach((btn) => {
+      btn.onclick = () => {
+        const category = btn.dataset.filter ?? 'all';
+        setActive(btn);
+        filterCards(category);
+      };
+    });
+  }
+
+  initFilter();
+  document.addEventListener('astro:after-swap', initFilter);
+</script>

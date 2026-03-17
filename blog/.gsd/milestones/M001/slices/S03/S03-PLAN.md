@@ -57,7 +57,7 @@
   - Verify: `npm run build` succeeds, `ls dist/og/*.png` shows 7 files (one per non-draft post), `node -e "require('sharp')('dist/og/building-a-developer-blog.png').metadata().then(m => console.log(m.width, m.height))"` outputs `1200 630`
   - Done when: Every non-draft blog post has a corresponding 1200×630 PNG in `dist/og/` and build completes with zero errors.
 
-- [ ] **T02: Enhance BaseHead with JSON-LD, dynamic OG image, and article meta** `est:30m`
+- [x] **T02: Enhance BaseHead with JSON-LD, dynamic OG image, and article meta** `est:30m`
   - Why: Wires the OG images into page meta tags, adds JSON-LD structured data for search engines, and supports canonical URL override from frontmatter — completing R016.
   - Files: `src/components/BaseHead.astro`, `src/components/BaseLayout.astro`, `src/layouts/BlogPost.astro`, `src/pages/blog/[slug].astro`
   - Do: Add optional props to BaseHead (`type`, `pubDate`, `updatedDate`, `tags`, `canonicalOverride`). When `type === 'article'`, derive slug from `Astro.url.pathname`, set `og:image` to absolute URL `/og/{slug}.png`, add `article:published_time` and `article:tag` meta tags, emit JSON-LD `BlogPosting` script block. Support `canonicalOverride` overriding auto-generated canonical. Thread new props through BaseLayout. Pass blog data from BlogPost.astro. All new props optional with defaults — non-blog pages unchanged.

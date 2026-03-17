@@ -1,0 +1,87 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+// Filter to h2 and h3 only
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{tocHeadings.length > 0 && (
+  <aside class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+    <nav aria-label="Table of Contents">
+      <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-secondary-400 dark:text-secondary-500">
+        Table of Contents
+      </h2>
+      <ul class="space-y-1 border-l border-secondary-200 dark:border-secondary-700">
+        {tocHeadings.map((heading) => (
+          <li>
+            <a
+              href={"#" + heading.slug}
+              data-toc-link
+              data-heading-slug={heading.slug}
+              class:list={[
+                "block border-l-2 border-transparent py-1 text-sm text-secondary-500 transition-colors hover:text-primary-500 dark:text-secondary-400 dark:hover:text-primary-400",
+                heading.depth === 3 ? "pl-6" : "pl-3",
+              ]}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<script>
+  function initScrollSpy() {
+    const tocLinks = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+    if (tocLinks.length === 0) return;
+
+    const headingIds = Array.from(tocLinks).map((link) => link.dataset.headingSlug!);
+    const headingElements = headingIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (headingElements.length === 0) return;
+
+    function setActive(slug: string) {
+      tocLinks.forEach((link) => {
+        if (link.dataset.headingSlug === slug) {
+          link.classList.add('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500');
+          link.classList.remove('text-secondary-500', 'dark:text-secondary-400', 'border-transparent');
+        } else {
+          link.classList.remove('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500');
+          link.classList.add('text-secondary-500', 'dark:text-secondary-400', 'border-transparent');
+        }
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+    );
+
+    headingElements.forEach((el) => observer.observe(el));
+  }
+
+  // Run on initial load and on Astro page transitions
+  document.addEventListener('DOMContentLoaded', initScrollSpy);
+  document.addEventListener('astro:after-swap', initScrollSpy);
+</script>

@@ -101,6 +101,13 @@
     background-color: var(--shiki-dark-bg);
   }
 
+  /* Heading anchor offset — clears sticky header (80px) */
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    scroll-margin-top: 5rem;
+  }
+
   /* Code block base styling */
   .astro-code {
     border-radius: 0.5rem;

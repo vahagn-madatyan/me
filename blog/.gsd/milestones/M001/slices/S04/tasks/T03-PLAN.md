@@ -112,6 +112,14 @@ This is the most complex task in S04. It modifies the BlogPost layout from singl
 - S02 forward intelligence: reading time at 200 WPM means 5 min ≈ 1000 words — use `readingTime >= 5` as TOC threshold
 - K002: all Tailwind classes must be static strings, no dynamic construction
 
+## Observability Impact
+
+- **TOC rendering:** `grep -l '<nav' dist/blog/*/index.html` shows which posts got a TOC. Long posts (≥5 min) must appear; short posts must not.
+- **Scroll-spy script:** `grep -c 'IntersectionObserver' dist/blog/mastering-typescript-patterns/index.html` confirms the scroll-spy is present (expect 1+).
+- **Heading anchor offset:** `grep 'scroll-margin-top' dist/_astro/*.css` verifies the heading offset rule shipped in the CSS bundle.
+- **verify-s04.sh:** The verification script itself is the primary diagnostic surface — it reports per-check PASS/FAIL and exits non-zero on any failure. Downstream agents run `bash scripts/verify-s04.sh` to verify the entire slice.
+- **Build failures:** Missing imports, bad prop types, or template errors in the TOC component surface as `npm run build` stderr with file:line:col detail.
+
 ## Expected Output
 
 - `src/components/TableOfContents.astro` — new TOC component with scroll-spy

@@ -36,6 +36,17 @@
   - RSS feed does not contain draft post titles
   - Prior S01 checks still pass (`bash scripts/verify-s01.sh`)
 
+## Observability / Diagnostics
+
+- **Build-time signals:** `npm run build` exit code and stderr — any schema validation failure, Shiki theme resolution error, or typography plugin load failure surfaces here as a build error with file/line context.
+- **Shiki CSS variable probe:** `grep -r 'shiki-dark' dist/blog/` — confirms dual-theme pipeline is active. Absence means `defaultColor: false` isn't working or Shiki config was ignored.
+- **Typography class probe:** `grep -r 'prose' dist/blog/` — confirms `@tailwindcss/typography` plugin is loaded and prose classes aren't being purged.
+- **Draft filtering probe:** Draft posts should be absent from `dist/blog/` in production builds and absent from RSS feed XML.
+- **Reading time probe:** `grep -r 'min read' dist/blog/` — confirms reading time utility is wired to both cards and post layouts.
+- **Verification script:** `bash scripts/verify-s02.sh` runs all probes above in a single pass with pass/fail output.
+- **Failure visibility:** Schema validation errors show field name and expected type. Shiki errors show theme name. Typography errors show plugin resolution path. All are build-time — no silent runtime failures.
+- **Redaction:** No sensitive data in blog content pipeline. No redaction constraints.
+
 ## Integration Closure
 
 - Upstream surfaces consumed: `BaseLayout.astro` (page wrapper), `Header.astro`/`Footer.astro` (chrome), `global.css` (Tailwind theme + design tokens), `FormattedDate.astro` (date formatting)
@@ -44,7 +55,7 @@
 
 ## Tasks
 
-- [ ] **T01: Configure rendering pipeline — Shiki dual themes, typography plugin, extended schema** `est:30m`
+- [x] **T01: Configure rendering pipeline — Shiki dual themes, typography plugin, extended schema** `est:30m`
   - Why: Foundation config changes that all components and pages depend on. Highest-risk items (Shiki CSS variables, typography plugin loading) must be proven first.
   - Files: `src/content.config.ts`, `astro.config.mjs`, `src/styles/global.css`
   - Do: (1) Extend blog schema in content.config.ts with tags, featured, draft, canonicalURL — all optional with defaults. (2) Add `markdown.shikiConfig` with `themes: { light: 'github-light', dark: 'github-dark' }` and `defaultColor: false` in astro.config.mjs. (3) Add `@plugin "@tailwindcss/typography"` directive in global.css. (4) Add CSS rules for Shiki dual-theme toggling: `.astro-code` background swap and `.astro-code span` color swap using `--shiki-light`/`--shiki-dark` CSS variables keyed on `html.dark`. (5) Add code block base styling (border-radius, padding, font-size, overflow).

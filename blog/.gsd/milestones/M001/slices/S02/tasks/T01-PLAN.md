@@ -74,6 +74,14 @@ This is the highest-risk task in the slice — the Shiki `defaultColor: false` C
 - `grep -l 'prose' dist/blog/first-post/index.html` — returns the file (typography classes work)
 - All 5 existing blog posts still render (schema defaults don't break them)
 
+## Observability Impact
+
+- **New signal — Shiki CSS variables in build output:** After this task, every code block in `dist/blog/*/index.html` emits `--shiki-light` and `--shiki-dark` CSS variables on `<span>` elements instead of inline color styles. Probe: `grep 'shiki-dark' dist/blog/markdown-style-guide/index.html`.
+- **New signal — Typography plugin loaded:** The `@plugin "@tailwindcss/typography"` directive causes Tailwind to generate prose utility classes. Probe: `grep 'prose' dist/blog/first-post/index.html`.
+- **Changed signal — Schema validation:** Adding 4 new fields with defaults means existing posts continue to validate. If a post omits a required field without a default, Astro's content layer emits a validation error at build time with the field name and expected type.
+- **Failure visibility:** All failures are build-time (Astro exits non-zero). No silent runtime degradation. Shiki theme not found → build error naming the theme. Plugin not resolved → build error with package path. Schema mismatch → build error with field name.
+- **Inspection surface:** `npm run build` + grep on `dist/` is the canonical inspection method for this task.
+
 ## Inputs
 
 - `src/content.config.ts` — current schema with title, description, pubDate, updatedDate, heroImage

@@ -67,6 +67,13 @@ Create paginated tag archive pages at `/blog/tag/[tag]/` and convert tag pills i
 - `grep -l 'href="/blog/tag/astro/"' dist/blog/index.html` — tag pill links in listing HTML
 - `grep -c 'BlogCard\|blog-card\|rounded-2xl' dist/blog/tag/astro/index.html` — BlogCard markup present in archive
 
+## Observability Impact
+
+- **New build artifacts:** `dist/blog/tag/*/index.html` — one page per unique tag. Absence indicates `getStaticPaths` enumeration failure.
+- **Inspectable signals:** `grep -r 'href="/blog/tag/' dist/blog/` confirms tag pill links are wired. Count should match total tag occurrences across all posts × 2 (BlogCard listing + individual post pages).
+- **Failure visibility:** Missing tag archive pages produce no error at build time (Astro simply doesn't generate them). Verify by checking `ls dist/blog/tag/` after build. Tag pills with broken hrefs are visible via `grep` — a tag pill `<a>` with no matching `dist/blog/tag/{tag}/` directory indicates a mismatch.
+- **How to inspect later:** `find dist/blog/tag -name index.html | sort` lists all generated tag archive pages. `grep -c 'href="/blog/tag/' dist/blog/index.html` counts tag pill links on the listing page.
+
 ## Inputs
 
 - `src/pages/blog/[...page].astro` — reference for `getStaticPaths` + `paginate()` pattern and BlogCard usage

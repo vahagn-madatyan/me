@@ -60,9 +60,9 @@ const derivedSlug = slug || Astro.url.pathname.replace(/^\/blog\//, '').replace(
       {tags.length > 0 && (
         <div class="mt-4 flex flex-wrap justify-center gap-2">
           {tags.map((tag) => (
-            <span class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+            <a href={"/blog/tag/" + tag + "/"} class="rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 transition-colors hover:bg-primary-200 dark:bg-primary-900 dark:text-primary-200 dark:hover:bg-primary-800">
               {tag}
-            </span>
+            </a>
           ))}
         </div>
       )}

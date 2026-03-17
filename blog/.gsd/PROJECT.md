@@ -10,7 +10,7 @@ A polished, fast, SEO-optimized personal site that establishes vahagn.dev as the
 
 ## Current State
 
-Foundation complete. Tailwind v4 design system integrated with full D003 design tokens (teal/cyan primary, slate secondary, orange accent). Dark-first site skeleton with responsive header (nav links, mobile hamburger), footer (social links, copyright, RSS), and three-state dark mode toggle with localStorage persistence and no FOUC. All pages render through BaseLayout. Inter + JetBrains Mono fonts loaded via Fontsource. Blog engine complete with extended content schema (tags, featured, draft, canonicalURL), paginated listing at /blog/, Shiki dual-theme syntax highlighting (github-dark/github-light via CSS variables), reading time on cards and posts, draft filtering, and 8 sample posts. Build passes with zero errors.
+Foundation complete. Tailwind v4 design system integrated with full D003 design tokens (teal/cyan primary, slate secondary, orange accent). Dark-first site skeleton with responsive header (nav links, mobile hamburger), footer (social links, copyright, RSS), and three-state dark mode toggle with localStorage persistence and no FOUC. All pages render through BaseLayout. Inter + JetBrains Mono fonts loaded via Fontsource. Blog engine complete with extended content schema (tags, featured, draft, canonicalURL), paginated listing at /blog/, Shiki dual-theme syntax highlighting (github-dark/github-light via CSS variables), reading time on cards and posts, draft filtering, and 8 sample posts. SEO infrastructure complete: OG images auto-generate at build time via Satori + Sharp (1200×630 PNG per non-draft post), JSON-LD BlogPosting on blog posts, article OG tags, twitter:image, canonical URLs with override support, RSS categories from tags, robots.txt with sitemap reference, and sitemap serialize config for blog URLs. Build passes with zero errors.
 
 ## Architecture / Key Patterns
 
@@ -30,6 +30,6 @@ See `.gsd/REQUIREMENTS.md` for the explicit capability contract, requirement sta
 
 ## Milestone Sequence
 
-- 🔄 M001: The Site — Full vahagn.dev with design system, all pages, blog engine, SEO, dark mode (S01-S02 complete, S03-S07 remaining)
+- 🔄 M001: The Site — Full vahagn.dev with design system, all pages, blog engine, SEO, dark mode (S01-S03 complete, S04-S07 remaining)
 - [ ] M002: Deployment — Cloudflare Pages setup, custom domain, DNS, build pipeline, analytics
 - [ ] M003: Distribution & Growth — Newsletter integration, cross-posting tooling, audience building

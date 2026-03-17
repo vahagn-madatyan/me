@@ -114,39 +114,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Unique differentiator page
 
-### R015 — Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
-- Class: launchability
-- Status: active
-- Description: Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
-- Why it matters: Professional appearance when links shared on social media
-- Source: user
-- Primary owning slice: M001/S03
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Sharp already in deps. Satori renders JSX to SVG, Sharp converts to PNG.
-
-### R016 — Dynamic meta tags per page, Open Graph tags, Twitter Card tags, JSON-LD structured data for blog posts, canonical URLs pointing to vahagn.dev
-- Class: launchability
-- Status: active
-- Description: Dynamic meta tags per page, Open Graph tags, Twitter Card tags, JSON-LD structured data for blog posts, canonical URLs pointing to vahagn.dev
-- Why it matters: Search engine discoverability and social media appearance
-- Source: user
-- Primary owning slice: M001/S03
-- Supporting slices: M001/S01 (BaseHead)
-- Validation: unmapped
-- Notes: JSON-LD uses BlogPosting schema
-
-### R017 — Auto-generated sitemap.xml, RSS feed from blog collection, robots.txt
-- Class: launchability
-- Status: active
-- Description: Auto-generated sitemap.xml, RSS feed from blog collection, robots.txt
-- Why it matters: Search engine indexing and feed readers
-- Source: user
-- Primary owning slice: M001/S03
-- Supporting slices: none
-- Validation: unmapped
-- Notes: @astrojs/sitemap already installed, RSS exists but needs updating
-
 ### R019 — Custom 404 page matching site design
 - Class: launchability
 - Status: active
@@ -281,6 +248,39 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: Reading time (200 WPM, Math.ceil, min 1) displayed on both blog cards and post headers. Proof: grep 'min read' matches in listing and all post HTML. scripts/verify-s02.sh checks 5, 10-11. Validated in S02.
 - Notes: Calculated from Markdown body at build time
 
+### R015 — Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
+- Class: launchability
+- Status: validated
+- Description: Template-based Open Graph images (1200x630) generated at build time from post title, tags, and branding using Satori + Sharp
+- Why it matters: Professional appearance when links shared on social media
+- Source: user
+- Primary owning slice: M001/S03
+- Supporting slices: none
+- Validation: 7 non-draft posts generate 1200×630 PNG OG images in dist/og/ via Satori + Sharp. Draft posts excluded. Dimensions confirmed via Sharp metadata. Proof: scripts/verify-s03.sh checks [1] (7 checks). Validated in S03.
+- Notes: Sharp already in deps. Satori renders JSX to SVG, Sharp converts to PNG.
+
+### R016 — Dynamic meta tags per page, Open Graph tags, Twitter Card tags, JSON-LD structured data for blog posts, canonical URLs pointing to vahagn.dev
+- Class: launchability
+- Status: validated
+- Description: Dynamic meta tags per page, Open Graph tags, Twitter Card tags, JSON-LD structured data for blog posts, canonical URLs pointing to vahagn.dev
+- Why it matters: Search engine discoverability and social media appearance
+- Source: user
+- Primary owning slice: M001/S03
+- Supporting slices: M001/S01 (BaseHead)
+- Validation: JSON-LD BlogPosting schema on blog posts with title, description, datePublished, author, keywords. og:image and twitter:image point to generated /og/{slug}.png. article:published_time and article:tag OG tags present. Canonical URL with frontmatter override support. Non-blog pages have og:type=website with no JSON-LD. Proof: scripts/verify-s03.sh checks [2-4] (9 checks). Validated in S03.
+- Notes: JSON-LD uses BlogPosting schema
+
+### R017 — Auto-generated sitemap.xml, RSS feed from blog collection, robots.txt
+- Class: launchability
+- Status: validated
+- Description: Auto-generated sitemap.xml, RSS feed from blog collection, robots.txt
+- Why it matters: Search engine indexing and feed readers
+- Source: user
+- Primary owning slice: M001/S03
+- Supporting slices: none
+- Validation: RSS feed includes <category> elements from post tags (10+ across 7 posts). robots.txt has User-agent/Allow/Sitemap directives. Sitemap serialize config applies weekly changefreq and 0.8 priority to blog URLs. Proof: scripts/verify-s03.sh checks [5-7] (10 checks). Validated in S03.
+- Notes: @astrojs/sitemap already installed, RSS exists but needs updating
+
 ### R018 — Dark mode toggle with localStorage persistence, system preference detection on first load, smooth transition, no FOUC
 - Class: core-capability
 - Status: validated
@@ -347,9 +347,9 @@ This file is the explicit capability and coverage contract for the project.
 | R012 | core-capability | active | M001/S05 | none | unmapped |
 | R013 | launchability | active | M001/S06 | none | unmapped |
 | R014 | differentiator | active | M001/S06 | none | unmapped |
-| R015 | launchability | active | M001/S03 | none | unmapped |
-| R016 | launchability | active | M001/S03 | M001/S01 (BaseHead) | unmapped |
-| R017 | launchability | active | M001/S03 | none | unmapped |
+| R015 | launchability | validated | M001/S03 | none | 7 non-draft posts generate 1200×630 PNG OG images in dist/og/ via Satori + Sharp. Draft posts excluded. Dimensions confirmed via Sharp metadata. Proof: scripts/verify-s03.sh checks [1] (7 checks). Validated in S03. |
+| R016 | launchability | validated | M001/S03 | M001/S01 (BaseHead) | JSON-LD BlogPosting schema on blog posts with title, description, datePublished, author, keywords. og:image and twitter:image point to generated /og/{slug}.png. article:published_time and article:tag OG tags present. Canonical URL with frontmatter override support. Non-blog pages have og:type=website with no JSON-LD. Proof: scripts/verify-s03.sh checks [2-4] (9 checks). Validated in S03. |
+| R017 | launchability | validated | M001/S03 | none | RSS feed includes <category> elements from post tags (10+ across 7 posts). robots.txt has User-agent/Allow/Sitemap directives. Sitemap serialize config applies weekly changefreq and 0.8 priority to blog URLs. Proof: scripts/verify-s03.sh checks [5-7] (10 checks). Validated in S03. |
 | R018 | core-capability | validated | M001/S01 | none | Three-state toggle persists across pages, respects system preference, no FOUC. Verified with browser testing in S01. |
 | R019 | launchability | active | M001/S07 | none | unmapped |
 | R020 | quality-attribute | active | M001/S01 | all slices | unmapped |
@@ -365,7 +365,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 21
-- Mapped to slices: 21
-- Validated: 5 (R001, R004, R005, R007, R018)
+- Active requirements: 18
+- Mapped to slices: 18
+- Validated: 8 (R001, R004, R005, R007, R015, R016, R017, R018)
 - Unmapped active requirements: 0

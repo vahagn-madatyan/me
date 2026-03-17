@@ -101,6 +101,13 @@ The existing `BaseHead.astro` already has basic OG and Twitter Card tags. This t
 - `src/consts.ts` — `SITE_TITLE = 'Vahagn Grigoryan'` (for JSON-LD author name).
 - T01 output: OG images at `/og/{slug}.png` (1200×630 PNG per non-draft post).
 
+## Observability Impact
+
+- **Build-time signals:** `npm run build` output — any type error from new optional props surfaces immediately with file/line context
+- **Inspection surfaces:** `grep 'application/ld+json' dist/blog/*/index.html` validates JSON-LD presence; `grep 'og:type' dist/*/index.html` confirms article vs website type differentiation; `grep 'og:image' dist/blog/*/index.html` confirms OG image URLs point to `/og/` PNGs
+- **Failure visibility:** Missing/malformed JSON-LD → `JSON.parse()` throws on the built HTML; broken canonical → `<link rel="canonical">` has wrong href visible in page source; wrong og:type → social preview crawlers show generic "website" card instead of article
+- **Regression detection:** Non-blog pages must still build — `grep 'og:type.*website' dist/index.html` confirms homepage unchanged; `grep -c 'ld+json' dist/index.html` must return 0
+
 ## Expected Output
 
 - `src/components/BaseHead.astro` — enhanced with JSON-LD, article OG tags, canonical override, dynamic og:image for blog posts

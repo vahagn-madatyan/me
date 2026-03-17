@@ -7,12 +7,25 @@ import { formatReadingTime } from '../utils/reading-time';
 
 type Props = CollectionEntry<'blog'>['data'] & {
   readingTime: number;
+  slug?: string;
 };
 
-const { title, description, pubDate, updatedDate, heroImage, tags = [], readingTime } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags = [], readingTime, canonicalURL, slug } = Astro.props;
+
+// Derive slug from page URL if not passed explicitly
+const derivedSlug = slug || Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  tags={tags}
+  slug={derivedSlug}
+  {...(canonicalURL ? { canonicalOverride: canonicalURL } : {})}
+>
   <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6">
     {heroImage && (
       <div class="mb-8">

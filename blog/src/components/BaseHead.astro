@@ -10,11 +10,48 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+	type?: 'website' | 'article';
+	pubDate?: Date;
+	updatedDate?: Date;
+	tags?: string[];
+	canonicalOverride?: string;
+	slug?: string;
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const {
+	title,
+	description,
+	image = FallbackImage,
+	type = 'website',
+	pubDate,
+	updatedDate,
+	tags = [],
+	canonicalOverride,
+	slug,
+} = Astro.props;
 
-const { title, description, image = FallbackImage } = Astro.props;
+const canonicalURL = canonicalOverride
+	? new URL(canonicalOverride)
+	: new URL(Astro.url.pathname, Astro.site);
+
+// For blog posts with a slug, use the generated OG image; otherwise fall back to image.src
+const ogImageUrl = (type === 'article' && slug)
+	? new URL(`/og/${slug}.png`, Astro.site).toString()
+	: new URL(image.src, Astro.url).toString();
+
+// JSON-LD BlogPosting structured data for blog posts
+const jsonLd = (type === 'article' && pubDate) ? JSON.stringify({
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	"headline": title,
+	"description": description,
+	"datePublished": pubDate.toISOString(),
+	"dateModified": (updatedDate || pubDate).toISOString(),
+	"author": { "@type": "Person", "name": "Vahagn Grigoryan" },
+	"image": ogImageUrl,
+	"url": canonicalURL.toString(),
+	"keywords": tags,
+}) : null;
 ---
 
 <!-- Global Metadata -->
@@ -40,15 +77,29 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:image" content={ogImageUrl} />
+{type === 'article' && pubDate && (
+	<meta property="article:published_time" content={pubDate.toISOString()} />
+)}
+{type === 'article' && updatedDate && (
+	<meta property="article:modified_time" content={updatedDate.toISOString()} />
+)}
+{type === 'article' && tags.map((tag) => (
+	<meta property="article:tag" content={tag} />
+))}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+<meta property="twitter:image" content={ogImageUrl} />
+
+<!-- JSON-LD Structured Data -->
+{jsonLd && (
+	<script type="application/ld+json" set:html={jsonLd} />
+)}

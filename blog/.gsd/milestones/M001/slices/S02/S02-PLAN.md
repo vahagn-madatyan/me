@@ -62,7 +62,7 @@
   - Verify: `npm run build` succeeds. `grep 'shiki-dark' dist/blog/markdown-style-guide/index.html` finds CSS variable references. `grep 'prose' dist/blog/first-post/index.html` confirms prose class present.
   - Done when: Build succeeds, existing posts render with dual-theme CSS variables on code spans, and prose classes produce actual typography styles.
 
-- [ ] **T02: Build blog components — BlogCard, reading time utility, and BlogPost layout update** `est:40m`
+- [x] **T02: Build blog components — BlogCard, reading time utility, and BlogPost layout update** `est:40m`
   - Why: Reusable components needed by paginated listing (T03), and downstream by S04 tag archives and S07 homepage. Reading time utility is a shared function.
   - Files: `src/utils/reading-time.ts`, `src/components/BlogCard.astro`, `src/layouts/BlogPost.astro`
   - Do: (1) Create `src/utils/reading-time.ts` exporting `getReadingTime(content: string): number` (strip markdown, count words, divide by 200, round up) and `formatReadingTime(minutes: number): string` → "X min read". (2) Create `src/components/BlogCard.astro` — card with hero image, title, description excerpt, formatted date, tag pills, reading time. Props from blog collection entry data + reading time + slug. Use static Tailwind classes (no dynamic class construction — they get purged in prod). (3) Update `src/layouts/BlogPost.astro` to accept and display reading time, tags array, and description. Add tag pills below title, reading time next to date. Keep existing prose container. Ensure type Props matches extended schema.

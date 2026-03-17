@@ -65,6 +65,14 @@ Create the reusable components that T03's pages will compose: a reading time uti
 - Check that BlogCard component file exists: `test -f src/components/BlogCard.astro`
 - Check that reading time utility exists: `test -f src/utils/reading-time.ts`
 
+## Observability Impact
+
+- **Reading time probe:** `grep -r 'min read' dist/blog/` — confirms reading time utility is wired to the BlogPost layout. Every post page should contain `X min read` text. Absence means the `[...slug].astro` page isn't computing or passing `readingTime` to the layout.
+- **Component existence:** `test -f src/components/BlogCard.astro && test -f src/utils/reading-time.ts` — verifies component and utility files are present.
+- **Tag rendering probe:** For any post with tags in frontmatter, `grep 'bg-primary-100' dist/blog/[slug]/index.html` should find tag pill markup. Absence means tags aren't being passed through or the layout's tag rendering is broken.
+- **BlogCard is not yet rendered in any page** — it's a component created for T03 (blog listing page) to consume. Until T03 integrates it, BlogCard is verifiable only by file existence and static analysis, not by build output.
+- **Failure mode:** If `readingTime` prop is missing from `[...slug].astro`, Astro will still build but the layout will render `NaN` or nothing — check for `NaN` in output as a failure signal.
+
 ## Inputs
 
 - `src/content.config.ts` — extended schema from T01 (tags, featured, draft, canonicalURL fields)

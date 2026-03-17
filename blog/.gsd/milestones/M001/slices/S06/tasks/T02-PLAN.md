@@ -84,6 +84,15 @@ Create the architecture gallery page at `/architecture` with a filterable diagra
 - `src/components/BaseLayout.astro` — wraps the page. Props: `title`, `description`.
 - S01 Forward Intelligence: Tailwind v4 purges classes only referenced in JS. Mitigate by having all toggled classes also appear in static `class:list` in the template.
 
+## Observability Impact
+
+- **New page route:** `/architecture` — verify presence via `dist/architecture/index.html` after build
+- **Lightbox component:** Inspect via `<dialog>` element in page source; test open/close via `data-lightbox-src` click, Escape, backdrop click
+- **Domain filter:** Verify via `data-filter` and `data-category` attributes in build HTML; test toggle via dev server
+- **Build signal:** `npm run build` exit code — non-zero means page has errors
+- **Verification script:** `bash scripts/verify-s06.sh` — aggregates all structural checks for both S06 pages into a single pass/fail summary
+- **Failure shapes:** Missing data-attributes in HTML → filter/lightbox JS silently no-ops (no errors, but UI doesn't respond). Missing `<dialog>` → lightbox doesn't open. Build failure → Astro error output with file/line.
+
 ## Expected Output
 
 - `src/data/architectures.ts` — TypeScript data file with interface and sample entries

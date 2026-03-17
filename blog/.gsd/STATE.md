@@ -1,9 +1,9 @@
 # GSD State
 
 **Active Milestone:** M001: The Site
-**Active Slice:** S04: Blog Reading Experience
+**Active Slice:** S06: About & Architecture
 **Phase:** executing
-**Requirements Status:** 18 active · 8 validated · 1 deferred · 2 out of scope
+**Requirements Status:** 12 active · 14 validated · 1 deferred · 2 out of scope
 
 ## Milestone Registry
 - 🔄 **M001:** The Site
@@ -17,4 +17,4 @@
 - None
 
 ## Next Action
-Execute T01 of slice S04 (Create tag archive pages and link tag pills).
+Execute T01: Build about page with bio, skills grid, and contact links in slice S06.

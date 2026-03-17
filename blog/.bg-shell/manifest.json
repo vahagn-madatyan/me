@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "93fed459",
+    "label": "astro-dev",
+    "command": "cd /Users/djbeatbug/RoadToMillion/me/blog && npm run dev",
+    "cwd": "/Users/djbeatbug/RoadToMillion/me/blog",
+    "startedAt": 1773731942524,
+    "processType": "server",
+    "group": null,
+    "readyPattern": null,
+    "readyPort": 4321,
+    "pid": 44766
+  }
+]

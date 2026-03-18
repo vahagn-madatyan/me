@@ -84,6 +84,13 @@ The NewsletterForm component is created here because it's part of the homepage a
 - Reading time must be computed via `getReadingTime(post.body ?? '')` in the page frontmatter, NOT in BlogCard.
 - Use `post.id` as the `slug` prop for BlogCard (Astro content collection pattern).
 
+## Observability Impact
+
+- **Signals changed:** Homepage goes from a single hero placeholder to rendering real blog collection data and project data — `dist/index.html` grows from ~20 lines of content to ~200+ lines with BlogCard and ProjectCard markup
+- **How to inspect:** `grep` for section-specific markers in `dist/index.html`: hero name ("Vahagn Grigoryan"), reading time ("min read"), post slugs ("building-a-developer-blog"), project names ("VaultBreaker"), and newsletter form ("Subscribe")
+- **Failure visibility:** Build errors surface via `npm run build` stderr. Empty featured posts section means the content collection query or featured-post fallback logic failed. Missing project cards mean `projects.ts` import failed. Newsletter form absence means `NewsletterForm.astro` wasn't created or imported.
+- **No runtime observability needed:** All content is statically rendered at build time. No client-side JS, no API calls, no error states to monitor.
+
 ## Expected Output
 
 - `src/components/NewsletterForm.astro` — new: visual-only newsletter form component with email input and styled submit button

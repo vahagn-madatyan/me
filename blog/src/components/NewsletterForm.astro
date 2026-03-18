@@ -1,0 +1,31 @@
+---
+// Visual-only newsletter signup component.
+// No form action, no JavaScript — purely presentational per D008.
+---
+
+<section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+  <div class="rounded-2xl bg-secondary-50 px-6 py-12 text-center dark:bg-secondary-800/50 sm:px-12">
+    <h2 class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100">
+      Stay in the loop
+    </h2>
+    <p class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-secondary-600 dark:text-secondary-400">
+      Get new posts on software architecture, system design, and engineering craft delivered to your inbox.
+    </p>
+    <form class="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
+      <label class="sr-only" for="newsletter-email">Email address</label>
+      <input
+        id="newsletter-email"
+        type="email"
+        placeholder="your@email.com"
+        required
+        class="flex-1 rounded-lg border border-secondary-300 bg-white px-4 py-2.5 text-sm text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-secondary-600 dark:bg-secondary-900 dark:text-secondary-100 dark:placeholder-secondary-500 dark:focus:border-primary-400 dark:focus:ring-primary-400/20"
+      />
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+      >
+        Subscribe
+      </button>
+    </form>
+  </div>
+</section>

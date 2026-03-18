@@ -1,29 +1,114 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BlogCard from '../components/BlogCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import NewsletterForm from '../components/NewsletterForm.astro';
+import { getCollection } from 'astro:content';
+import { getReadingTime } from '../utils/reading-time';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { projects } from '../data/projects';
+
+// Query blog posts — filter drafts in production, sort newest first
+const allPosts = (await getCollection('blog'))
+  .filter((post) => (import.meta.env.PROD ? !post.data.draft : true))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Get featured posts — if fewer than 3, fill remaining slots from latest non-featured
+const featured = allPosts.filter((p) => p.data.featured);
+const nonFeatured = allPosts.filter((p) => !p.data.featured);
+const slotsToFill = Math.max(0, 3 - featured.length);
+const featuredPosts = [...featured, ...nonFeatured.slice(0, slotsToFill)];
+
+// Compute reading time for each featured post
+const postsWithReadingTime = featuredPosts.map((post) => ({
+  ...post,
+  readingTime: getReadingTime(post.body ?? ''),
+}));
+
+// Select first 4 projects as highlights
+const highlightedProjects = projects.slice(0, 4);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 text-center">
+  <!-- Hero -->
+  <section class="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
     <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-5xl">
       Vahagn Grigoryan
     </h1>
-    <p class="mt-4 text-lg text-secondary-500 dark:text-secondary-400 max-w-xl mx-auto">
-      Software architect and engineer. Writing about building software, system design, and the craft of engineering.
+    <p class="mx-auto mt-4 max-w-xl text-lg text-secondary-500 dark:text-secondary-400">
+      {SITE_DESCRIPTION}
     </p>
     <div class="mt-8 flex justify-center gap-4">
       <a
         href="/blog"
-        class="inline-flex items-center px-5 py-2.5 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        class="inline-flex items-center rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
       >
         Read the Blog
       </a>
       <a
         href="/about"
-        class="inline-flex items-center px-5 py-2.5 rounded-lg border border-secondary-300 dark:border-secondary-700 text-secondary-700 dark:text-secondary-300 text-sm font-medium hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        class="inline-flex items-center rounded-lg border border-secondary-300 px-5 py-2.5 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800"
       >
         About Me
       </a>
     </div>
-  </div>
+  </section>
+
+  <!-- Featured Posts -->
+  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+    <div class="flex items-baseline justify-between">
+      <h2 class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100">
+        Latest Writing
+      </h2>
+      <a
+        href="/blog"
+        class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+      >
+        View all &rarr;
+      </a>
+    </div>
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {postsWithReadingTime.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          description={post.data.description}
+          pubDate={post.data.pubDate}
+          heroImage={post.data.heroImage}
+          tags={post.data.tags}
+          readingTime={post.readingTime}
+          slug={post.id}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Project Highlights -->
+  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+    <div class="flex items-baseline justify-between">
+      <h2 class="text-2xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100">
+        Featured Work
+      </h2>
+      <a
+        href="/work"
+        class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+      >
+        View all &rarr;
+      </a>
+    </div>
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {highlightedProjects.map((project) => (
+        <ProjectCard
+          title={project.title}
+          description={project.description}
+          category={project.category}
+          techStack={project.techStack}
+          githubUrl={project.githubUrl}
+          liveUrl={project.liveUrl}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Newsletter CTA -->
+  <NewsletterForm />
 </BaseLayout>

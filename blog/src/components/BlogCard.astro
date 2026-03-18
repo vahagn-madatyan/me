@@ -18,7 +18,7 @@ const { title, description, pubDate, heroImage, tags = [], readingTime, slug } =
 
 <article class="group rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:bg-secondary-900 dark:ring-secondary-800 dark:hover:ring-primary-700 overflow-hidden">
   {heroImage && (
-    <a href={`/blog/${slug}/`} class="block overflow-hidden">
+    <a href={`/blog/${slug}/`} class="block overflow-hidden" aria-hidden="true" tabindex="-1">
       <Image
         width={720}
         height={360}

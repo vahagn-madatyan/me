@@ -47,3 +47,14 @@ Recurring gotchas, non-obvious rules, and useful patterns discovered during exec
 - **Context:** TOC visibility threshold uses `readingTime >= 5` (5 min at 200 WPM = 1000 prose words).
 - **Detail:** The `getReadingTime()` utility strips code fences, inline code, images, and Markdown syntax before counting words. A post with 1300 total words but heavy code examples may only have 400 prose words → 2 min read. When targeting a specific reading-time threshold, count prose words after stripping, not raw word count.
 - **Gotcha:** `wc -w` on the markdown file reports total words including code blocks. The actual reading time will be much lower for code-heavy posts.
+
+## K010: Shiki github-dark theme comment color (#6A737D) fails WCAG AA contrast
+- **Context:** Lighthouse auditing code-heavy blog posts in dark mode (via `prefers-color-scheme: dark`).
+- **Detail:** The `github-dark` Shiki theme uses `#6A737D` for code comments on `#24292E` background — only 3.04:1 contrast, failing the 4.5:1 AA requirement. GitHub itself updated this color to `#8B949E` (4.77:1) in their newer theme versions, but the Shiki bundled version still uses the old color.
+- **Fix:** CSS override: `html.dark .astro-code span[style*="--shiki-dark:#6A737D"] { --shiki-dark: #8B949E !important; }`
+- **Gotcha:** Lighthouse detects dark mode from the OS/browser `prefers-color-scheme` setting. If your machine uses dark mode, Lighthouse will test the dark-mode variant of the page, catching contrast issues that wouldn't appear in light mode.
+
+## K011: Duplicate image-only links in card components fail Lighthouse link-name audit
+- **Context:** Blog card component with hero image wrapped in `<a>` plus heading text wrapped in separate `<a>` to the same URL.
+- **Detail:** An `<a>` containing only an `<img alt="">` is flagged as "Links do not have a discernible name" because assistive technology sees an empty link. The heading link below already provides accessible navigation.
+- **Fix:** Add `aria-hidden="true" tabindex="-1"` to the decorative image link — removes it from accessibility tree and tab order while keeping the visual click target for sighted users.

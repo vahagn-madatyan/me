@@ -45,3 +45,20 @@ Run Lighthouse audit against the live production URL. Verify Brotli compression 
 
 - Lighthouse report confirming 95+ on all metrics (saved as `lighthouse-report.html` / `lighthouse-report.json` for reference)
 - `public/_headers` — possibly updated if tuning was needed
+
+## Observability Impact
+
+**Signals this task produces:**
+- Lighthouse report files (`lighthouse-report.report.html`, `lighthouse-report.report.json`) — persist the full audit as a reference artifact. Scores are the primary signal for R023 validation.
+- Any source file changes made to fix Lighthouse issues become observable in future audits.
+
+**How a future agent inspects this task's output:**
+- Re-run `npx lighthouse http://localhost:4321 --output=json --chrome-flags="--headless"` and parse the JSON for `categories.*.score` values
+- Check `public/_headers` for correct cache-control and security header rules
+- After deployment: `curl -sI https://vahagn.dev -H "Accept-Encoding: br" | grep -i content-encoding` → should show `br`
+- After deployment: `curl -sI https://vahagn.dev/ | grep -i cache-control` → should show revalidation header
+
+**Failure states:**
+- Lighthouse score <95 on any metric → indicates missing meta tags, accessibility issues, or unoptimized images
+- Missing `_headers` file or wrong syntax → CDN won't apply custom cache/security headers (only visible post-deploy)
+- Brotli not enabled → hosting platform configuration issue (not fixable in source code)

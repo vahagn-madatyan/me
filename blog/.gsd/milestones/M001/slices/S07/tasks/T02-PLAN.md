@@ -79,6 +79,13 @@ Create a branded 404 page (R019) and write the slice verification script that va
 - `scripts/verify-s05.sh` — S05 regression script (19 checks)
 - Project names from `src/data/projects.ts`: VaultBreaker, CortexML, PacketForge, AlphaGrid, SentinelIDS, NeuroChat
 
+## Observability Impact
+
+- **New inspection surface:** `dist/404.html` — grep for "404", "Page not found", and `href="/"` to confirm 404 page renders correctly
+- **Verification script:** `bash scripts/verify-s07.sh` — runs all S07 checks plus S01/S02/S05 regressions; exit code 0 means all pass, non-zero means failures with per-check output showing which failed
+- **Failure visibility:** 404 page build failures surface as Astro build errors with stack traces pointing to `src/pages/404.astro`. Missing BaseLayout import or broken props cause compile-time errors, never silent runtime failures.
+- **No runtime signals:** 404 page is fully static HTML — no client-side JS, no async data fetching, no error boundaries
+
 ## Expected Output
 
 - `src/pages/404.astro` — new: branded 404 page with heading, message, and home link

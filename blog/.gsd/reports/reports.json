@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "projectName": "blog",
+  "projectPath": "/Users/djbeatbug/RoadToMillion/me/blog",
+  "gsdVersion": "2.28.0",
+  "entries": [
+    {
+      "filename": "M001-2026-03-18T05-30-10.html",
+      "generatedAt": "2026-03-18T05:30:10.080Z",
+      "milestoneId": "M001",
+      "milestoneTitle": "The Site",
+      "label": "M001: The Site",
+      "kind": "milestone",
+      "totalCost": 73.51167749999996,
+      "totalTokens": 88542680,
+      "totalDuration": 32426095,
+      "doneSlices": 7,
+      "totalSlices": 7,
+      "doneMilestones": 1,
+      "totalMilestones": 3,
+      "phase": "pre-planning"
+    }
+  ]
+}

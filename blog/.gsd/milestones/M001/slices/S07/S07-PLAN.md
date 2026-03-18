@@ -42,7 +42,7 @@
   - Verify: `npm run build` zero errors; `grep` for hero text, BlogCard markup (min read, tag pills), ProjectCard markup (tech badges, GitHub links), and newsletter form in `dist/index.html`
   - Done when: `dist/index.html` contains all four homepage sections with real data from blog collection and projects.ts
 
-- [ ] **T02: Add custom 404 page and build verification script** `est:20m`
+- [x] **T02: Add custom 404 page and build verification script** `est:20m`
   - Why: Delivers R019 (custom 404) and provides the slice's objective verification script covering all S07 deliverables plus upstream regressions.
   - Files: `src/pages/404.astro`, `scripts/verify-s07.sh`
   - Do: Create `404.astro` wrapped in BaseLayout with heading, friendly message, and link back to home — styled consistently with the site's dark-first design. Write `scripts/verify-s07.sh` that runs `npm run build` and checks: (1) dist/index.html exists, (2) hero content present, (3) featured blog post titles in homepage, (4) reading time on homepage cards, (5) project titles in homepage, (6) tech stack badges in homepage, (7) newsletter form markup present, (8) dist/404.html exists, (9) 404 has back-to-home link, (10) S01/S02/S05 regression scripts pass. Run the script to confirm all checks pass.

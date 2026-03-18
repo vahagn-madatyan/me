@@ -87,6 +87,12 @@ export function useKeyboardNav({
         setViewMode("list");
         return;
       }
+
+      // --- s: grouped (sector) view ---
+      if (e.key === "s") {
+        setViewMode("grouped");
+        return;
+      }
     },
     [
       filteredCount,

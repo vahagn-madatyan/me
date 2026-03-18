@@ -1,13 +1,50 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import MatrixCanvas from "./components/MatrixCanvas";
 import GlobalStyles from "./components/GlobalStyles";
 import ScanLine from "./components/ScanLine";
 import LandingPage from "./components/LandingPage";
 import ProjectsView from "./components/ProjectsView";
 
+function getInitialView() {
+  const hash = window.location.hash;
+  if (hash.startsWith("#/project/") || hash.startsWith("#/category/") || hash === "#/projects") {
+    return "projects";
+  }
+  return "landing";
+}
+
 export default function UnifiedPortfolioDashboard() {
-  const [view, setView] = useState("landing");
+  const [view, setView] = useState(getInitialView);
   const [entering, setEntering] = useState(false);
+
+  // Sync hash -> view on hashchange
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === "#/" || hash === "" || hash === "#") {
+        setView("landing");
+      } else if (hash.startsWith("#/project/") || hash.startsWith("#/category/") || hash === "#/projects") {
+        setView("projects");
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  // Sync view -> hash
+  useEffect(() => {
+    if (view === "landing") {
+      if (window.location.hash !== "#/") {
+        window.location.hash = "#/";
+      }
+    } else if (view === "projects") {
+      const hash = window.location.hash;
+      // Only set generic #/projects if not already on a deep link
+      if (!hash.startsWith("#/project/") && !hash.startsWith("#/category/") && hash !== "#/projects") {
+        window.location.hash = "#/projects";
+      }
+    }
+  }, [view]);
 
   const handleEnter = useCallback(() => {
     setEntering(true);

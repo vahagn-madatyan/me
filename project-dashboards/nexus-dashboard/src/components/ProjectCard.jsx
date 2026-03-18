@@ -5,7 +5,7 @@ import { relativeTime } from "../utils/relativeTime";
 
 const MONO = "'JetBrains Mono', 'Fira Code', monospace";
 
-const ProjectCard = ({ project, onClick, delay = 0 }) => {
+const ProjectCard = ({ project, onClick, delay = 0, focused = false }) => {
   const [hovered, setHovered] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -15,6 +15,8 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
   }, [delay]);
 
   const sc = statusConfig[project.status] || { color: "#888", sym: "○" };
+  const statusRgb = hexToRgb(sc.color);
+  const accentRgb = hexToRgb(project.accent);
   const priorityOpacity = project.priority ? Math.max(0.1, 1 - (project.priority - 1) * 0.2) : 0;
 
   return (
@@ -24,15 +26,17 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
       onMouseLeave={() => setHovered(false)}
       style={{
         background: hovered
-          ? `linear-gradient(135deg, rgba(${hexToRgb(project.accent)},0.06) 0%, rgba(2,4,2,0.95) 100%)`
-          : "rgba(4,8,4,0.8)",
-        border: `1px solid ${hovered ? project.accent + "40" : "rgba(0,255,170,0.06)"}`,
+          ? `linear-gradient(135deg, rgba(${statusRgb},0.05) 0%, rgba(2,4,2,0.95) 100%)`
+          : `linear-gradient(180deg, rgba(${statusRgb},0.02) 0%, rgba(4,8,4,0.8) 100%)`,
+        border: `1px solid ${focused ? sc.color + "60" : hovered ? sc.color + "30" : "rgba(0,255,170,0.06)"}`,
         padding: "16px",
         cursor: "pointer",
         transition: "all 0.3s ease",
         position: "relative",
         overflow: "hidden",
-        boxShadow: hovered ? `0 0 20px rgba(${hexToRgb(project.accent)},0.08)` : "none",
+        boxShadow: focused
+          ? `0 0 20px rgba(${statusRgb},0.12), inset 0 0 20px rgba(${statusRgb},0.02)`
+          : hovered ? `0 0 20px rgba(${statusRgb},0.08)` : "none",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(12px)",
         backdropFilter: "blur(8px)",
@@ -41,14 +45,14 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
       {/* Priority bar (left edge) */}
       <div style={{
         position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
-        background: `rgba(${hexToRgb(project.accent)},${priorityOpacity})`,
-        boxShadow: priorityOpacity > 0.5 ? `0 0 4px rgba(${hexToRgb(project.accent)},${priorityOpacity * 0.5})` : "none",
+        background: `rgba(${accentRgb},${priorityOpacity})`,
+        boxShadow: priorityOpacity > 0.5 ? `0 0 4px rgba(${accentRgb},${priorityOpacity * 0.5})` : "none",
       }} />
 
-      {/* Top line */}
+      {/* Top line — uses status color */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: "1px",
-        background: `linear-gradient(90deg, transparent, ${project.accent}${hovered ? "60" : "20"}, transparent)`,
+        background: `linear-gradient(90deg, transparent, ${sc.color}${hovered ? "50" : "20"}, transparent)`,
         transition: "all 0.3s ease",
       }} />
 
@@ -60,7 +64,7 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{
                 fontFamily: MONO, fontSize: "0.9rem", fontWeight: "bold",
-                color: project.accent, textShadow: `0 0 8px rgba(${hexToRgb(project.accent)},0.3)`,
+                color: project.accent, textShadow: `0 0 8px rgba(${accentRgb},0.3)`,
                 letterSpacing: "2px",
               }}>
                 {project.name}
@@ -110,20 +114,20 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
         {project.tagline}
       </div>
 
-      {/* Progress */}
+      {/* Progress — uses status color */}
       <div style={{ marginBottom: "12px" }}>
         <div style={{
           display: "flex", justifyContent: "space-between", marginBottom: "3px",
           fontFamily: MONO, fontSize: "0.45rem", color: "rgba(0,255,170,0.2)", letterSpacing: "1px",
         }}>
           <span>COMPLETION</span>
-          <span style={{ color: project.accent }}>{project.phase}%</span>
+          <span style={{ color: sc.color }}>{project.phase}%</span>
         </div>
         <div style={{ height: "2px", background: "rgba(0,255,170,0.06)", overflow: "hidden" }}>
           <div style={{
             height: "100%", width: `${project.phase}%`,
-            background: project.accent,
-            boxShadow: `0 0 8px ${project.accent}`,
+            background: sc.color,
+            boxShadow: `0 0 8px ${sc.color}`,
             transition: "width 1s ease",
           }} />
         </div>
@@ -133,8 +137,8 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", marginBottom: "8px" }}>
         {project.stats.map((stat, i) => (
           <div key={i} style={{
-            background: "rgba(0,255,170,0.015)",
-            border: "1px solid rgba(0,255,170,0.04)",
+            background: `rgba(${statusRgb},0.015)`,
+            border: `1px solid rgba(${statusRgb},0.04)`,
             padding: "6px 8px",
           }}>
             <div style={{
@@ -145,7 +149,7 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
             </div>
             <div style={{
               fontFamily: MONO, fontSize: "0.75rem", color: project.accent,
-              fontWeight: "bold", textShadow: `0 0 6px rgba(${hexToRgb(project.accent)},0.2)`,
+              fontWeight: "bold", textShadow: `0 0 6px rgba(${accentRgb},0.2)`,
             }}>
               {stat.value}
             </div>

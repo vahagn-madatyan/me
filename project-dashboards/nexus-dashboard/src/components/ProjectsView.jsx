@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { projects, categoryColors, statusConfig } from "../data/projects";
-import { hexToRgb } from "../utils/hexToRgb";
 import { computeHeatScore } from "../utils/computeHeatScore";
+import { useKeyboardNav } from "../hooks/useKeyboardNav";
 import ProjectCard from "./ProjectCard";
 import FilterPill from "./FilterPill";
 import ActiveOpsStrip from "./ActiveOpsStrip";
+import StatusBar from "./StatusBar";
+import ProjectDetailPanel from "./ProjectDetailPanel";
 
 const MONO = "'JetBrains Mono', 'Fira Code', monospace";
 
@@ -33,18 +35,38 @@ function sortProjects(list, sortBy) {
     default:
       break;
   }
-  // Pin active projects to top
   const active = sorted.filter(p => p.isActive);
   const rest = sorted.filter(p => !p.isActive);
   return [...active, ...rest];
 }
 
+function groupByCategory(list) {
+  const groups = {};
+  list.forEach(p => {
+    if (!groups[p.category]) groups[p.category] = [];
+    groups[p.category].push(p);
+  });
+  // Sort groups by aggregate heat score (descending)
+  const entries = Object.entries(groups);
+  entries.sort((a, b) => {
+    const scoreA = a[1].reduce((sum, p) => sum + computeHeatScore(p), 0);
+    const scoreB = b[1].reduce((sum, p) => sum + computeHeatScore(p), 0);
+    return scoreB - scoreA;
+  });
+  return entries;
+}
+
 const ProjectsView = ({ onBack }) => {
-  const [expandedCard, setExpandedCard] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const [activeStatus, setActiveStatus] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("activity");
+  const [collapsedGroups, setCollapsedGroups] = useState({});
+  const searchInputRef = useRef(null);
+  // Track whether hash is being updated internally to avoid loops
+  const hashUpdateRef = useRef(false);
 
   const categories = ["ALL", ...new Set(projects.map(p => p.category))];
   const activeProjects = projects.filter(p => p.isActive);
@@ -52,14 +74,126 @@ const ProjectsView = ({ onBack }) => {
   const filtered = sortProjects(
     projects.filter(p => {
       const matchCat = activeFilter === "ALL" || p.category === activeFilter;
+      const matchStatus = !activeStatus || p.status === activeStatus;
       const matchSearch = !searchTerm ||
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.tagline.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.tech.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
-      return matchCat && matchSearch;
+      return matchCat && matchStatus && matchSearch;
     }),
     sortBy
   );
+
+  // --- Hash routing: read hash on mount ---
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#/category/")) {
+      const catName = decodeURIComponent(hash.slice("#/category/".length));
+      const matchedCat = categories.find(c => c === catName);
+      if (matchedCat) {
+        setActiveFilter(matchedCat);
+      }
+    } else if (hash.startsWith("#/project/")) {
+      const projectId = decodeURIComponent(hash.slice("#/project/".length));
+      const found = projects.find(p => p.id === projectId);
+      if (found) {
+        setSelectedProject(found);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // --- Hash routing: listen for hashchange ---
+  useEffect(() => {
+    const onHashChange = () => {
+      if (hashUpdateRef.current) {
+        hashUpdateRef.current = false;
+        return;
+      }
+      const hash = window.location.hash;
+      if (hash.startsWith("#/category/")) {
+        const catName = decodeURIComponent(hash.slice("#/category/".length));
+        const matchedCat = categories.find(c => c === catName);
+        if (matchedCat) {
+          setActiveFilter(matchedCat);
+          setSelectedProject(null);
+        }
+      } else if (hash.startsWith("#/project/")) {
+        const projectId = decodeURIComponent(hash.slice("#/project/".length));
+        const found = projects.find(p => p.id === projectId);
+        if (found) {
+          setSelectedProject(found);
+        }
+      } else if (hash === "#/projects") {
+        setActiveFilter("ALL");
+        setSelectedProject(null);
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories]);
+
+  // --- Hash routing: sync activeFilter -> hash ---
+  const setActiveFilterWithHash = useCallback((filter) => {
+    setActiveFilter(filter);
+    hashUpdateRef.current = true;
+    if (filter === "ALL") {
+      window.location.hash = "#/projects";
+    } else {
+      window.location.hash = "#/category/" + encodeURIComponent(filter);
+    }
+  }, []);
+
+  // --- Hash routing: sync detail panel -> hash ---
+  const openDetailWithHash = useCallback((project) => {
+    setSelectedProject(project);
+    hashUpdateRef.current = true;
+    window.location.hash = "#/project/" + encodeURIComponent(project.id);
+  }, []);
+
+  const closeDetailWithHash = useCallback(() => {
+    setSelectedProject(null);
+    hashUpdateRef.current = true;
+    if (activeFilter === "ALL") {
+      window.location.hash = "#/projects";
+    } else {
+      window.location.hash = "#/category/" + encodeURIComponent(activeFilter);
+    }
+  }, [activeFilter]);
+
+  const handleOpenDetail = useCallback((index) => {
+    if (index >= 0 && index < filtered.length) {
+      openDetailWithHash(filtered[index]);
+    }
+  }, [filtered, openDetailWithHash]);
+
+  const handleCloseDetail = useCallback(() => {
+    closeDetailWithHash();
+  }, [closeDetailWithHash]);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchTerm("");
+  }, []);
+
+  const toggleGroup = useCallback((category) => {
+    setCollapsedGroups(prev => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  }, []);
+
+  const { focusedIndex } = useKeyboardNav({
+    filteredCount: filtered.length,
+    searchInputRef,
+    onOpenDetail: handleOpenDetail,
+    onCloseDetail: handleCloseDetail,
+    onClearSearch: handleClearSearch,
+    setViewMode,
+    detailOpen: !!selectedProject,
+  });
+
+  const grouped = groupByCategory(filtered);
 
   return (
     <div style={{
@@ -129,6 +263,7 @@ const ProjectsView = ({ onBack }) => {
           }}>
             <span style={{ fontFamily: MONO, color: "rgba(0,255,170,0.3)", fontSize: "0.7rem", marginRight: "8px" }}>$</span>
             <input
+              ref={searchInputRef}
               type="text" placeholder="grep -i 'keyword' ./projects/*"
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -143,7 +278,11 @@ const ProjectsView = ({ onBack }) => {
             )}
           </div>
           <div style={{ display: "flex", gap: "2px" }}>
-            {["grid", "list"].map(mode => (
+            {[
+              { mode: "grid", icon: "⊞" },
+              { mode: "list", icon: "☰" },
+              { mode: "grouped", icon: "⊟" },
+            ].map(({ mode, icon }) => (
               <button key={mode} onClick={() => setViewMode(mode)} style={{
                 padding: "7px 10px", fontFamily: MONO,
                 background: viewMode === mode ? "rgba(0,255,170,0.1)" : "transparent",
@@ -151,7 +290,7 @@ const ProjectsView = ({ onBack }) => {
                 color: viewMode === mode ? "#0fa" : "rgba(0,255,170,0.2)",
                 cursor: "pointer", fontSize: "0.6rem",
               }}>
-                {mode === "grid" ? "⊞" : "☰"}
+                {icon}
               </button>
             ))}
           </div>
@@ -185,10 +324,13 @@ const ProjectsView = ({ onBack }) => {
             <FilterPill key={cat} label={cat}
               active={activeFilter === cat}
               color={cat === "ALL" ? "#0fa" : categoryColors[cat]}
-              onClick={() => setActiveFilter(cat)} />
+              onClick={() => setActiveFilterWithHash(cat)} />
           ))}
         </div>
       </div>
+
+      {/* Status Bar */}
+      <StatusBar activeStatus={activeStatus} onStatusClick={setActiveStatus} />
 
       {/* Count */}
       <div style={{
@@ -197,21 +339,92 @@ const ProjectsView = ({ onBack }) => {
       }}>
         RESULTS: {filtered.length}/{projects.length}
         {activeFilter !== "ALL" && <span style={{ color: categoryColors[activeFilter] }}> [{activeFilter}]</span>}
+        {activeStatus && <span style={{ color: statusConfig[activeStatus]?.color }}> [{activeStatus}]</span>}
       </div>
 
-      {/* Grid */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(340px, 1fr))" : "1fr",
-        gap: "8px", marginBottom: "50px",
-      }}>
-        {filtered.map((project, i) => (
-          <ProjectCard key={project.id} project={project}
-            onClick={() => setExpandedCard(expandedCard === project.id ? null : project.id)}
-            delay={i * 50}
-          />
-        ))}
-      </div>
+      {/* Grid / List / Grouped */}
+      {viewMode === "grouped" ? (
+        <div style={{ marginBottom: "50px" }}>
+          {grouped.map(([category, groupProjects]) => {
+            const isCollapsed = !!collapsedGroups[category];
+            const catColor = categoryColors[category] || "#0fa";
+            return (
+              <div key={category} style={{ marginBottom: "16px" }}>
+                {/* Group header */}
+                <div
+                  onClick={() => toggleGroup(category)}
+                  style={{
+                    cursor: "pointer",
+                    fontFamily: MONO,
+                    fontSize: "0.5rem",
+                    letterSpacing: "2px",
+                    color: catColor,
+                    textShadow: `0 0 10px ${catColor}40`,
+                    padding: "10px 0",
+                    borderBottom: `1px solid ${catColor}30`,
+                    marginBottom: isCollapsed ? "0" : "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    userSelect: "none",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <span style={{
+                    display: "inline-block",
+                    transition: "transform 0.2s ease",
+                    transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                    fontSize: "0.5rem",
+                  }}>
+                    ▾
+                  </span>
+                  <span>
+                    {"═══"} SECTOR: {category} {"═══"} [{groupProjects.length} NODES]
+                  </span>
+                </div>
+                {/* Group content with collapse animation */}
+                <div style={{
+                  overflow: "hidden",
+                  maxHeight: isCollapsed ? "0" : "5000px",
+                  opacity: isCollapsed ? 0 : 1,
+                  transition: "max-height 0.4s ease, opacity 0.3s ease",
+                }}>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                    gap: "8px",
+                    paddingTop: "4px",
+                  }}>
+                    {groupProjects.map((project, i) => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onClick={() => openDetailWithHash(project)}
+                        delay={i * 50}
+                        focused={focusedIndex !== null && filtered[focusedIndex]?.id === project.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(340px, 1fr))" : "1fr",
+          gap: "8px", marginBottom: "50px",
+        }}>
+          {filtered.map((project, i) => (
+            <ProjectCard key={project.id} project={project}
+              onClick={() => openDetailWithHash(project)}
+              delay={i * 50}
+              focused={focusedIndex === i}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Tech Radar */}
       <div style={{ borderTop: "1px solid rgba(0,255,170,0.06)", paddingTop: "30px", marginBottom: "30px" }}>
@@ -245,32 +458,12 @@ const ProjectsView = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Status */}
+      {/* Keyboard shortcuts hint */}
       <div style={{
-        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: "4px", marginBottom: "40px",
+        textAlign: "center", fontFamily: MONO, fontSize: "0.38rem",
+        color: "rgba(0,255,170,0.1)", letterSpacing: "1px", marginBottom: "20px",
       }}>
-        {Object.entries(statusConfig).map(([status, config]) => {
-          const count = projects.filter(p => p.status === status).length;
-          return (
-            <div key={status} style={{
-              background: "rgba(0,255,170,0.015)",
-              border: `1px solid rgba(${hexToRgb(config.color)},0.1)`,
-              padding: "12px 14px",
-              display: "flex", alignItems: "center", gap: "10px",
-            }}>
-              <div style={{
-                fontFamily: MONO, fontSize: "1.4rem", fontWeight: "bold",
-                color: config.color, textShadow: `0 0 8px ${config.color}40`,
-                minWidth: "28px",
-              }}>{count}</div>
-              <div style={{
-                fontFamily: MONO, fontSize: "0.45rem", color: config.color,
-                letterSpacing: "1.5px", opacity: 0.7,
-              }}>{status}</div>
-            </div>
-          );
-        })}
+        / search &nbsp; esc close &nbsp; j/k navigate &nbsp; enter detail &nbsp; g grid &nbsp; l list &nbsp; s grouped
       </div>
 
       {/* Footer */}
@@ -284,6 +477,9 @@ const ProjectsView = ({ onBack }) => {
           V.MADATYAN // 2025-2026 // BUILDING AUTONOMOUS SECURITY & AI
         </div>
       </div>
+
+      {/* Project Detail Panel */}
+      <ProjectDetailPanel project={selectedProject} onClose={handleCloseDetail} />
     </div>
   );
 };

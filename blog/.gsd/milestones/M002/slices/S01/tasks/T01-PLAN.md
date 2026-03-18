@@ -52,3 +52,23 @@ Create the two static files needed for Cloudflare Pages deployment (`.node-versi
 - `.node-version` — new file, Node version for CF Pages
 - `public/_headers` — new file, cache control and security response headers
 - Live site at `<project>.pages.dev` served by Cloudflare Pages
+
+## Observability Impact
+
+**Signals added:**
+- `.node-version` tells CF Pages which Node version to use — visible in build log as "Node version: 22.x.x"
+- `public/_headers` injects response headers on every request — observable via `curl -I` against any path
+- `/_astro/*` assets get `Cache-Control: public, max-age=31536000, immutable` — verifiable per-asset
+- `/*` paths get security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) — verifiable via `curl -I`
+
+**Inspection commands:**
+- `cat .node-version` — confirms file content is `22`
+- `cat public/_headers` — confirms header rules, absence of `no-transform`
+- `npm run build` — local build sanity check (22 pages, zero errors)
+- `curl -I https://<project>.pages.dev` — confirms site is live with correct headers
+- `curl -I https://<project>.pages.dev/og/mastering-typescript-patterns.png` — confirms OG images built
+
+**Failure states:**
+- If `.node-version` is missing or wrong: CF Pages uses default Node (may be too old), build fails on Sharp or `engines` mismatch
+- If `public/_headers` has syntax errors: headers are silently ignored, `curl -I` shows default CF headers
+- If `no-transform` is present on HTML: Web Analytics beacon auto-injection is blocked (detectable in T04)

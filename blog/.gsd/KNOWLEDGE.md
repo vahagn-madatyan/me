@@ -38,6 +38,11 @@ Recurring gotchas, non-obvious rules, and useful patterns discovered during exec
 - **Detail:** esbuild (used by Vite/Astro) fails to parse nested template literals like `` `outer ${encodeURIComponent(`inner ${var}`)}` ``. The error is a cryptic `Syntax error "\"` pointing at the line.
 - **Fix:** Use string concatenation instead: `"prefix" + var + "suffix"` for the inner expression, then wrap in the outer template literal or also concatenate.
 
+## K009: Cloudflare Pages `_headers` file — order matters and `no-transform` blocks beacon injection
+- **Context:** `public/_headers` deployed as a static file with Cloudflare Pages.
+- **Detail:** CF Pages processes `_headers` rules top-to-bottom, with more-specific paths first. The `/_astro/*` rule must come before `/*` so hashed assets get immutable caching while HTML gets must-revalidate. The `no-transform` directive in `Cache-Control` blocks Cloudflare's auto-injection of the Web Analytics beacon script into HTML responses — never use it on HTML paths if you want CF Web Analytics.
+- **Gotcha:** The `_headers` file is silently ignored if it has syntax errors (wrong indentation, missing colon). Always verify with `curl -I` after deployment.
+
 ## K008: Reading-time function strips code blocks — prose word count is what matters for thresholds
 - **Context:** TOC visibility threshold uses `readingTime >= 5` (5 min at 200 WPM = 1000 prose words).
 - **Detail:** The `getReadingTime()` utility strips code fences, inline code, images, and Markdown syntax before counting words. A post with 1300 total words but heavy code examples may only have 400 prose words → 2 min read. When targeting a specific reading-time threshold, count prose words after stripping, not raw word count.

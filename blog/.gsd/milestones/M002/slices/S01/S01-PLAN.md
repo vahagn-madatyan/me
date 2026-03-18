@@ -41,16 +41,7 @@
   - Verify: CF Pages build completes with zero errors; `<project>.pages.dev` URL serves the site; OG images are present at `<project>.pages.dev/og/mastering-typescript-patterns.png`
   - Done when: the site is live at the `.pages.dev` URL with all pages and OG images working
 
-- [ ] **T02: Configure custom domain and DNS** `est:15m`
-  - Why: Without the custom domain, there's no `vahagn.dev`. This validates R022 and starts DNS propagation early.
-  - Files: none (Cloudflare dashboard configuration)
-  - Do:
-    1. If vahagn.dev is not already on Cloudflare: add it as a zone in Cloudflare dashboard, update registrar nameservers to Cloudflare's assigned nameservers, wait for zone activation
-    2. In CF Pages project settings → Custom domains: add `vahagn.dev` as custom domain
-    3. Add `www.vahagn.dev` as a second custom domain (CF Pages handles www→apex redirect automatically)
-    4. Wait for SSL certificate provisioning (typically 5-15 minutes after DNS propagates)
-  - Verify: `curl -I https://vahagn.dev` returns 200 with valid HTTPS; `curl -I https://www.vahagn.dev` redirects to `https://vahagn.dev`; all pages load at the production domain
-  - Done when: `https://vahagn.dev` serves the site with valid HTTPS and www redirects to apex
+- [x] **T02: Configure custom domain and DNS** `est:15m` — ⚠️ Skipped: user will handle all deployment (Vercel, not CF Pages). Local build verified: 22 pages, 7 OG images, zero errors.
 
 - [ ] **T03: Verify performance and tune if needed** `est:15m`
   - Why: Validates R023 (Lighthouse 95+, Brotli, cache headers). The site's architecture (pure static, zero JS, one 57KB CSS file) should hit 95+ naturally, but this task verifies against the live URL and fixes any gaps.

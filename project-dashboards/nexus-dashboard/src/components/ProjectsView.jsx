@@ -1,27 +1,65 @@
 import { useState } from "react";
 import { projects, categoryColors, statusConfig } from "../data/projects";
 import { hexToRgb } from "../utils/hexToRgb";
+import { computeHeatScore } from "../utils/computeHeatScore";
 import ProjectCard from "./ProjectCard";
 import FilterPill from "./FilterPill";
+import ActiveOpsStrip from "./ActiveOpsStrip";
 
 const MONO = "'JetBrains Mono', 'Fira Code', monospace";
+
+const SORT_MODES = [
+  { key: "activity", label: "ACTIVITY" },
+  { key: "progress", label: "PROGRESS" },
+  { key: "name", label: "NAME" },
+  { key: "sector", label: "SECTOR" },
+];
+
+function sortProjects(list, sortBy) {
+  const sorted = [...list];
+  switch (sortBy) {
+    case "activity":
+      sorted.sort((a, b) => computeHeatScore(b) - computeHeatScore(a));
+      break;
+    case "progress":
+      sorted.sort((a, b) => b.phase - a.phase);
+      break;
+    case "name":
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "sector":
+      sorted.sort((a, b) => a.category.localeCompare(b.category) || computeHeatScore(b) - computeHeatScore(a));
+      break;
+    default:
+      break;
+  }
+  // Pin active projects to top
+  const active = sorted.filter(p => p.isActive);
+  const rest = sorted.filter(p => !p.isActive);
+  return [...active, ...rest];
+}
 
 const ProjectsView = ({ onBack }) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
+  const [sortBy, setSortBy] = useState("activity");
 
   const categories = ["ALL", ...new Set(projects.map(p => p.category))];
+  const activeProjects = projects.filter(p => p.isActive);
 
-  const filtered = projects.filter(p => {
-    const matchCat = activeFilter === "ALL" || p.category === activeFilter;
-    const matchSearch = !searchTerm ||
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.tagline.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.tech.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchCat && matchSearch;
-  });
+  const filtered = sortProjects(
+    projects.filter(p => {
+      const matchCat = activeFilter === "ALL" || p.category === activeFilter;
+      const matchSearch = !searchTerm ||
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.tagline.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.tech.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+      return matchCat && matchSearch;
+    }),
+    sortBy
+  );
 
   return (
     <div style={{
@@ -78,7 +116,10 @@ const ProjectsView = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Search + view */}
+      {/* Active Ops Strip */}
+      <ActiveOpsStrip projects={activeProjects} />
+
+      {/* Search + sort + view */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{
@@ -111,6 +152,29 @@ const ProjectsView = ({ onBack }) => {
                 cursor: "pointer", fontSize: "0.6rem",
               }}>
                 {mode === "grid" ? "⊞" : "☰"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sort controls */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{
+            fontFamily: MONO, fontSize: "0.42rem", color: "rgba(0,255,170,0.2)",
+            letterSpacing: "1.5px", whiteSpace: "nowrap",
+          }}>
+            SORT_BY:
+          </span>
+          <div style={{ display: "flex", gap: "2px" }}>
+            {SORT_MODES.map(mode => (
+              <button key={mode.key} onClick={() => setSortBy(mode.key)} style={{
+                padding: "3px 10px", fontFamily: MONO, fontSize: "0.42rem", letterSpacing: "1px",
+                color: sortBy === mode.key ? "#020402" : "rgba(0,255,170,0.3)",
+                background: sortBy === mode.key ? "#0fa" : "transparent",
+                border: `1px solid ${sortBy === mode.key ? "transparent" : "rgba(0,255,170,0.08)"}`,
+                cursor: "pointer", transition: "all 0.2s ease", textTransform: "uppercase",
+              }}>
+                {sortBy === mode.key ? `${mode.label}▾` : mode.label}
               </button>
             ))}
           </div>

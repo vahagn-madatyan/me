@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { statusConfig } from "../data/projects";
 import { hexToRgb } from "../utils/hexToRgb";
+import { relativeTime } from "../utils/relativeTime";
 
 const MONO = "'JetBrains Mono', 'Fira Code', monospace";
 
@@ -14,6 +15,7 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
   }, [delay]);
 
   const sc = statusConfig[project.status] || { color: "#888", sym: "○" };
+  const priorityOpacity = project.priority ? Math.max(0.1, 1 - (project.priority - 1) * 0.2) : 0;
 
   return (
     <div
@@ -36,6 +38,13 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
         backdropFilter: "blur(8px)",
       }}
     >
+      {/* Priority bar (left edge) */}
+      <div style={{
+        position: "absolute", left: 0, top: 0, bottom: 0, width: "2px",
+        background: `rgba(${hexToRgb(project.accent)},${priorityOpacity})`,
+        boxShadow: priorityOpacity > 0.5 ? `0 0 4px rgba(${hexToRgb(project.accent)},${priorityOpacity * 0.5})` : "none",
+      }} />
+
       {/* Top line */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: "1px",
@@ -48,13 +57,24 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "1.1rem" }}>{project.icon}</span>
           <div>
-            <span style={{
-              fontFamily: MONO, fontSize: "0.9rem", fontWeight: "bold",
-              color: project.accent, textShadow: `0 0 8px rgba(${hexToRgb(project.accent)},0.3)`,
-              letterSpacing: "2px",
-            }}>
-              {project.name}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{
+                fontFamily: MONO, fontSize: "0.9rem", fontWeight: "bold",
+                color: project.accent, textShadow: `0 0 8px rgba(${hexToRgb(project.accent)},0.3)`,
+                letterSpacing: "2px",
+              }}>
+                {project.name}
+              </span>
+              {project.isActive && (
+                <span style={{
+                  fontFamily: MONO, fontSize: "0.42rem", color: "#0fa",
+                  letterSpacing: "1px", animation: "livePulse 2s ease infinite",
+                  textShadow: "0 0 6px rgba(0,255,170,0.5)",
+                }}>
+                  ◉ LIVE
+                </span>
+              )}
+            </div>
             <div style={{
               fontFamily: MONO, fontSize: "0.5rem", color: "rgba(0,255,170,0.25)",
               letterSpacing: "1.5px", marginTop: "1px",
@@ -63,12 +83,22 @@ const ProjectCard = ({ project, onClick, delay = 0 }) => {
             </div>
           </div>
         </div>
-        <div style={{
-          fontFamily: MONO, fontSize: "0.5rem", letterSpacing: "1px",
-          color: sc.color, display: "flex", alignItems: "center", gap: "4px",
-        }}>
-          <span style={{ textShadow: `0 0 6px ${sc.color}` }}>{sc.sym}</span>
-          {project.status}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+          <div style={{
+            fontFamily: MONO, fontSize: "0.5rem", letterSpacing: "1px",
+            color: sc.color, display: "flex", alignItems: "center", gap: "4px",
+          }}>
+            <span style={{ textShadow: `0 0 6px ${sc.color}` }}>{sc.sym}</span>
+            {project.status}
+          </div>
+          {project.lastUpdated && (
+            <div style={{
+              fontFamily: MONO, fontSize: "0.42rem", color: "rgba(0,255,170,0.2)",
+              letterSpacing: "1px",
+            }}>
+              {relativeTime(project.lastUpdated)}
+            </div>
+          )}
         </div>
       </div>
 

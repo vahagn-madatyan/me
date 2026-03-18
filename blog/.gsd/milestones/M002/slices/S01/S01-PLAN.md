@@ -29,7 +29,7 @@
 
 ## Tasks
 
-- [ ] **T01: Add build environment files and deploy to CF Pages** `est:20m`
+- [x] **T01: Add build environment files and deploy to CF Pages** `est:20m`
   - Why: This is the highest-risk step — proving Node 22 + Sharp works in CF Pages' build environment. Everything else is blocked until the build succeeds. Also validates R021 (auto-deploy on push to main).
   - Files: `.node-version`, `public/_headers`
   - Do:
@@ -84,6 +84,33 @@
        - `curl -sI https://vahagn.dev/og/mastering-typescript-patterns.png` returns 200 with content-type image/png
   - Verify: `bash scripts/verify-m02.sh` passes all checks; CF Web Analytics dashboard shows page views
   - Done when: Web Analytics is recording page views and verify-m02.sh passes all checks against the live site
+
+## Observability / Diagnostics
+
+**Runtime signals:**
+- CF Pages build log: success/failure status, Node version used, page count, Sharp compatibility
+- `cf-ray` response header on every request confirms Cloudflare is serving the site
+- `_headers` file rules are observable via `curl -I` on any page or asset path
+- Brotli encoding confirmed via `content-encoding: br` header when `Accept-Encoding: br` is sent
+- Web Analytics beacon presence: `grep 'static.cloudflareinsights.com'` in page HTML
+
+**Inspection surfaces:**
+- `curl -I https://vahagn.dev` — HTTP status, cache headers, `cf-ray`, content-type
+- `curl -I https://vahagn.dev/_astro/<any-hashed-file>` — immutable cache header verification
+- `curl -I https://vahagn.dev/og/<slug>.png` — OG image availability and content-type
+- CF Pages dashboard → Deployments → build log for each deploy
+- CF Web Analytics dashboard → page views and beacon injection status
+- `scripts/verify-m02.sh` (created in T04) — automated health check script
+
+**Failure visibility:**
+- CF Pages build failure: visible in dashboard Deployments tab with full build log
+- Missing `_headers` rules: detectable via `curl -I` showing default headers instead of custom ones
+- OG image generation failure: 404 on `/og/*.png` paths
+- Web Analytics beacon blocked by `no-transform`: `curl -s https://vahagn.dev | grep -c 'cloudflareinsights'` returns 0
+
+**Redaction constraints:**
+- No secrets in committed files — CF Pages env vars (`NODE_VERSION`, `SHARP_IGNORE_GLOBAL_LIBVIPS`) are non-sensitive build config
+- Cloudflare account ID and API tokens are dashboard-only, never in repo
 
 ## Files Likely Touched
 

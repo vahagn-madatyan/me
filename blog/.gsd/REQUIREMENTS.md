@@ -15,28 +15,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Tailwind breakpoints handle this natively
 
-### R003 — Homepage with hero section (name, tagline, roles), featured blog posts (3-4 cards), project highlights (3-4 cards), and newsletter signup CTA (visual only in M001)
-- Class: primary-user-loop
-- Status: active
-- Description: Homepage with hero section (name, tagline, roles), featured blog posts (3-4 cards), project highlights (3-4 cards), and newsletter signup CTA (visual only in M001)
-- Why it matters: First impression and navigation hub
-- Source: user
-- Primary owning slice: M001/S07
-- Supporting slices: M001/S02, M001/S05
-- Validation: unmapped
-- Notes: Newsletter CTA is visual-only until M003
-
-### R019 — Custom 404 page matching site design
-- Class: launchability
-- Status: active
-- Description: Custom 404 page matching site design
-- Why it matters: Professional polish
-- Source: user
-- Primary owning slice: M001/S07
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Simple page
-
 ### R020 — Semantic HTML, keyboard navigation, focus management, sufficient color contrast ratios
 - Class: quality-attribute
 - Status: active
@@ -101,7 +79,7 @@ This file is the explicit capability and coverage contract for the project.
 - Primary owning slice: M003
 - Supporting slices: M001/S07 (visual form)
 - Validation: unmapped
-- Notes: M003 scope, M001 has visual-only form
+- Notes: M003 scope, M001 has visual-only form. S07 delivered the visual newsletter form (NewsletterForm.astro) — email input + Subscribe button with no form action and no JS. Ready for M003 wiring to Buttondown/Beehiiv.
 
 ### R026 — Tooling/workflow for distributing blog content to X, LinkedIn, Medium, Dev.to with canonical URLs pointing back to vahagn.dev
 - Class: core-capability
@@ -126,6 +104,17 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: none
 - Validation: Build output contains all custom theme tokens; design tokens resolve in dev server; dark variant compiles correctly. Validated in S01.
 - Notes: Tailwind v4 uses Vite plugin, `@import "tailwindcss"`, `@custom-variant dark`
+
+### R003 — Homepage with hero section (name, tagline, roles), featured blog posts (3-4 cards), project highlights (3-4 cards), and newsletter signup CTA (visual only in M001)
+- Class: primary-user-loop
+- Status: validated
+- Description: Homepage with hero section (name, tagline, roles), featured blog posts (3-4 cards), project highlights (3-4 cards), and newsletter signup CTA (visual only in M001)
+- Why it matters: First impression and navigation hub
+- Source: user
+- Primary owning slice: M001/S07
+- Supporting slices: M001/S02, M001/S05
+- Validation: Homepage contains hero (name, tagline, CTA buttons), 3 featured blog post cards (1 featured + 2 latest backfill) with reading time via BlogCard, 4 project highlights via ProjectCard with tech badges and GitHub links, and visual-only newsletter CTA (email input + Subscribe button, no action, no JS per D008). Proof: npm run build zero errors + scripts/verify-s07.sh checks 1-6 (23 total checks pass). Validated in S07.
+- Notes: Newsletter CTA is visual-only until M003
 
 ### R004 — Blog posts as Markdown/MDX with extended frontmatter schema — title, description, pubDate, updatedDate, tags, featured, draft, heroImage, canonicalURL
 - Class: core-capability
@@ -292,6 +281,17 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: Three-state toggle persists across pages, respects system preference, no FOUC. Verified with browser testing in S01.
 - Notes: Tailwind v4 `@custom-variant dark` with class strategy
 
+### R019 — Custom 404 page matching site design
+- Class: launchability
+- Status: validated
+- Description: Custom 404 page matching site design
+- Why it matters: Professional polish
+- Source: user
+- Primary owning slice: M001/S07
+- Supporting slices: none
+- Validation: Custom 404 page at dist/404.html wrapped in BaseLayout with large muted "404" display, "Page not found" heading, friendly message, and primary-styled "Back to Home" CTA linking to /. Styled consistently with site's dark-first design. Proof: scripts/verify-s07.sh checks 7 (5 sub-checks: 404.html exists, "404" text, "Page not found" heading, href="/", "Back to Home" CTA). Validated in S07.
+- Notes: Simple page
+
 ## Deferred
 
 ### R027 — Search functionality across blog posts
@@ -335,7 +335,7 @@ This file is the explicit capability and coverage contract for the project.
 |---|---|---|---|---|---|
 | R001 | core-capability | validated | M001/S01 | none | Build output contains all custom theme tokens; design tokens resolve in dev server; dark variant compiles correctly. Validated in S01. |
 | R002 | quality-attribute | active | M001/S01 | all slices | unmapped |
-| R003 | primary-user-loop | active | M001/S07 | M001/S02, M001/S05 | unmapped |
+| R003 | primary-user-loop | validated | M001/S07 | M001/S02, M001/S05 | Homepage contains hero (name, tagline, CTA buttons), 3 featured blog post cards (1 featured + 2 latest backfill) with reading time via BlogCard, 4 project highlights via ProjectCard with tech badges and GitHub links, and visual-only newsletter CTA (email input + Subscribe button, no action, no JS per D008). Proof: npm run build zero errors + scripts/verify-s07.sh checks 1-6 (23 total checks pass). Validated in S07. |
 | R004 | core-capability | validated | M001/S02 | none | Extended schema with tags, featured, draft, canonicalURL builds successfully with all 8 posts. All frontmatter fields validated by Zod at build time. Proof: npm run build zero errors + scripts/verify-s02.sh checks 1-2. Validated in S02. |
 | R005 | primary-user-loop | validated | M001/S02 | none | Paginated listing at /blog/ uses Astro paginate() with pageSize 10. BlogCard grid with reading time renders on listing page. Proof: dist/blog/index.html exists with cards. scripts/verify-s02.sh checks 3-4. Validated in S02. |
 | R006 | primary-user-loop | validated | M001/S04 | M001/S02 | 9 tag archive pages generated at /blog/tag/[tag]/ with paginated routes (pageSize 10). Tag pills in BlogCard and BlogPost are navigable <a> links pointing to correct archive routes. Draft tags excluded from production. Proof: scripts/verify-s04.sh checks [Tag Archives] + [Tag Pill Links] (4 checks). Validated in S04. |
@@ -351,7 +351,7 @@ This file is the explicit capability and coverage contract for the project.
 | R016 | launchability | validated | M001/S03 | M001/S01 (BaseHead) | JSON-LD BlogPosting schema on blog posts with title, description, datePublished, author, keywords. og:image and twitter:image point to generated /og/{slug}.png. article:published_time and article:tag OG tags present. Canonical URL with frontmatter override support. Non-blog pages have og:type=website with no JSON-LD. Proof: scripts/verify-s03.sh checks [2-4] (9 checks). Validated in S03. |
 | R017 | launchability | validated | M001/S03 | none | RSS feed includes <category> elements from post tags (10+ across 7 posts). robots.txt has User-agent/Allow/Sitemap directives. Sitemap serialize config applies weekly changefreq and 0.8 priority to blog URLs. Proof: scripts/verify-s03.sh checks [5-7] (10 checks). Validated in S03. |
 | R018 | core-capability | validated | M001/S01 | none | Three-state toggle persists across pages, respects system preference, no FOUC. Verified with browser testing in S01. |
-| R019 | launchability | active | M001/S07 | none | unmapped |
+| R019 | launchability | validated | M001/S07 | none | Custom 404 page at dist/404.html wrapped in BaseLayout with large muted "404" display, "Page not found" heading, friendly message, and primary-styled "Back to Home" CTA linking to /. Styled consistently with site's dark-first design. Proof: scripts/verify-s07.sh checks 7 (5 sub-checks: 404.html exists, "404" text, "Page not found" heading, href="/", "Back to Home" CTA). Validated in S07. |
 | R020 | quality-attribute | active | M001/S01 | all slices | unmapped |
 | R021 | operability | active | M002 | none | unmapped |
 | R022 | launchability | active | M002 | none | unmapped |
@@ -365,7 +365,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 10
-- Mapped to slices: 10
-- Validated: 16 (R001, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R016, R017, R018)
+- Active requirements: 8
+- Mapped to slices: 8
+- Validated: 18 (R001, R003, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R016, R017, R018, R019)
 - Unmapped active requirements: 0

@@ -71,7 +71,7 @@ This milestone is complete only when all are true:
 - [x] **S06: About & Architecture** `risk:low` `depends:[S01]`
   > After this: /about page with bio, skills, and contact links; /architecture page with diagram gallery and lightbox — visible in dev server.
 
-- [ ] **S07: Homepage & Polish** `risk:low` `depends:[S02,S05]`
+- [x] **S07: Homepage & Polish** `risk:low` `depends:[S02,S05]`
   > After this: Complete homepage with hero, featured posts from blog collection, project highlights, visual newsletter CTA, custom 404 page — full site navigable in dev server.
 
 ## Boundary Map

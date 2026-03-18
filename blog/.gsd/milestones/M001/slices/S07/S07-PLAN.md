@@ -35,7 +35,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build complete homepage with hero, featured posts, and project highlights** `est:30m`
+- [x] **T01: Build complete homepage with hero, featured posts, and project highlights** `est:30m`
   - Why: The homepage is the critical deliverable — it's the only file with data dependencies crossing both blog collection and project data boundaries. It fulfills R003 (hero, featured posts, project highlights, newsletter CTA).
   - Files: `src/pages/index.astro`, `src/components/NewsletterForm.astro`
   - Do: Rewrite `index.astro` with four sections: (1) hero with name/tagline/CTAs matching current style, (2) featured posts queried from blog collection with `featured: true` fallback to latest if <3, rendered via BlogCard with reading time computed in frontmatter, (3) project highlights sliced from projects array rendered via ProjectCard, (4) newsletter CTA using a new NewsletterForm component (visual-only per D008 — email input + styled button, no action attribute, no JS). Use `max-w-3xl` container for consistency with other pages. Compute reading time via `getReadingTime(post.body ?? '')` in frontmatter. Use static Tailwind classes only.
@@ -48,6 +48,15 @@
   - Do: Create `404.astro` wrapped in BaseLayout with heading, friendly message, and link back to home — styled consistently with the site's dark-first design. Write `scripts/verify-s07.sh` that runs `npm run build` and checks: (1) dist/index.html exists, (2) hero content present, (3) featured blog post titles in homepage, (4) reading time on homepage cards, (5) project titles in homepage, (6) tech stack badges in homepage, (7) newsletter form markup present, (8) dist/404.html exists, (9) 404 has back-to-home link, (10) S01/S02/S05 regression scripts pass. Run the script to confirm all checks pass.
   - Verify: `bash scripts/verify-s07.sh` — all checks pass
   - Done when: 404 page exists in build output, verification script passes all checks including upstream regressions
+
+## Observability / Diagnostics
+
+- **Build output verification:** `npm run build` must succeed; `dist/index.html` is the primary inspection surface — grep for hero text, blog post slugs, project titles, and newsletter form markup
+- **Runtime signals:** Homepage renders entirely at build time (static HTML) — no client-side JS, no async data fetching, no error boundaries. All failures surface as build errors, never as runtime errors.
+- **Inspection surfaces:** `dist/index.html` for homepage content; `dist/404.html` for 404 page; browser dev tools for visual verification (layout, dark mode, responsive breakpoints)
+- **Failure visibility:** Missing imports or broken content collection queries cause Astro build failures with stack traces pointing to the offending `.astro` file. Missing blog posts or empty project arrays produce empty sections (visible in HTML output), not errors.
+- **Redaction constraints:** None — no secrets, API keys, or PII in any homepage component. Newsletter form is visual-only with no backend integration.
+- **Regression surface:** S01/S02/S05 verification scripts cover upstream components (BaseLayout, BlogCard, ProjectCard, content collections) that this slice consumes
 
 ## Files Likely Touched
 

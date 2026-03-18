@@ -7,6 +7,8 @@ import FilterPill from "./FilterPill";
 import ActiveOpsStrip from "./ActiveOpsStrip";
 import StatusBar from "./StatusBar";
 import ProjectDetailPanel from "./ProjectDetailPanel";
+import TechRadar from "./TechRadar";
+import ActivityFeed from "./ActivityFeed";
 
 const MONO = "'JetBrains Mono', 'Fira Code', monospace";
 
@@ -427,36 +429,10 @@ const ProjectsView = ({ onBack }) => {
       )}
 
       {/* Tech Radar */}
-      <div style={{ borderTop: "1px solid rgba(0,255,170,0.06)", paddingTop: "30px", marginBottom: "30px" }}>
-        <div style={{
-          textAlign: "center", marginBottom: "20px", fontFamily: MONO,
-          fontSize: "0.5rem", color: "rgba(0,255,170,0.3)", letterSpacing: "4px",
-        }}>
-          ─── TECH STACK RADAR ───
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
-          {[
-            { name: "Python", count: 10 }, { name: "Docker", count: 6 }, { name: "FastMCP", count: 4 },
-            { name: "LangGraph", count: 3 }, { name: "React", count: 4 }, { name: "MCP Protocol", count: 5 },
-            { name: "PostgreSQL", count: 3 }, { name: "Alpaca", count: 3 }, { name: "TypeScript", count: 2 },
-            { name: "FastAPI", count: 2 }, { name: "ClickHouse", count: 2 }, { name: "Finnhub", count: 2 },
-            { name: "Node.js", count: 2 }, { name: "Zabbix", count: 1 }, { name: "LiteLLM", count: 1 },
-            { name: "AWS Bedrock", count: 1 }, { name: "Massive.com", count: 1 }, { name: "Tailscale", count: 1 },
-            { name: "tmux", count: 1 }, { name: "TimescaleDB", count: 1 },
-          ].map((t, i) => (
-            <span key={i} style={{
-              padding: `${3 + t.count}px ${8 + t.count * 2}px`,
-              fontFamily: MONO, fontSize: `${0.45 + t.count * 0.03}rem`,
-              color: `rgba(0,255,170,${0.2 + (t.count / 10) * 0.5})`,
-              background: `rgba(0,255,170,${0.01 + (t.count / 10) * 0.03})`,
-              border: `1px solid rgba(0,255,170,${0.04 + (t.count / 10) * 0.06})`,
-              letterSpacing: "0.5px",
-            }}>
-              {t.name} <span style={{ opacity: 0.4 }}>×{t.count}</span>
-            </span>
-          ))}
-        </div>
-      </div>
+      <TechRadar />
+
+      {/* Activity Feed */}
+      <ActivityFeed />
 
       {/* Keyboard shortcuts hint */}
       <div style={{

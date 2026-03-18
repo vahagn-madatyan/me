@@ -101,6 +101,12 @@
     background-color: var(--shiki-dark-bg);
   }
 
+  /* Shiki comment contrast fix — github-dark default #6A737D has only 3.04:1
+     contrast on #24292E bg. Override to #8B949E for WCAG AA (4.77:1). */
+  html.dark .astro-code span[style*="--shiki-dark:#6A737D"] {
+    --shiki-dark: #8B949E !important;
+  }
+
   /* Heading anchor offset — clears sticky header (80px) */
   .prose h2,
   .prose h3,

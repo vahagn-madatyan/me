@@ -43,18 +43,18 @@
 
 - [x] **T02: Configure custom domain and DNS** `est:15m` — ⚠️ Skipped: user will handle all deployment (Vercel, not CF Pages). Local build verified: 22 pages, 7 OG images, zero errors.
 
-- [ ] **T03: Verify performance and tune if needed** `est:15m`
-  - Why: Validates R023 (Lighthouse 95+, Brotli, cache headers). The site's architecture (pure static, zero JS, one 57KB CSS file) should hit 95+ naturally, but this task verifies against the live URL and fixes any gaps.
-  - Files: `public/_headers` (if adjustments needed)
+- [x] **T03: Verify performance and tune if needed** `est:15m`
+  - Why: Validates R023 (Lighthouse 95+, Brotli, cache headers). The site's architecture (pure static, zero JS, one 57KB CSS file) should hit 95+ naturally, but this task verifies against the preview server and fixes any gaps. CDN-specific checks (Brotli, immutable cache) are deployment-dependent and verified post-deploy.
+  - Files: `public/_headers` (if adjustments needed), any source files flagged by Lighthouse
   - Do:
-    1. Run Lighthouse CLI against `https://vahagn.dev`: `npx lighthouse https://vahagn.dev --output=json --output=html --output-path=./lighthouse-report --chrome-flags="--headless"`
-    2. Verify all four scores (Performance, Accessibility, Best Practices, SEO) are ≥ 95
-    3. Verify Brotli: `curl -I https://vahagn.dev -H "Accept-Encoding: br"` should show `content-encoding: br`
-    4. Verify cache headers: `curl -I https://vahagn.dev/_astro/[any-hashed-file]` should show `cache-control: public, max-age=31536000, immutable`
-    5. Verify HTML cache: `curl -I https://vahagn.dev/` should show `cache-control: public, max-age=0, must-revalidate`
-    6. If any Lighthouse score is below 95, diagnose and fix (likely candidates: missing meta description on a page, image without dimensions, accessibility issue)
-  - Verify: Lighthouse JSON output shows all scores ≥ 95; Brotli and cache headers confirmed via curl
-  - Done when: Lighthouse audit produces 95+ on all four metrics against the live production URL
+    1. Build the site and start the preview server
+    2. Run Lighthouse CLI against `http://localhost:4321`: `npx lighthouse http://localhost:4321 --output=json --output=html --output-path=./lighthouse-report --chrome-flags="--headless"`
+    3. Verify all four scores (Performance, Accessibility, Best Practices, SEO) are ≥ 95
+    4. If any Lighthouse score is below 95, diagnose from the Lighthouse JSON report and fix (likely candidates: missing meta description, image without dimensions, accessibility issue)
+    5. Run Lighthouse on key pages (blog post, blog index) if home page passes to ensure site-wide quality
+    6. Note CDN-specific checks (Brotli, cache headers) as deployment-dependent — `public/_headers` is already configured for CF Pages
+  - Verify: Lighthouse JSON output shows all scores ≥ 95 on home page and key content pages
+  - Done when: Lighthouse audit produces 95+ on all four metrics against the local preview server, confirming the site is performance-ready for deployment
 
 - [ ] **T04: Enable analytics and write deployment verification script** `est:15m`
   - Why: Validates R024 (Cloudflare Web Analytics) and creates the ongoing verification surface for the deployment. This is the final task because analytics is lowest-risk and depends on the site being live.

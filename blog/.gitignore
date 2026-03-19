@@ -62,3 +62,6 @@ tmp/
 # ── GSD baseline (auto-generated) ──
 .gsd/parallel/
 lighthouse-report*
+
+# ── GSD baseline (auto-generated) ──
+.gsd

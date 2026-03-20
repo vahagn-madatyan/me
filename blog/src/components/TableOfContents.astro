@@ -16,9 +16,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {tocHeadings.length > 0 && (
-  <aside class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+  <aside class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto dark:rounded-lg dark:bg-white/[0.02] dark:p-4 dark:ring-1 dark:ring-white/[0.06]">
     <nav aria-label="Table of Contents">
-      <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-secondary-400 dark:text-secondary-500">
+      <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider font-code text-secondary-400 dark:text-secondary-500">
         Table of Contents
       </h2>
       <ul class="space-y-1 border-l border-secondary-200 dark:border-secondary-700">
@@ -57,10 +57,10 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
     function setActive(slug: string) {
       tocLinks.forEach((link) => {
         if (link.dataset.headingSlug === slug) {
-          link.classList.add('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500');
+          link.classList.add('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500', 'toc-active');
           link.classList.remove('text-secondary-500', 'dark:text-secondary-400', 'border-transparent');
         } else {
-          link.classList.remove('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500');
+          link.classList.remove('text-primary-500', 'dark:text-primary-400', 'font-medium', 'border-primary-500', 'toc-active');
           link.classList.add('text-secondary-500', 'dark:text-secondary-400', 'border-transparent');
         }
       });
@@ -85,3 +85,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
   document.addEventListener('DOMContentLoaded', initScrollSpy);
   document.addEventListener('astro:after-swap', initScrollSpy);
 </script>
+
+<style>
+  .dark [data-toc-link].toc-active {
+    box-shadow: -2px 0 8px rgba(16, 185, 129, 0.3);
+  }
+</style>

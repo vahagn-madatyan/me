@@ -33,18 +33,18 @@ const related = currentTags.length === 0
 ---
 
 {related.length > 0 && (
-  <section class="mt-12 border-t border-secondary-200 pt-8 dark:border-secondary-800">
+  <section class="mt-12 border-t border-secondary-200 pt-8 dark:border-white/[0.08]">
     <h2 class="mb-6 text-xl font-bold text-secondary-900 dark:text-secondary-100">Related Posts</h2>
     <div class="grid gap-4 sm:grid-cols-3">
       {related.map((post) => (
         <a
           href={`/blog/${post.id}/`}
-          class="group rounded-xl bg-secondary-50 p-4 transition-colors hover:bg-secondary-100 dark:bg-secondary-800/50 dark:hover:bg-secondary-800"
+          class="group rounded-xl bg-secondary-50 p-4 transition-all hover:bg-secondary-100 dark:bg-white/[0.03] dark:ring-1 dark:ring-white/[0.06] dark:hover:bg-white/[0.06] dark:hover:ring-primary-500/20"
         >
           <h3 class="text-sm font-semibold text-secondary-900 transition-colors group-hover:text-primary-600 dark:text-secondary-100 dark:group-hover:text-primary-400">
             {post.data.title}
           </h3>
-          <div class="mt-2 flex items-center gap-1.5 text-xs text-secondary-500 dark:text-secondary-400">
+          <div class="mt-2 flex items-center gap-1.5 text-xs font-code text-secondary-500 dark:text-secondary-400">
             <FormattedDate date={post.data.pubDate} />
             <span aria-hidden="true">&middot;</span>
             <span>{formatReadingTime(getReadingTime(post.body ?? ''))}</span>

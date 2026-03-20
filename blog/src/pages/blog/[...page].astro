@@ -40,24 +40,24 @@ const { page } = Astro.props;
     </div>
 
     {(page.url.prev || page.url.next) && (
-      <nav class="mt-10 flex items-center justify-between border-t border-secondary-200 pt-6 dark:border-secondary-800" aria-label="Blog pagination">
+      <nav class="mt-10 flex items-center justify-between border-t border-secondary-200 pt-6 dark:border-white/[0.08]" aria-label="Blog pagination">
         {page.url.prev ? (
           <a
             href={page.url.prev}
-            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
+            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-white/[0.05] dark:text-secondary-300 dark:hover:bg-white/[0.1] dark:ring-1 dark:ring-white/[0.06]"
           >
             &larr; Previous
           </a>
         ) : (
           <span />
         )}
-        <span class="text-sm text-secondary-500 dark:text-secondary-400">
+        <span class="text-sm font-code text-secondary-500 dark:text-secondary-400">
           Page {page.currentPage} of {page.lastPage}
         </span>
         {page.url.next ? (
           <a
             href={page.url.next}
-            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700"
+            class="inline-flex items-center gap-1 rounded-lg bg-secondary-100 px-4 py-2 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-white/[0.05] dark:text-secondary-300 dark:hover:bg-white/[0.1] dark:ring-1 dark:ring-white/[0.06]"
           >
             Next &rarr;
           </a>

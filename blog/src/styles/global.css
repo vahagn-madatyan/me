@@ -10,22 +10,22 @@
 /* Typography plugin (S02) — Tailwind v4 CSS-first plugin loading */
 @plugin "@tailwindcss/typography";
 
-/* Design tokens (D003): dark-first, teal/cyan primary, slate secondary, orange accent */
+/* Design tokens — emerald-cyan primary (dashboard-inspired), green-tinted slate secondary, orange accent */
 @theme {
-  /* Primary — teal/cyan */
-  --color-primary-50: #f0fdfa;
-  --color-primary-100: #ccfbf1;
-  --color-primary-200: #99f6e4;
-  --color-primary-300: #5eead4;
-  --color-primary-400: #2dd4bf;
-  --color-primary-500: #14b8a6;
-  --color-primary-600: #0d9488;
-  --color-primary-700: #0f766e;
-  --color-primary-800: #115e59;
-  --color-primary-900: #134e4a;
-  --color-primary-950: #042f2e;
+  /* Primary — emerald-cyan (shifted from teal toward dashboard's #0fa) */
+  --color-primary-50: #ecfdf8;
+  --color-primary-100: #d1fae8;
+  --color-primary-200: #a7f3d5;
+  --color-primary-300: #6ee7bb;
+  --color-primary-400: #34d39e;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+  --color-primary-950: #022c22;
 
-  /* Secondary — slate */
+  /* Secondary — green-tinted slate (dark end echoes dashboard's near-black) */
   --color-secondary-50: #f8fafc;
   --color-secondary-100: #f1f5f9;
   --color-secondary-200: #e2e8f0;
@@ -34,9 +34,9 @@
   --color-secondary-500: #64748b;
   --color-secondary-600: #475569;
   --color-secondary-700: #334155;
-  --color-secondary-800: #1e293b;
-  --color-secondary-900: #0f172a;
-  --color-secondary-950: #020617;
+  --color-secondary-800: #1a2233;
+  --color-secondary-900: #111827;
+  --color-secondary-950: #080f1a;
 
   /* Accent — orange */
   --color-accent-50: #fff7ed;
@@ -57,6 +57,16 @@
 
   /* Spacing scale */
   --spacing: 0.25rem;
+}
+
+/* Dashboard-inspired glow/glass effect tokens */
+:root {
+  --glow-primary: rgba(16, 185, 129, 0.15);
+  --glow-primary-strong: rgba(16, 185, 129, 0.3);
+  --glow-primary-text: rgba(16, 185, 129, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg-hover: rgba(255, 255, 255, 0.06);
 }
 
 /* Base styles */
@@ -114,6 +124,13 @@
     scroll-margin-top: 5rem;
   }
 
+  /* Subtle glow on headings in dark mode */
+  .dark h1,
+  .dark h2,
+  .dark h3 {
+    text-shadow: 0 0 40px var(--glow-primary);
+  }
+
   /* Code block base styling */
   .astro-code {
     border-radius: 0.5rem;
@@ -122,5 +139,65 @@
     line-height: 1.7;
     overflow-x: auto;
     font-family: var(--font-code);
+  }
+
+  /* Code block glass border in dark mode */
+  .dark .astro-code {
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.05);
+  }
+
+  /* Fade-up animation for scroll-triggered elements */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.5s ease-out both;
+  }
+
+  /* Stagger delays for grid children */
+  .stagger-children > :nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > :nth-child(2) { animation-delay: 80ms; }
+  .stagger-children > :nth-child(3) { animation-delay: 160ms; }
+  .stagger-children > :nth-child(4) { animation-delay: 240ms; }
+  .stagger-children > :nth-child(5) { animation-delay: 320ms; }
+  .stagger-children > :nth-child(6) { animation-delay: 400ms; }
+}
+
+/* Dashboard-inspired component classes */
+@layer components {
+  /* Glass card — translucent bg + blur + glow border in dark mode */
+  .glass-card {
+    background: white;
+    border: 1px solid var(--color-secondary-200);
+    transition: all 0.3s ease;
+  }
+
+  .dark .glass-card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    backdrop-filter: blur(12px);
+  }
+
+  .dark .glass-card:hover {
+    background: var(--glass-bg-hover);
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.07), 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Monospace label — dashboard-style metadata */
+  .mono-label {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 }

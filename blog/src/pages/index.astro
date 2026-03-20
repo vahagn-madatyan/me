@@ -35,19 +35,19 @@ const highlightedProjects = projects.slice(0, 4);
     <h1 class="text-4xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-5xl">
       Vahagn Grigoryan
     </h1>
-    <p class="mx-auto mt-4 max-w-xl text-lg text-secondary-500 dark:text-secondary-400">
+    <p class="mx-auto mt-4 max-w-xl text-lg font-code text-secondary-500 dark:text-secondary-400">
       {SITE_DESCRIPTION}
     </p>
     <div class="mt-8 flex justify-center gap-4">
       <a
         href="/blog"
-        class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
       >
         Read the Blog
       </a>
       <a
         href="/about"
-        class="inline-flex items-center rounded-lg border border-secondary-300 px-5 py-2.5 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800"
+        class="inline-flex items-center rounded-lg border border-secondary-300 px-5 py-2.5 text-sm font-medium text-secondary-700 transition-colors hover:bg-secondary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:border-white/10 dark:text-secondary-300 dark:hover:border-primary-500/30 dark:hover:bg-white/[0.03]"
       >
         About Me
       </a>
@@ -62,13 +62,14 @@ const highlightedProjects = projects.slice(0, 4);
       </h2>
       <a
         href="/blog"
-        class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+        class="text-sm font-medium font-code text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
       >
         View all &rarr;
       </a>
     </div>
-    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
       {postsWithReadingTime.map((post) => (
+        <div class="animate-fade-up">
         <BlogCard
           title={post.data.title}
           description={post.data.description}
@@ -78,6 +79,7 @@ const highlightedProjects = projects.slice(0, 4);
           readingTime={post.readingTime}
           slug={post.id}
         />
+        </div>
       ))}
     </div>
   </section>
@@ -90,13 +92,14 @@ const highlightedProjects = projects.slice(0, 4);
       </h2>
       <a
         href="/work"
-        class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+        class="text-sm font-medium font-code text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
       >
         View all &rarr;
       </a>
     </div>
-    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 stagger-children">
       {highlightedProjects.map((project) => (
+        <div class="animate-fade-up">
         <ProjectCard
           title={project.title}
           description={project.description}
@@ -105,6 +108,7 @@ const highlightedProjects = projects.slice(0, 4);
           githubUrl={project.githubUrl}
           liveUrl={project.liveUrl}
         />
+        </div>
       ))}
     </div>
   </section>

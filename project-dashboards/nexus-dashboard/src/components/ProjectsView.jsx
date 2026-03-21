@@ -6,7 +6,6 @@ import ProjectCard from "./ProjectCard";
 import FilterPill from "./FilterPill";
 import ActiveOpsStrip from "./ActiveOpsStrip";
 import StatusBar from "./StatusBar";
-import ProjectDetailPanel from "./ProjectDetailPanel";
 import TechRadar from "./TechRadar";
 import ActivityFeed from "./ActivityFeed";
 
@@ -48,7 +47,6 @@ function groupByCategory(list) {
     if (!groups[p.category]) groups[p.category] = [];
     groups[p.category].push(p);
   });
-  // Sort groups by aggregate heat score (descending)
   const entries = Object.entries(groups);
   entries.sort((a, b) => {
     const scoreA = a[1].reduce((sum, p) => sum + computeHeatScore(p), 0);
@@ -59,7 +57,7 @@ function groupByCategory(list) {
 }
 
 const ProjectsView = ({ onBack }) => {
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [expandedProjectId, setExpandedProjectId] = useState(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [activeStatus, setActiveStatus] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,7 +65,6 @@ const ProjectsView = ({ onBack }) => {
   const [sortBy, setSortBy] = useState("activity");
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const searchInputRef = useRef(null);
-  // Track whether hash is being updated internally to avoid loops
   const hashUpdateRef = useRef(false);
 
   const categories = ["ALL", ...new Set(projects.map(p => p.category))];
@@ -86,7 +83,6 @@ const ProjectsView = ({ onBack }) => {
     sortBy
   );
 
-  // --- Hash routing: read hash on mount ---
   useEffect(() => {
     const hash = window.location.hash;
     if (hash.startsWith("#/category/")) {
@@ -99,13 +95,12 @@ const ProjectsView = ({ onBack }) => {
       const projectId = decodeURIComponent(hash.slice("#/project/".length));
       const found = projects.find(p => p.id === projectId);
       if (found) {
-        setSelectedProject(found);
+        setExpandedProjectId(found.id);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- Hash routing: listen for hashchange ---
   useEffect(() => {
     const onHashChange = () => {
       if (hashUpdateRef.current) {
@@ -118,17 +113,17 @@ const ProjectsView = ({ onBack }) => {
         const matchedCat = categories.find(c => c === catName);
         if (matchedCat) {
           setActiveFilter(matchedCat);
-          setSelectedProject(null);
+          setExpandedProjectId(null);
         }
       } else if (hash.startsWith("#/project/")) {
         const projectId = decodeURIComponent(hash.slice("#/project/".length));
         const found = projects.find(p => p.id === projectId);
         if (found) {
-          setSelectedProject(found);
+          setExpandedProjectId(found.id);
         }
       } else if (hash === "#/projects") {
         setActiveFilter("ALL");
-        setSelectedProject(null);
+        setExpandedProjectId(null);
       }
     };
     window.addEventListener("hashchange", onHashChange);
@@ -136,7 +131,6 @@ const ProjectsView = ({ onBack }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories]);
 
-  // --- Hash routing: sync activeFilter -> hash ---
   const setActiveFilterWithHash = useCallback((filter) => {
     setActiveFilter(filter);
     hashUpdateRef.current = true;
@@ -147,15 +141,23 @@ const ProjectsView = ({ onBack }) => {
     }
   }, []);
 
-  // --- Hash routing: sync detail panel -> hash ---
-  const openDetailWithHash = useCallback((project) => {
-    setSelectedProject(project);
+  const toggleDetailWithHash = useCallback((project) => {
+    const isClosing = expandedProjectId === project.id;
+    setExpandedProjectId(isClosing ? null : project.id);
     hashUpdateRef.current = true;
-    window.location.hash = "#/project/" + encodeURIComponent(project.id);
-  }, []);
+    if (isClosing) {
+      if (activeFilter === "ALL") {
+        window.location.hash = "#/projects";
+      } else {
+        window.location.hash = "#/category/" + encodeURIComponent(activeFilter);
+      }
+    } else {
+      window.location.hash = "#/project/" + encodeURIComponent(project.id);
+    }
+  }, [expandedProjectId, activeFilter]);
 
   const closeDetailWithHash = useCallback(() => {
-    setSelectedProject(null);
+    setExpandedProjectId(null);
     hashUpdateRef.current = true;
     if (activeFilter === "ALL") {
       window.location.hash = "#/projects";
@@ -166,9 +168,9 @@ const ProjectsView = ({ onBack }) => {
 
   const handleOpenDetail = useCallback((index) => {
     if (index >= 0 && index < filtered.length) {
-      openDetailWithHash(filtered[index]);
+      toggleDetailWithHash(filtered[index]);
     }
-  }, [filtered, openDetailWithHash]);
+  }, [filtered, toggleDetailWithHash]);
 
   const handleCloseDetail = useCallback(() => {
     closeDetailWithHash();
@@ -192,7 +194,7 @@ const ProjectsView = ({ onBack }) => {
     onCloseDetail: handleCloseDetail,
     onClearSearch: handleClearSearch,
     setViewMode,
-    detailOpen: !!selectedProject,
+    detailOpen: !!expandedProjectId,
   });
 
   const grouped = groupByCategory(filtered);
@@ -206,13 +208,13 @@ const ProjectsView = ({ onBack }) => {
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         marginBottom: "20px", flexWrap: "wrap", gap: "12px",
-        borderBottom: "1px solid rgba(0,255,170,0.08)", paddingBottom: "16px",
+        borderBottom: "1px solid rgba(0,255,170,0.12)", paddingBottom: "16px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <button onClick={onBack} style={{
-            padding: "5px 12px", fontFamily: MONO, fontSize: "0.55rem", letterSpacing: "1px",
-            color: "#0fa", background: "rgba(0,255,170,0.04)",
-            border: "1px solid rgba(0,255,170,0.15)", cursor: "pointer",
+            padding: "6px 14px", fontFamily: MONO, fontSize: "0.65rem", letterSpacing: "1px",
+            color: "#0fa", background: "rgba(0,255,170,0.06)",
+            border: "1px solid rgba(0,255,170,0.2)", cursor: "pointer",
             transition: "all 0.2s ease",
           }}>
             ◂ EXIT
@@ -225,7 +227,7 @@ const ProjectsView = ({ onBack }) => {
             NEXUS
           </span>
           <span style={{
-            fontFamily: MONO, fontSize: "0.45rem", color: "rgba(0,255,170,0.2)",
+            fontFamily: MONO, fontSize: "0.55rem", color: "rgba(0,255,170,0.4)",
             letterSpacing: "2px",
           }}>
             // {projects.length} ACTIVE NODES
@@ -244,7 +246,7 @@ const ProjectsView = ({ onBack }) => {
                 color: s.color, textShadow: `0 0 10px ${s.color}40`,
               }}>{s.val}</div>
               <div style={{
-                fontFamily: MONO, fontSize: "0.4rem", color: "rgba(0,255,170,0.25)",
+                fontFamily: MONO, fontSize: "0.5rem", color: "rgba(0,255,170,0.45)",
                 letterSpacing: "2px",
               }}>{s.label}</div>
             </div>
@@ -260,23 +262,23 @@ const ProjectsView = ({ onBack }) => {
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{
             flex: 1, display: "flex", alignItems: "center",
-            background: "rgba(0,255,170,0.02)", border: "1px solid rgba(0,255,170,0.08)",
+            background: "rgba(6,12,6,0.9)", border: "1px solid rgba(0,255,170,0.12)",
             padding: "0 12px",
           }}>
-            <span style={{ fontFamily: MONO, color: "rgba(0,255,170,0.3)", fontSize: "0.7rem", marginRight: "8px" }}>$</span>
+            <span style={{ fontFamily: MONO, color: "rgba(0,255,170,0.5)", fontSize: "0.75rem", marginRight: "8px" }}>$</span>
             <input
               ref={searchInputRef}
               type="text" placeholder="grep -i 'keyword' ./projects/*"
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 flex: 1, background: "transparent", border: "none", outline: "none",
-                color: "#0fa", fontFamily: MONO, fontSize: "0.65rem",
-                padding: "9px 0", letterSpacing: "0.5px",
+                color: "#0fa", fontFamily: MONO, fontSize: "0.72rem",
+                padding: "10px 0", letterSpacing: "0.5px",
               }}
             />
             {searchTerm && (
               <span onClick={() => setSearchTerm("")}
-                style={{ color: "rgba(0,255,170,0.3)", cursor: "pointer", fontFamily: MONO, fontSize: "0.7rem" }}>×</span>
+                style={{ color: "rgba(0,255,170,0.5)", cursor: "pointer", fontFamily: MONO, fontSize: "0.75rem" }}>×</span>
             )}
           </div>
           <div style={{ display: "flex", gap: "2px" }}>
@@ -286,11 +288,11 @@ const ProjectsView = ({ onBack }) => {
               { mode: "grouped", icon: "⊟" },
             ].map(({ mode, icon }) => (
               <button key={mode} onClick={() => setViewMode(mode)} style={{
-                padding: "7px 10px", fontFamily: MONO,
-                background: viewMode === mode ? "rgba(0,255,170,0.1)" : "transparent",
-                border: `1px solid ${viewMode === mode ? "rgba(0,255,170,0.2)" : "rgba(0,255,170,0.06)"}`,
-                color: viewMode === mode ? "#0fa" : "rgba(0,255,170,0.2)",
-                cursor: "pointer", fontSize: "0.6rem",
+                padding: "8px 12px", fontFamily: MONO,
+                background: viewMode === mode ? "rgba(0,255,170,0.12)" : "rgba(6,12,6,0.9)",
+                border: `1px solid ${viewMode === mode ? "rgba(0,255,170,0.25)" : "rgba(0,255,170,0.1)"}`,
+                color: viewMode === mode ? "#0fa" : "rgba(0,255,170,0.4)",
+                cursor: "pointer", fontSize: "0.7rem",
               }}>
                 {icon}
               </button>
@@ -301,7 +303,7 @@ const ProjectsView = ({ onBack }) => {
         {/* Sort controls */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{
-            fontFamily: MONO, fontSize: "0.42rem", color: "rgba(0,255,170,0.2)",
+            fontFamily: MONO, fontSize: "0.55rem", color: "rgba(0,255,170,0.4)",
             letterSpacing: "1.5px", whiteSpace: "nowrap",
           }}>
             SORT_BY:
@@ -309,10 +311,10 @@ const ProjectsView = ({ onBack }) => {
           <div style={{ display: "flex", gap: "2px" }}>
             {SORT_MODES.map(mode => (
               <button key={mode.key} onClick={() => setSortBy(mode.key)} style={{
-                padding: "3px 10px", fontFamily: MONO, fontSize: "0.42rem", letterSpacing: "1px",
-                color: sortBy === mode.key ? "#020402" : "rgba(0,255,170,0.3)",
+                padding: "4px 12px", fontFamily: MONO, fontSize: "0.55rem", letterSpacing: "1px",
+                color: sortBy === mode.key ? "#020402" : "rgba(0,255,170,0.5)",
                 background: sortBy === mode.key ? "#0fa" : "transparent",
-                border: `1px solid ${sortBy === mode.key ? "transparent" : "rgba(0,255,170,0.08)"}`,
+                border: `1px solid ${sortBy === mode.key ? "transparent" : "rgba(0,255,170,0.12)"}`,
                 cursor: "pointer", transition: "all 0.2s ease", textTransform: "uppercase",
               }}>
                 {sortBy === mode.key ? `${mode.label}▾` : mode.label}
@@ -336,7 +338,7 @@ const ProjectsView = ({ onBack }) => {
 
       {/* Count */}
       <div style={{
-        fontFamily: MONO, fontSize: "0.45rem", color: "rgba(0,255,170,0.2)",
+        fontFamily: MONO, fontSize: "0.55rem", color: "rgba(0,255,170,0.4)",
         letterSpacing: "2px", marginBottom: "12px",
       }}>
         RESULTS: {filtered.length}/{projects.length}
@@ -358,7 +360,7 @@ const ProjectsView = ({ onBack }) => {
                   style={{
                     cursor: "pointer",
                     fontFamily: MONO,
-                    fontSize: "0.5rem",
+                    fontSize: "0.6rem",
                     letterSpacing: "2px",
                     color: catColor,
                     textShadow: `0 0 10px ${catColor}40`,
@@ -376,7 +378,7 @@ const ProjectsView = ({ onBack }) => {
                     display: "inline-block",
                     transition: "transform 0.2s ease",
                     transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-                    fontSize: "0.5rem",
+                    fontSize: "0.6rem",
                   }}>
                     ▾
                   </span>
@@ -401,9 +403,10 @@ const ProjectsView = ({ onBack }) => {
                       <ProjectCard
                         key={project.id}
                         project={project}
-                        onClick={() => openDetailWithHash(project)}
+                        onClick={() => toggleDetailWithHash(project)}
                         delay={i * 50}
                         focused={focusedIndex !== null && filtered[focusedIndex]?.id === project.id}
+                        expanded={expandedProjectId === project.id}
                       />
                     ))}
                   </div>
@@ -420,9 +423,10 @@ const ProjectsView = ({ onBack }) => {
         }}>
           {filtered.map((project, i) => (
             <ProjectCard key={project.id} project={project}
-              onClick={() => openDetailWithHash(project)}
+              onClick={() => toggleDetailWithHash(project)}
               delay={i * 50}
               focused={focusedIndex === i}
+              expanded={expandedProjectId === project.id}
             />
           ))}
         </div>
@@ -436,26 +440,24 @@ const ProjectsView = ({ onBack }) => {
 
       {/* Keyboard shortcuts hint */}
       <div style={{
-        textAlign: "center", fontFamily: MONO, fontSize: "0.38rem",
-        color: "rgba(0,255,170,0.1)", letterSpacing: "1px", marginBottom: "20px",
+        textAlign: "center", fontFamily: MONO, fontSize: "0.5rem",
+        color: "rgba(0,255,170,0.2)", letterSpacing: "1px", marginBottom: "20px",
       }}>
         / search &nbsp; esc close &nbsp; j/k navigate &nbsp; enter detail &nbsp; g grid &nbsp; l list &nbsp; s grouped
       </div>
 
       {/* Footer */}
       <div style={{
-        textAlign: "center", borderTop: "1px solid rgba(0,255,170,0.04)", paddingTop: "20px",
+        textAlign: "center", borderTop: "1px solid rgba(0,255,170,0.08)", paddingTop: "20px",
       }}>
         <div style={{
-          fontFamily: MONO, fontSize: "0.45rem", color: "rgba(0,255,170,0.12)",
+          fontFamily: MONO, fontSize: "0.55rem", color: "rgba(0,255,170,0.25)",
           letterSpacing: "3px",
         }}>
           V.MADATYAN // 2025-2026 // BUILDING AUTONOMOUS SECURITY & AI
         </div>
       </div>
 
-      {/* Project Detail Panel */}
-      <ProjectDetailPanel project={selectedProject} onClose={handleCloseDetail} />
     </div>
   );
 };

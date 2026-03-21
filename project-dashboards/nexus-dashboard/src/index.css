@@ -36,5 +36,5 @@ body {
 }
 
 input::placeholder {
-  color: rgba(0, 255, 170, 0.2) !important;
+  color: rgba(0, 255, 170, 0.35) !important;
 }

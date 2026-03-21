@@ -210,7 +210,7 @@ const TechRadar = () => {
 
       // --- Ring labels (right side) ---
       ctx.font = `${Math.max(7, size * 0.022)}px ${MONO}`;
-      ctx.fillStyle = "rgba(0,255,170,0.15)";
+      ctx.fillStyle = "rgba(0,255,170,0.3)";
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
       RINGS.forEach((ring) => {
@@ -220,7 +220,7 @@ const TechRadar = () => {
 
       // --- Sector labels (outer edge) ---
       ctx.font = `bold ${Math.max(8, size * 0.025)}px ${MONO}`;
-      ctx.fillStyle = "rgba(0,255,170,0.2)";
+      ctx.fillStyle = "rgba(0,255,170,0.4)";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       SECTORS.forEach((sector, i) => {
@@ -328,7 +328,7 @@ const TechRadar = () => {
     <div
       ref={containerRef}
       style={{
-        borderTop: "1px solid rgba(0,255,170,0.06)",
+        borderTop: "1px solid rgba(0,255,170,0.1)",
         paddingTop: "30px",
         marginBottom: "30px",
       }}
@@ -338,8 +338,8 @@ const TechRadar = () => {
           textAlign: "center",
           marginBottom: "20px",
           fontFamily: MONO,
-          fontSize: "0.5rem",
-          color: "rgba(0,255,170,0.3)",
+          fontSize: "0.6rem",
+          color: "rgba(0,255,170,0.45)",
           letterSpacing: "4px",
         }}
       >
@@ -372,10 +372,10 @@ const TechRadar = () => {
               left: tooltip.left + 14,
               top: tooltip.top - 30,
               padding: "5px 10px",
-              background: "rgba(2,4,2,0.92)",
-              border: "1px solid rgba(0,255,170,0.25)",
+              background: "rgba(6,12,6,0.95)",
+              border: "1px solid rgba(0,255,170,0.3)",
               fontFamily: MONO,
-              fontSize: "0.55rem",
+              fontSize: "0.65rem",
               color: "#0fa",
               letterSpacing: "1px",
               pointerEvents: "none",
@@ -385,14 +385,14 @@ const TechRadar = () => {
             }}
           >
             <span style={{ fontWeight: "bold" }}>{tooltip.name}</span>
-            <span style={{ color: "rgba(0,255,170,0.4)", marginLeft: "8px" }}>
+            <span style={{ color: "rgba(0,255,170,0.55)", marginLeft: "8px" }}>
               {tooltip.count} project{tooltip.count !== 1 ? "s" : ""}
             </span>
             <span
               style={{
                 display: "block",
-                fontSize: "0.4rem",
-                color: "rgba(0,255,170,0.2)",
+                fontSize: "0.5rem",
+                color: "rgba(0,255,170,0.35)",
                 marginTop: "2px",
               }}
             >

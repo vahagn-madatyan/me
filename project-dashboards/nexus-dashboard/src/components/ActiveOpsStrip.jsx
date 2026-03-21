@@ -9,7 +9,7 @@ const ActiveOpsStrip = ({ projects }) => {
   return (
     <div
       style={{
-        borderBottom: "1px solid rgba(0,255,170,0.08)",
+        borderBottom: "1px solid rgba(0,255,170,0.12)",
         paddingBottom: "14px",
         marginBottom: "16px",
       }}
@@ -18,8 +18,8 @@ const ActiveOpsStrip = ({ projects }) => {
       <div
         style={{
           fontFamily: MONO,
-          fontSize: "0.45rem",
-          color: "rgba(0,255,170,0.25)",
+          fontSize: "0.55rem",
+          color: "rgba(0,255,170,0.45)",
           letterSpacing: "3px",
           marginBottom: "10px",
           textAlign: "center",
@@ -43,10 +43,11 @@ const ActiveOpsStrip = ({ projects }) => {
             style={{
               flex: "1 1 0",
               minWidth: "220px",
-              background: "rgba(0,255,170,0.02)",
-              border: "1px solid rgba(0,255,170,0.08)",
+              background: "rgba(6,12,6,0.95)",
+              border: "1px solid rgba(0,255,170,0.12)",
               padding: "10px 16px",
               position: "relative",
+              backdropFilter: "blur(8px)",
             }}
           >
             {/* Top accent line */}
@@ -57,7 +58,7 @@ const ActiveOpsStrip = ({ projects }) => {
                 left: 0,
                 right: 0,
                 height: "1px",
-                background: `linear-gradient(90deg, transparent, ${project.accent}30, transparent)`,
+                background: `linear-gradient(90deg, transparent, ${project.accent}40, transparent)`,
               }}
             />
 
@@ -77,7 +78,7 @@ const ActiveOpsStrip = ({ projects }) => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.75rem",
+                  fontSize: "0.8rem",
                   fontWeight: "bold",
                   color: project.accent,
                   letterSpacing: "2px",
@@ -109,8 +110,8 @@ const ActiveOpsStrip = ({ projects }) => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.45rem",
-                  color: "rgba(0,255,170,0.3)",
+                  fontSize: "0.55rem",
+                  color: "rgba(0,255,170,0.5)",
                   letterSpacing: "1px",
                   whiteSpace: "nowrap",
                 }}
@@ -131,8 +132,8 @@ const ActiveOpsStrip = ({ projects }) => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.42rem",
-                  color: "rgba(0,255,170,0.2)",
+                  fontSize: "0.55rem",
+                  color: "rgba(0,255,170,0.4)",
                   letterSpacing: "1px",
                 }}
               >
@@ -141,7 +142,7 @@ const ActiveOpsStrip = ({ projects }) => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.5rem",
+                  fontSize: "0.6rem",
                   color: project.accent,
                   fontWeight: "bold",
                 }}
@@ -155,7 +156,7 @@ const ActiveOpsStrip = ({ projects }) => {
               style={{
                 width: "100%",
                 height: "3px",
-                background: "rgba(0,255,170,0.06)",
+                background: "rgba(0,255,170,0.1)",
                 overflow: "hidden",
               }}
             >

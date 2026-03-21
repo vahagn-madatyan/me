@@ -20,7 +20,7 @@ const StatusBar = ({ activeStatus, onStatusClick }) => {
       style={{
         marginBottom: 16,
         paddingBottom: 12,
-        borderBottom: "1px solid rgba(0,255,170,0.06)",
+        borderBottom: "1px solid rgba(0,255,170,0.1)",
       }}
     >
       {/* Stacked bar */}
@@ -77,13 +77,13 @@ const StatusBar = ({ activeStatus, onStatusClick }) => {
               onClick={() => handleClick(status)}
               style={{
                 fontFamily,
-                fontSize: "0.42rem",
+                fontSize: "0.55rem",
                 color,
                 opacity: !activeStatus || isActive ? 1 : 0.5,
                 cursor: "pointer",
                 transition: "opacity 0.2s",
                 userSelect: "none",
-                letterSpacing: "0.03em",
+                letterSpacing: "0.05em",
               }}
             >
               {sym} {counts[status]} {status}

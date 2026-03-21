@@ -38,9 +38,9 @@ const ActivityFeed = () => {
         style={{
           background: "none",
           border: "none",
-          color: "rgba(0,255,170,0.35)",
+          color: "rgba(0,255,170,0.5)",
           fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-          fontSize: "0.55rem",
+          fontSize: "0.65rem",
           cursor: "pointer",
           padding: "4px 0",
           letterSpacing: "0.08em",
@@ -56,8 +56,8 @@ const ActivityFeed = () => {
           style={{
             maxHeight: 250,
             overflowY: "auto",
-            background: "rgba(2,4,2,0.9)",
-            border: "1px solid rgba(0,255,170,0.06)",
+            background: "rgba(6,12,6,0.95)",
+            border: "1px solid rgba(0,255,170,0.1)",
             padding: 12,
           }}
         >
@@ -66,22 +66,22 @@ const ActivityFeed = () => {
               key={i}
               style={{
                 fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                fontSize: "0.5rem",
+                fontSize: "0.6rem",
                 lineHeight: 2,
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ color: "rgba(0,255,170,0.2)" }}>
+              <span style={{ color: "rgba(0,255,170,0.4)" }}>
                 [{entry.date}]
               </span>{" "}
               <span style={{ color: entry.accent, fontWeight: 600 }}>
                 {entry.name}
               </span>{" "}
-              <span style={{ color: "rgba(0,255,170,0.35)" }}>
+              <span style={{ color: "rgba(0,255,170,0.55)" }}>
                 // {entry.message}
               </span>{" "}
-              <span style={{ color: "rgba(0,255,170,0.25)" }}>
-                // {entry.from}%\u2192{entry.to}%
+              <span style={{ color: "rgba(0,255,170,0.4)" }}>
+                // {entry.from}%→{entry.to}%
               </span>
             </div>
           ))}

@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
-import Lightbox from '../components/Lightbox.astro';
 import { architectures } from '../data/architectures';
 
 const domains = ['all', ...new Set(architectures.map((a) => a.domain))] as const;
@@ -15,13 +14,13 @@ function domainLabel(domain: string): string {
 }
 ---
 
-<BaseLayout title="Architecture — Vahagn Madatyan" description="Architecture diagrams, system design decisions, and technical deep-dives.">
-  <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+<BaseLayout title="Architecture — Vahagn Madatyan" description="NetSec Skills Suite architecture — skill domains, decision flows, and how AI agents navigate network security procedures.">
+  <div class="mx-auto max-w-4xl px-4 py-16 sm:px-6">
     <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
       Architecture
     </h1>
     <p class="mt-3 text-secondary-600 dark:text-secondary-400 leading-relaxed">
-      System designs and architecture decisions from real projects — the diagrams behind the decisions.
+      How the <a href="https://github.com/vahagn-madatyan/netsec-skills-suite" class="text-primary-500 hover:underline">NetSec Skills Suite</a> is organized — skill domains, decision flows, and how agents navigate network security procedures.
     </p>
 
     <!-- Domain filter buttons -->
@@ -42,29 +41,18 @@ function domainLabel(domain: string): string {
     </div>
 
     <!-- Architecture card grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="architecture-grid">
+    <div class="grid grid-cols-1 gap-8" id="architecture-grid">
       {architectures.map((arch) => (
         <div data-category={arch.domain}>
           <article
-            class="group rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:bg-secondary-900 dark:ring-secondary-800 dark:hover:ring-primary-700 overflow-hidden"
+            class="rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:bg-secondary-900 dark:ring-secondary-800 dark:hover:ring-primary-700 overflow-hidden"
           >
-            {/* Clickable image area */}
-            <div
-              data-lightbox-src={arch.image}
-              data-lightbox-alt={arch.title}
-              class="relative cursor-pointer overflow-hidden bg-secondary-100 dark:bg-secondary-800"
-            >
-              <div class="flex h-40 items-center justify-center text-secondary-400 dark:text-secondary-600">
-                <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V4.5a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v15a1.5 1.5 0 001.5 1.5z" />
-                </svg>
+            {/* Mermaid diagram */}
+            {arch.mermaid && (
+              <div class="border-b border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-800/50 p-6 overflow-x-auto">
+                <pre class="mermaid flex justify-center text-sm">{arch.mermaid}</pre>
               </div>
-              <div class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10 dark:group-hover:bg-white/5">
-                <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-secondary-700 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 dark:bg-secondary-800/90 dark:text-secondary-300">
-                  View diagram
-                </span>
-              </div>
-            </div>
+            )}
 
             <div class="p-5 sm:p-6">
               {/* Domain badge */}
@@ -106,19 +94,28 @@ function domainLabel(domain: string): string {
       ))}
     </div>
   </div>
-
-  <Lightbox />
 </BaseLayout>
 
 <script>
-  const ACTIVE_CLASSES = ['bg-primary-500', 'text-white', 'dark:shadow-[0_0_15px_rgba(16,185,129,0.25)]'];
-  const INACTIVE_CLASSES = [
-    'bg-secondary-100', 'text-secondary-600', 'hover:bg-secondary-200',
-    'dark:bg-white/[0.05]', 'dark:text-secondary-300', 'dark:hover:bg-white/[0.1]',
-    'dark:ring-1', 'dark:ring-white/[0.06]',
-  ];
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
-  function initFilter() {
+  function initPage() {
+    const isDark = document.documentElement.classList.contains('dark');
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      flowchart: { curve: 'basis', padding: 15 },
+    });
+    mermaid.run({ querySelector: '.mermaid' });
+
+    // Filter logic
+    const ACTIVE_CLASSES = ['bg-primary-500', 'text-white', 'dark:shadow-[0_0_15px_rgba(16,185,129,0.25)]'];
+    const INACTIVE_CLASSES = [
+      'bg-secondary-100', 'text-secondary-600', 'hover:bg-secondary-200',
+      'dark:bg-white/[0.05]', 'dark:text-secondary-300', 'dark:hover:bg-white/[0.1]',
+      'dark:ring-1', 'dark:ring-white/[0.06]',
+    ];
+
     const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
     const cards = document.querySelectorAll<HTMLElement>('[data-category]');
 
@@ -141,12 +138,10 @@ function domainLabel(domain: string): string {
       });
     }
 
-    // Set "All" active on init, show all cards
     const allBtn = document.querySelector<HTMLButtonElement>('[data-filter="all"]');
     if (allBtn) setActive(allBtn);
     filterCards('all');
 
-    // Bind click handlers via onclick (safe for HMR + view transitions)
     buttons.forEach((btn) => {
       btn.onclick = () => {
         const category = btn.dataset.filter ?? 'all';
@@ -156,6 +151,6 @@ function domainLabel(domain: string): string {
     });
   }
 
-  initFilter();
-  document.addEventListener('astro:after-swap', initFilter);
+  initPage();
+  document.addEventListener('astro:after-swap', initPage);
 </script>

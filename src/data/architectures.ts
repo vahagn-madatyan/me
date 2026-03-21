@@ -1,71 +1,133 @@
 export interface Architecture {
   title: string;
   description: string;
-  domain: "distributed-systems" | "security" | "data-pipeline" | "infrastructure";
+  domain: "device-health" | "routing" | "security" | "cloud" | "observability";
   image: string;
   problemSolved: string;
   techDecisions: string[];
+  mermaid?: string;
 }
 
 export const architectures: Architecture[] = [
   {
-    title: "Event-Driven Order Pipeline",
+    title: "Device Health Triage",
     description:
-      "Asynchronous order processing system handling 50k+ events/sec with exactly-once delivery guarantees and automatic dead-letter recovery.",
-    domain: "distributed-systems",
-    image: "/diagrams/event-pipeline.png",
+      "Platform-specific health check procedures for Cisco IOS-XE/NX-OS, Juniper JunOS, and Arista EOS with threshold-based severity classification.",
+    domain: "device-health",
+    image: "",
     problemSolved:
-      "Replaced a synchronous REST chain that collapsed under peak traffic with a partitioned event bus that scales horizontally and recovers from partial failures without data loss.",
-    techDecisions: ["Kafka", "Avro", "Kubernetes", "Go"],
+      "Standardized device triage across multi-vendor environments — agents follow the same structured procedure regardless of platform, eliminating inconsistent ad-hoc debugging.",
+    techDecisions: ["Cisco IOS-XE", "NX-OS", "JunOS", "Arista EOS"],
+    mermaid: `graph TD
+  A[Device Health Check] --> B{Identify Platform}
+  B -->|IOS-XE| C[cisco-device-health]
+  B -->|NX-OS| C
+  B -->|JunOS| D[juniper-device-health]
+  B -->|EOS| E[arista-device-health]
+  C --> F[CPU / Memory / Interface]
+  D --> F
+  E --> F
+  F --> G{Threshold Check}
+  G -->|Normal| H[Report OK]
+  G -->|Warning| I[Flag + Continue]
+  G -->|Critical| J[Decision Tree Triage]
+  J --> K[Structured Report]`,
   },
   {
-    title: "Zero-Trust Service Mesh",
+    title: "Routing Protocol Analysis",
     description:
-      "mTLS-enforced service mesh with dynamic policy evaluation at the sidecar layer. All inter-service traffic encrypted and authorized per-request.",
+      "BGP, OSPF, EIGRP, and IS-IS analysis skills covering peer state diagnosis, path selection, convergence, and route filtering across Cisco, Juniper, and Arista.",
+    domain: "routing",
+    image: "",
+    problemSolved:
+      "Unified routing protocol diagnosis across vendors and protocols — from BGP peer flaps to OSPF area design validation, agents follow decision trees to pinpoint root causes.",
+    techDecisions: ["BGP", "OSPF", "EIGRP", "IS-IS", "Multi-vendor"],
+    mermaid: `graph TD
+  A[Routing Analysis] --> B{Protocol}
+  B -->|BGP| C[bgp-analysis]
+  B -->|OSPF| D[ospf-analysis]
+  B -->|EIGRP| E[eigrp-analysis]
+  B -->|IS-IS| F[isis-analysis]
+  C --> G[Peer State / Path Selection / Filtering]
+  D --> H[Adjacency / Area Design / LSA Analysis]
+  E --> I[DUAL / SIA Diagnosis / K-values]
+  F --> J[Adjacency / LSPDB / Level 1-2]
+  G --> K[Convergence Report]
+  H --> K
+  I --> K
+  J --> K`,
+  },
+  {
+    title: "Firewall & Security Audit",
+    description:
+      "Policy analysis for Palo Alto, FortiGate, Check Point, and Cisco ASA/FTD plus vendor-agnostic ACL analysis, CIS benchmarks, and NIST compliance mapping.",
     domain: "security",
-    image: "/diagrams/zero-trust-mesh.png",
+    image: "",
     problemSolved:
-      "Eliminated implicit trust between microservices by embedding identity verification and fine-grained authorization into the network layer — no application code changes required.",
-    techDecisions: ["Envoy", "SPIFFE", "OPA", "Rust"],
+      "Consistent firewall policy auditing across four major platforms — shadowed rule detection, overly permissive rule flagging, compliance mapping, and vulnerability assessment.",
+    techDecisions: ["PAN-OS", "FortiGate", "Check Point", "Cisco ASA/FTD", "CIS", "NIST 800-53"],
+    mermaid: `graph TD
+  A[Security Audit] --> B{Platform}
+  B -->|PAN-OS| C[palo-alto-firewall-audit]
+  B -->|FortiOS| D[fortigate-firewall-audit]
+  B -->|Check Point| E[checkpoint-firewall-audit]
+  B -->|ASA/FTD| F[cisco-firewall-audit]
+  A --> G[acl-rule-analysis]
+  G --> H[Shadow / Permit-Any / Unused Rules]
+  A --> I{Compliance}
+  I --> J[cis-benchmark-audit]
+  I --> K[nist-compliance-assessment]
+  I --> L[vulnerability-assessment]
+  H --> M[Audit Report]
+  J --> M
+  K --> M
+  L --> M`,
   },
   {
-    title: "Real-Time Feature Store",
+    title: "Cloud Security Posture",
     description:
-      "Dual-layer feature store combining batch-computed features in a columnar store with sub-10ms online serving through a Redis-backed hot cache.",
-    domain: "data-pipeline",
-    image: "/diagrams/feature-store.png",
+      "VPC design analysis, security group audits, and cross-cloud posture assessment for AWS, Azure, and GCP with IAM analysis and public exposure detection.",
+    domain: "cloud",
+    image: "",
     problemSolved:
-      "Unified offline training and online inference feature access behind a single API, eliminating the train/serve skew that caused silent model degradation in production.",
-    techDecisions: ["Apache Spark", "Redis", "Protobuf", "Python"],
+      "Unified cloud security assessment across three major providers — agents audit VPC architecture, firewall rules, encryption, and IAM using provider-native constructs.",
+    techDecisions: ["AWS VPC", "Azure VNet", "GCP VPC", "IAM", "Terraform"],
+    mermaid: `graph TD
+  A[Cloud Security] --> B{Provider}
+  B -->|AWS| C[aws-networking-audit]
+  B -->|Azure| D[azure-networking-audit]
+  B -->|GCP| E[gcp-networking-audit]
+  A --> F[cloud-security-posture]
+  C --> G[VPC / SG / NACL / Flow Logs]
+  D --> H[VNet / NSG / Azure Firewall]
+  E --> I[VPC / FW Rules / Cloud NAT]
+  F --> J[IAM / Encryption / Public Exposure]
+  G --> K[Posture Report]
+  H --> K
+  I --> K
+  J --> K`,
   },
   {
-    title: "GitOps Deployment Platform",
+    title: "Observability & Incident Response",
     description:
-      "Declarative infrastructure platform where every environment change flows through Git. Automated drift detection with self-healing reconciliation loops.",
-    domain: "infrastructure",
-    image: "/diagrams/gitops-platform.png",
+      "SIEM log analysis with Splunk/ELK/QRadar query patterns, Grafana dashboard auditing, network forensics, and NIST 800-61 incident response lifecycle management.",
+    domain: "observability",
+    image: "",
     problemSolved:
-      "Replaced manual kubectl-and-SSH deployments with a fully auditable, rollback-capable pipeline where the Git repo is the single source of truth for cluster state.",
-    techDecisions: ["ArgoCD", "Terraform", "Helm", "GitHub Actions"],
-  },
-  {
-    title: "Distributed Tracing Backbone",
-    description:
-      "Unified observability pipeline correlating traces, metrics, and logs across 200+ services with adaptive sampling that keeps costs predictable at scale.",
-    domain: "infrastructure",
-    image: "/diagrams/tracing-backbone.png",
-    problemSolved:
-      "Transformed debugging from log-grepping across dozens of services into single-click trace inspection, cutting mean-time-to-diagnose from hours to minutes.",
-    techDecisions: ["OpenTelemetry", "Jaeger", "ClickHouse", "Go"],
-  },
-  {
-    title: "Stream Processing DAG",
-    description:
-      "Composable stream processing framework that lets teams define transformation DAGs in YAML. Handles backpressure, checkpointing, and exactly-once semantics transparently.",
-    domain: "data-pipeline",
-    image: "/diagrams/stream-dag.png",
-    problemSolved:
-      "Gave data engineering teams a self-service platform for building real-time pipelines without writing Flink jobs from scratch — reducing pipeline creation time from weeks to hours.",
-    techDecisions: ["Apache Flink", "Kafka Streams", "Kubernetes", "Java"],
+      "End-to-end incident handling — from SIEM alert triage through network forensics to structured post-mortem, with query patterns for the three major SIEM platforms.",
+    techDecisions: ["Splunk SPL", "ELK KQL", "QRadar AQL", "Grafana", "NIST 800-61"],
+    mermaid: `graph TD
+  A[Observability] --> B[siem-log-analysis]
+  A --> C[network-log-analysis]
+  A --> D[monitoring-dashboard-audit]
+  A --> E[incident-response-lifecycle]
+  A --> F[incident-response-network]
+  B --> G{SIEM Platform}
+  G -->|Splunk| H[SPL Queries]
+  G -->|ELK| I[KQL Queries]
+  G -->|QRadar| J[AQL Queries]
+  D --> K[Grafana / PromQL / Alert Rules]
+  E --> L[Detection → Analysis → Containment → Recovery → Post-Mortem]
+  F --> M[Packet Capture / Flow Analysis / Forensics]`,
   },
 ];

@@ -33,7 +33,7 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 		server: {
 			watch: {
-				ignored: ['**/.gsd/**', '**/.planning/**', '**/lighthouse-report.*'],
+				ignored: ['**/.gsd/**', '**/.bg-shell/**', '**/.claude/**', '**/.artifacts/**', '**/.planning/**', '**/lighthouse-report.*'],
 			},
 		},
 	},

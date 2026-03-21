@@ -29,7 +29,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           position: "fixed",
           inset: 0,
           zIndex: 50,
-          background: "rgba(2,4,2,0.6)",
+          background: "rgba(2,4,2,0.7)",
         }}
       />
 
@@ -42,9 +42,9 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           bottom: 0,
           width: "min(520px, 90vw)",
           zIndex: 51,
-          background: "rgba(4,8,4,0.98)",
-          backdropFilter: "blur(12px)",
-          borderLeft: "1px solid rgba(0,255,170,0.1)",
+          background: "rgba(6,12,6,0.98)",
+          backdropFilter: "blur(16px)",
+          borderLeft: "1px solid rgba(0,255,170,0.15)",
           transform: "translateX(0)",
           transition: "transform 0.3s ease",
           overflowY: "auto",
@@ -76,8 +76,8 @@ const ProjectDetailPanel = ({ project, onClose }) => {
             <div
               style={{
                 fontFamily: MONO,
-                fontSize: "0.42rem",
-                color: "rgba(0,255,170,0.2)",
+                fontSize: "0.55rem",
+                color: "rgba(0,255,170,0.4)",
                 letterSpacing: "1.5px",
               }}
             >
@@ -87,11 +87,11 @@ const ProjectDetailPanel = ({ project, onClose }) => {
               onClick={onClose}
               style={{
                 fontFamily: MONO,
-                fontSize: "0.5rem",
-                color: "rgba(0,255,170,0.4)",
-                background: "rgba(0,255,170,0.04)",
-                border: "1px solid rgba(0,255,170,0.1)",
-                padding: "4px 10px",
+                fontSize: "0.6rem",
+                color: "rgba(0,255,170,0.55)",
+                background: "rgba(0,255,170,0.06)",
+                border: "1px solid rgba(0,255,170,0.15)",
+                padding: "5px 12px",
                 cursor: "pointer",
                 letterSpacing: "1.5px",
                 transition: "all 0.2s ease",
@@ -99,12 +99,12 @@ const ProjectDetailPanel = ({ project, onClose }) => {
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = "#0fa";
                 e.currentTarget.style.borderColor = "rgba(0,255,170,0.3)";
-                e.currentTarget.style.background = "rgba(0,255,170,0.08)";
+                e.currentTarget.style.background = "rgba(0,255,170,0.1)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "rgba(0,255,170,0.4)";
-                e.currentTarget.style.borderColor = "rgba(0,255,170,0.1)";
-                e.currentTarget.style.background = "rgba(0,255,170,0.04)";
+                e.currentTarget.style.color = "rgba(0,255,170,0.55)";
+                e.currentTarget.style.borderColor = "rgba(0,255,170,0.15)";
+                e.currentTarget.style.background = "rgba(0,255,170,0.06)";
               }}
             >
               {"\u00D7 CLOSE"}
@@ -124,7 +124,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
             <span
               style={{
                 fontFamily: MONO,
-                fontSize: "1.1rem",
+                fontSize: "1.2rem",
                 fontWeight: "bold",
                 color: project.accent,
                 letterSpacing: "3px",
@@ -137,7 +137,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
               <span
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.42rem",
+                  fontSize: "0.55rem",
                   color: "#0fa",
                   letterSpacing: "1px",
                   animation: "livePulse 2s ease infinite",
@@ -153,8 +153,8 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           <div
             style={{
               fontFamily: MONO,
-              fontSize: "0.5rem",
-              color: "rgba(0,255,170,0.25)",
+              fontSize: "0.6rem",
+              color: "rgba(0,255,170,0.45)",
               letterSpacing: "1.5px",
               marginBottom: "8px",
               marginLeft: "2px",
@@ -176,7 +176,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
             <div
               style={{
                 fontFamily: MONO,
-                fontSize: "0.5rem",
+                fontSize: "0.6rem",
                 letterSpacing: "1px",
                 color: sc.color,
                 display: "flex",
@@ -193,8 +193,8 @@ const ProjectDetailPanel = ({ project, onClose }) => {
               <div
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.42rem",
-                  color: "rgba(0,255,170,0.2)",
+                  fontSize: "0.55rem",
+                  color: "rgba(0,255,170,0.4)",
                   letterSpacing: "1px",
                 }}
               >
@@ -207,8 +207,8 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           <div
             style={{
               fontFamily: MONO,
-              fontSize: "0.7rem",
-              color: "rgba(0,255,170,0.5)",
+              fontSize: "0.78rem",
+              color: "rgba(0,255,170,0.65)",
               lineHeight: 1.5,
               marginBottom: "20px",
             }}
@@ -224,15 +224,15 @@ const ProjectDetailPanel = ({ project, onClose }) => {
                 justifyContent: "space-between",
                 marginBottom: "4px",
                 fontFamily: MONO,
-                fontSize: "0.45rem",
-                color: "rgba(0,255,170,0.2)",
+                fontSize: "0.55rem",
+                color: "rgba(0,255,170,0.4)",
                 letterSpacing: "1px",
               }}
             >
               <span>COMPLETION</span>
               <span
                 style={{
-                  fontSize: "0.7rem",
+                  fontSize: "0.75rem",
                   color: project.accent,
                   fontWeight: "bold",
                   textShadow: `0 0 6px rgba(${rgb},0.3)`,
@@ -244,7 +244,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
             <div
               style={{
                 height: "4px",
-                background: "rgba(0,255,170,0.06)",
+                background: "rgba(0,255,170,0.1)",
                 overflow: "hidden",
               }}
             >
@@ -273,16 +273,16 @@ const ProjectDetailPanel = ({ project, onClose }) => {
               <div
                 key={i}
                 style={{
-                  background: "rgba(0,255,170,0.02)",
-                  border: "1px solid rgba(0,255,170,0.06)",
+                  background: "rgba(0,255,170,0.03)",
+                  border: "1px solid rgba(0,255,170,0.1)",
                   padding: "8px 10px",
                 }}
               >
                 <div
                   style={{
                     fontFamily: MONO,
-                    fontSize: "0.45rem",
-                    color: "rgba(0,255,170,0.25)",
+                    fontSize: "0.55rem",
+                    color: "rgba(0,255,170,0.45)",
                     letterSpacing: "1px",
                     marginBottom: "3px",
                   }}
@@ -292,7 +292,7 @@ const ProjectDetailPanel = ({ project, onClose }) => {
                 <div
                   style={{
                     fontFamily: MONO,
-                    fontSize: "0.85rem",
+                    fontSize: "0.9rem",
                     color: project.accent,
                     fontWeight: "bold",
                     textShadow: `0 0 6px rgba(${rgb},0.2)`,
@@ -308,8 +308,8 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           <div
             style={{
               fontFamily: MONO,
-              fontSize: "0.65rem",
-              color: "rgba(0,255,170,0.45)",
+              fontSize: "0.72rem",
+              color: "rgba(0,255,170,0.6)",
               lineHeight: 1.7,
               marginBottom: "20px",
             }}
@@ -331,10 +331,10 @@ const ProjectDetailPanel = ({ project, onClose }) => {
                 key={i}
                 style={{
                   fontFamily: MONO,
-                  fontSize: "0.5rem",
+                  fontSize: "0.6rem",
                   color: project.accent,
-                  border: `1px solid ${project.accent}40`,
-                  padding: "3px 10px",
+                  border: `1px solid ${project.accent}50`,
+                  padding: "4px 12px",
                   letterSpacing: "0.5px",
                 }}
               >
@@ -346,12 +346,12 @@ const ProjectDetailPanel = ({ project, onClose }) => {
           {/* I. Divider + footer */}
           <div
             style={{
-              borderTop: "1px solid rgba(0,255,170,0.06)",
+              borderTop: "1px solid rgba(0,255,170,0.1)",
               paddingTop: "12px",
               textAlign: "center",
               fontFamily: MONO,
-              fontSize: "0.42rem",
-              color: "rgba(0,255,170,0.15)",
+              fontSize: "0.55rem",
+              color: "rgba(0,255,170,0.3)",
               letterSpacing: "1.5px",
             }}
           >

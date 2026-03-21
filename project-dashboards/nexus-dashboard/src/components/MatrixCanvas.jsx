@@ -177,7 +177,7 @@ const MatrixCanvas = ({ dimmed }) => {
   return (
     <canvas ref={canvasRef} style={{
       position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0,
-      opacity: dimmed ? 0.25 : 0.7,
+      opacity: dimmed ? 0.12 : 0.7,
       transition: "opacity 1s ease",
     }} />
   );

@@ -17,5 +17,10 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Cloudflare
+.wrangler/
+.dev.vars
+
 # Lighthouse reports
 lighthouse-report.*
+.agents/*

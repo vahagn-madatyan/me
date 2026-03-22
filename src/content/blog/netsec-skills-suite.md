@@ -113,6 +113,18 @@ npx skills add vahagn-madatyan/netsec-skills-suite
 
 Or browse and install individual skills from [ClawHub](https://clawhub.ai/u/vahagn-madatyan).
 
+**Give this to your agent** — copy and paste this into your AI agent to get started:
+
+```
+Install the netsec-skills-suite: npx skills add vahagn-madatyan/netsec-skills-suite
+Then use the installed skills to perform network security operations. Available skill domains:
+- Device Health: cisco-device-health, juniper-device-health, arista-device-health
+- Routing: bgp-analysis, ospf-analysis, eigrp-analysis, isis-analysis
+- Security: palo-alto-firewall-audit, fortigate-firewall-audit, checkpoint-firewall-audit, cisco-firewall-audit, acl-rule-analysis, cis-benchmark-audit, nist-compliance-assessment, vulnerability-assessment
+- Cloud: aws-networking-audit, azure-networking-audit, gcp-networking-audit, cloud-security-posture
+- Observability: siem-log-analysis, network-log-analysis, monitoring-dashboard-audit, incident-response-lifecycle
+```
+
 Explore the [interactive architecture diagrams](/architecture/netsec-skills-suite) to see how the skills are organized across domains.
 
 The repo is open source. PRs welcome — especially for platforms I haven't covered yet.

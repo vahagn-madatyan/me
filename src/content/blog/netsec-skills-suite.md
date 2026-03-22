@@ -113,4 +113,6 @@ npx skills add vahagn-madatyan/netsec-skills-suite
 
 Or browse and install individual skills from [ClawHub](https://clawhub.ai/u/vahagn-madatyan).
 
+Explore the [interactive architecture diagrams](/architecture/netsec-skills-suite) to see how the skills are organized across domains.
+
 The repo is open source. PRs welcome — especially for platforms I haven't covered yet.

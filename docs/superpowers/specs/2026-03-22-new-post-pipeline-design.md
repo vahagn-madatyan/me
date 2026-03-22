@@ -233,7 +233,7 @@ If no keyword matches, the gradient is applied to the last 2 words of the title.
 
 Auto-injected into **cross-posted versions only** (LinkedIn, X article) when the post is a **project showcase** (detected by: links to a GitHub repo, contains `npx` or install commands, or tags include `open-source`).
 
-The blog post itself already has the agent instructions block added during the drafting phase by `technical-blog-writing` — the cross-poster does NOT modify the blog `.md` file.
+The cross-poster does NOT modify the blog `.md` file. If the user wants an agent instructions block in the blog post itself, they should add it during the drafting review loop (Phase 4 of `technical-blog-writing`).
 
 Format:
 

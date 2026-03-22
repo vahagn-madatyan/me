@@ -1,10 +1,12 @@
 ---
 title: 'Building an AI Skills Suite for Network Security'
-description: 'How I built a collection of 35+ agent skills that turn AI coding assistants into network security engineers — covering device triage, firewall audits, compliance assessments, and cloud security posture reviews.'
+description: '35+ agent skills that turn AI assistants into network security engineers — device triage, firewall audits, compliance, and cloud security.'
 pubDate: 'Mar 21 2026'
 featured: true
-tags: ['ai-agents', 'network-security', 'open-source', 'cisco', 'python']
+tags: ['ai-agents', 'network-security', 'open-source', 'cisco', 'automation']
 ---
+
+Network security operations are ripe for the agentic AI era — structured procedures, multi-vendor complexity, and repeatability make them ideal for agent-driven automation.
 
 I spent the last few months building [netsec-skills-suite](https://github.com/vahagn-madatyan/netsec-skills-suite) — a collection of 35+ agent skills that let AI coding assistants perform real network security operations. Device health checks, firewall policy audits, compliance assessments, incident response procedures — all structured as step-by-step procedures an agent can follow.
 
@@ -97,7 +99,7 @@ The custom security auditor (`skill_security_auditor.py`) scans for command inje
 
 ## What's Next
 
-The suite currently has 35 skills across networking, security, cloud, and observability. The roadmap includes:
+The suite currently has 35+ skills across networking, security, cloud, and observability. The roadmap includes:
 
 - **Automation skills** — Moving from analysis to remediation with `read-write` skills for common fixes
 - **Playbook composition** — Chaining skills into multi-step incident response workflows
@@ -108,5 +110,7 @@ If you work in network security and want to try it:
 ```bash
 npx skills add vahagn-madatyan/netsec-skills-suite
 ```
+
+Or browse and install individual skills from [ClawHub](https://clawhub.ai/u/vahagn-madatyan).
 
 The repo is open source. PRs welcome — especially for platforms I haven't covered yet.

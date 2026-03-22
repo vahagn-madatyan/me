@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../components/BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import avatar from '../assets/avatar.png';
 import ShareButtons from '../components/ShareButtons.astro';
 import RelatedPosts from '../components/RelatedPosts.astro';
 import CopyButton from '../components/CopyButton.astro';
@@ -70,10 +71,15 @@ const showToc = tocHeadings.length > 0 && readingTime >= 5;
           </div>
         )}
         <div class="mb-8 text-center">
-          <div class="flex items-center justify-center gap-1.5 text-sm font-code text-secondary-500 dark:text-secondary-400 mb-3">
-            <FormattedDate date={pubDate} />
-            <span aria-hidden="true">&middot;</span>
-            <span>{formatReadingTime(readingTime)}</span>
+          <div class="flex items-center justify-center gap-3 mb-3">
+            <Image src={avatar} alt="Vahagn Madatyan" width={36} height={36} class="rounded-full" />
+            <div class="flex items-center gap-1.5 text-sm font-code text-secondary-500 dark:text-secondary-400">
+              <span class="text-secondary-700 dark:text-secondary-200 font-medium">Vahagn Madatyan</span>
+              <span aria-hidden="true">&middot;</span>
+              <FormattedDate date={pubDate} />
+              <span aria-hidden="true">&middot;</span>
+              <span>{formatReadingTime(readingTime)}</span>
+            </div>
           </div>
           {updatedDate && (
             <p class="text-sm text-secondary-500 dark:text-secondary-400 italic mb-3">
@@ -127,10 +133,15 @@ const showToc = tocHeadings.length > 0 && readingTime >= 5;
         </div>
       )}
       <div class="mb-8 text-center">
-        <div class="flex items-center justify-center gap-1.5 text-sm font-code text-secondary-500 dark:text-secondary-400 mb-3">
-          <FormattedDate date={pubDate} />
-          <span aria-hidden="true">&middot;</span>
-          <span>{formatReadingTime(readingTime)}</span>
+        <div class="flex items-center justify-center gap-3 mb-3">
+          <Image src={avatar} alt="Vahagn Madatyan" width={36} height={36} class="rounded-full" />
+          <div class="flex items-center gap-1.5 text-sm font-code text-secondary-500 dark:text-secondary-400">
+            <span class="text-secondary-700 dark:text-secondary-200 font-medium">Vahagn Madatyan</span>
+            <span aria-hidden="true">&middot;</span>
+            <FormattedDate date={pubDate} />
+            <span aria-hidden="true">&middot;</span>
+            <span>{formatReadingTime(readingTime)}</span>
+          </div>
         </div>
         {updatedDate && (
           <p class="text-sm text-secondary-500 dark:text-secondary-400 italic mb-3">

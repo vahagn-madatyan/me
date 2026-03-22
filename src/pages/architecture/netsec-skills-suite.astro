@@ -1,0 +1,533 @@
+---
+import BaseLayout from '../../components/BaseLayout.astro';
+
+const sections = [
+  {
+    id: 'overview',
+    title: 'Suite Overview',
+    description: 'High-level view of how the 35+ skills are organized across five domains, with the security pipeline validating every skill before it reaches production.',
+    mermaid: `graph TB
+  subgraph Suite["netsec-skills-suite"]
+    direction TB
+    DH["Device Health<br/>Cisco · Juniper · Arista"]
+    RP["Routing Protocols<br/>BGP · OSPF · EIGRP · IS-IS"]
+    SA["Security Audits<br/>PAN-OS · FortiGate · Check Point · ASA"]
+    CS["Cloud Security<br/>AWS · Azure · GCP"]
+    OB["Observability<br/>Splunk · ELK · QRadar · Grafana"]
+  end
+
+  Agent["AI Agent"] --> Suite
+  Suite --> Pipeline["Security Pipeline"]
+  Pipeline --> V1["Spec Validation"]
+  Pipeline --> V2["Convention Check"]
+  Pipeline --> V3["Injection Detection"]
+  Pipeline --> V4["VirusTotal Scan"]
+  Pipeline --> V5["OpenSSF Scorecard"]
+
+  style Suite fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f1f5f9
+  style Agent fill:#818cf8,stroke:#6366f1,color:#fff
+  style Pipeline fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#fbbf24
+  style DH fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe
+  style RP fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style SA fill:#4c0519,stroke:#fb7185,color:#ffe4e6
+  style CS fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style OB fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style V1 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style V2 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style V3 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style V4 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style V5 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'device-health',
+    title: 'Device Health Triage',
+    description: 'Platform-specific health check procedures with threshold-based severity classification and decision trees for root cause analysis.',
+    mermaid: `graph TD
+  Start["Device Health Check"] --> Identify{Identify Platform}
+  Identify -->|IOS-XE / NX-OS| Cisco["cisco-device-health"]
+  Identify -->|JunOS| Juniper["juniper-device-health"]
+  Identify -->|EOS| Arista["arista-device-health"]
+
+  Cisco --> Collect["Collect Metrics"]
+  Juniper --> Collect
+  Arista --> Collect
+
+  Collect --> CPU["CPU Utilization"]
+  Collect --> Mem["Memory Usage"]
+  Collect --> Intf["Interface Health"]
+
+  CPU --> Threshold{Threshold Check}
+  Mem --> Threshold
+  Intf --> Threshold
+
+  Threshold -->|"5min CPU < 50%"| Normal["✅ Normal — Report OK"]
+  Threshold -->|"5min CPU 50-70%"| Warning["⚠️ Warning — Flag & Continue"]
+  Threshold -->|"5min CPU > 70%"| Critical["🔴 Critical"]
+
+  Critical --> TopProc{Top Process?}
+  TopProc -->|BGP Router| RouteChurn["Check Route Churn"]
+  TopProc -->|SNMP Engine| SNMPPoll["Check Polling Rate"]
+  TopProc -->|IP Input| TrafficSpike["Analyze Traffic"]
+
+  RouteChurn --> Report["Structured Report"]
+  SNMPPoll --> Report
+  TrafficSpike --> Report
+  Warning --> Report
+  Normal --> Report
+
+  style Start fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe
+  style Cisco fill:#164e63,stroke:#22d3ee,color:#cffafe
+  style Juniper fill:#164e63,stroke:#22d3ee,color:#cffafe
+  style Arista fill:#164e63,stroke:#22d3ee,color:#cffafe
+  style Normal fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Warning fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Critical fill:#4c0519,stroke:#fb7185,color:#ffe4e6
+  style Report fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'routing',
+    title: 'Routing Protocol Analysis',
+    description: 'Multi-protocol, multi-vendor routing diagnosis — from BGP peer flaps to OSPF area design validation to IS-IS LSPDB analysis.',
+    mermaid: `graph TD
+  Start["Routing Analysis"] --> Proto{Protocol?}
+
+  Proto -->|BGP| BGP["bgp-analysis"]
+  Proto -->|OSPF| OSPF["ospf-analysis"]
+  Proto -->|EIGRP| EIGRP["eigrp-analysis"]
+  Proto -->|IS-IS| ISIS["isis-analysis"]
+
+  BGP --> BGP1["Peer State Assessment"]
+  BGP --> BGP2["Path Selection Audit"]
+  BGP --> BGP3["Route Filtering Check"]
+  BGP --> BGP4["Community / AS-Path Analysis"]
+
+  OSPF --> OSPF1["Adjacency Diagnosis"]
+  OSPF --> OSPF2["Area Design Validation"]
+  OSPF --> OSPF3["LSA / SPF Analysis"]
+  OSPF --> OSPF4["Redistribution Audit"]
+
+  EIGRP --> EIGRP1["DUAL FSM State"]
+  EIGRP --> EIGRP2["SIA Diagnosis"]
+  EIGRP --> EIGRP3["K-Value Mismatch"]
+
+  ISIS --> ISIS1["Adjacency Check"]
+  ISIS --> ISIS2["LSPDB Integrity"]
+  ISIS --> ISIS3["Level 1/2 Topology"]
+
+  BGP1 --> Converge["Convergence Report"]
+  BGP2 --> Converge
+  BGP3 --> Converge
+  BGP4 --> Converge
+  OSPF1 --> Converge
+  OSPF2 --> Converge
+  OSPF3 --> Converge
+  OSPF4 --> Converge
+  EIGRP1 --> Converge
+  EIGRP2 --> Converge
+  EIGRP3 --> Converge
+  ISIS1 --> Converge
+  ISIS2 --> Converge
+  ISIS3 --> Converge
+
+  style Start fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style BGP fill:#312e81,stroke:#a78bfa,color:#ede9fe
+  style OSPF fill:#312e81,stroke:#a78bfa,color:#ede9fe
+  style EIGRP fill:#312e81,stroke:#a78bfa,color:#ede9fe
+  style ISIS fill:#312e81,stroke:#a78bfa,color:#ede9fe
+  style Converge fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'security',
+    title: 'Firewall & Security Audit',
+    description: 'Consistent firewall policy auditing across four major platforms — shadowed rule detection, overly permissive rule flagging, compliance mapping, and vulnerability assessment.',
+    mermaid: `graph TD
+  Start["Security Audit"] --> FW{Firewall Platform}
+  Start --> ACL["acl-rule-analysis"]
+  Start --> Compliance{Compliance Framework}
+
+  FW -->|PAN-OS| PA["palo-alto-firewall-audit"]
+  FW -->|FortiOS| FG["fortigate-firewall-audit"]
+  FW -->|Check Point| CP["checkpoint-firewall-audit"]
+  FW -->|ASA / FTD| Cisco["cisco-firewall-audit"]
+
+  PA --> PolicyCheck["Policy Analysis"]
+  FG --> PolicyCheck
+  CP --> PolicyCheck
+  Cisco --> PolicyCheck
+
+  PolicyCheck --> Shadow["Shadowed Rules"]
+  PolicyCheck --> PermitAny["Overly Permissive"]
+  PolicyCheck --> Unused["Unused Rules"]
+  PolicyCheck --> Logging["Logging Gaps"]
+
+  ACL --> Shadow
+  ACL --> PermitAny
+  ACL --> Unused
+
+  Compliance --> CIS["cis-benchmark-audit"]
+  Compliance --> NIST["nist-compliance-assessment"]
+  Compliance --> Vuln["vulnerability-assessment"]
+
+  Shadow --> AuditReport["Audit Report"]
+  PermitAny --> AuditReport
+  Unused --> AuditReport
+  Logging --> AuditReport
+  CIS --> AuditReport
+  NIST --> AuditReport
+  Vuln --> AuditReport
+
+  style Start fill:#4c0519,stroke:#fb7185,color:#ffe4e6
+  style PA fill:#831843,stroke:#f472b6,color:#fce7f3
+  style FG fill:#831843,stroke:#f472b6,color:#fce7f3
+  style CP fill:#831843,stroke:#f472b6,color:#fce7f3
+  style Cisco fill:#831843,stroke:#f472b6,color:#fce7f3
+  style CIS fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style NIST fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Vuln fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style AuditReport fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'cloud',
+    title: 'Cloud Security Posture',
+    description: 'Unified cloud security assessment across AWS, Azure, and GCP — VPC architecture, firewall rules, encryption, IAM, and public exposure detection.',
+    mermaid: `graph TD
+  Start["Cloud Security"] --> Provider{Cloud Provider}
+  Start --> Posture["cloud-security-posture"]
+
+  Provider -->|AWS| AWS["aws-networking-audit"]
+  Provider -->|Azure| Azure["azure-networking-audit"]
+  Provider -->|GCP| GCP["gcp-networking-audit"]
+
+  AWS --> AWSChecks["VPC Design<br/>Security Groups<br/>NACLs<br/>Flow Logs"]
+  Azure --> AzureChecks["VNet Config<br/>NSGs<br/>Azure Firewall<br/>Route Tables"]
+  GCP --> GCPChecks["VPC Networks<br/>Firewall Rules<br/>Cloud NAT<br/>Shared VPC"]
+
+  Posture --> CrossCloud["Cross-Cloud Analysis"]
+  CrossCloud --> IAM["IAM Audit"]
+  CrossCloud --> Encrypt["Encryption Check"]
+  CrossCloud --> Public["Public Exposure Scan"]
+  CrossCloud --> TF["Terraform/IaC Review"]
+
+  AWSChecks --> Report["Posture Report"]
+  AzureChecks --> Report
+  GCPChecks --> Report
+  IAM --> Report
+  Encrypt --> Report
+  Public --> Report
+  TF --> Report
+
+  style Start fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style AWS fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe
+  style Azure fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style GCP fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Posture fill:#064e3b,stroke:#6ee7b7,color:#d1fae5
+  style Report fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'observability',
+    title: 'Observability & Incident Response',
+    description: 'End-to-end incident handling — from SIEM alert triage through network forensics to structured post-mortem, following NIST 800-61 lifecycle.',
+    mermaid: `graph TD
+  Start["Observability & IR"] --> SIEM["siem-log-analysis"]
+  Start --> NetLog["network-log-analysis"]
+  Start --> Dashboard["monitoring-dashboard-audit"]
+  Start --> IR["incident-response-lifecycle"]
+  Start --> NetIR["incident-response-network"]
+
+  SIEM --> Platform{SIEM Platform}
+  Platform -->|Splunk| SPL["SPL Queries"]
+  Platform -->|ELK| KQL["KQL Queries"]
+  Platform -->|QRadar| AQL["AQL Queries"]
+
+  Dashboard --> Grafana["Grafana Audit"]
+  Grafana --> PromQL["PromQL Validation"]
+  Grafana --> AlertRules["Alert Rule Review"]
+  Grafana --> PanelCheck["Panel Coverage"]
+
+  IR --> Phase1["1. Detection & Alerting"]
+  Phase1 --> Phase2["2. Analysis & Scoping"]
+  Phase2 --> Phase3["3. Containment"]
+  Phase3 --> Phase4["4. Eradication & Recovery"]
+  Phase4 --> Phase5["5. Post-Mortem"]
+
+  NetIR --> Packet["Packet Capture Analysis"]
+  NetIR --> Flow["NetFlow / sFlow Analysis"]
+  NetIR --> Forensics["Network Forensics"]
+
+  style Start fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style SIEM fill:#78350f,stroke:#f59e0b,color:#fef3c7
+  style IR fill:#78350f,stroke:#f59e0b,color:#fef3c7
+  style Phase1 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style Phase2 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style Phase3 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style Phase4 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style Phase5 fill:#1e293b,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'safety',
+    title: 'Safety Tier Model',
+    description: 'Every skill declares a safety tier that controls what operations an agent can perform — read-only skills collect data, read-write skills can modify configuration.',
+    mermaid: `graph LR
+  Skill["Skill Loaded"] --> Check{Safety Tier?}
+
+  Check -->|read-only| RO["Read-Only Mode"]
+  Check -->|read-write| RW["Read-Write Mode"]
+
+  RO --> ShowCmd["show / display commands"]
+  RO --> Collect["Data collection"]
+  RO --> Analyze["Analysis & reporting"]
+
+  RW --> ShowCmd2["show / display commands"]
+  RW --> Config["Configuration changes"]
+  RW --> Remediate["Auto-remediation"]
+
+  ShowCmd --> Safe["✅ Safe for production"]
+  Collect --> Safe
+  Analyze --> Safe
+
+  ShowCmd2 --> Approval{"Operator Approval<br/>Required"}
+  Config --> Approval
+  Remediate --> Approval
+
+  Approval -->|Approved| Execute["Execute Change"]
+  Approval -->|Denied| Block["🛑 Blocked"]
+
+  style Skill fill:#0f172a,stroke:#38bdf8,color:#e0f2fe
+  style RO fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style RW fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Safe fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Execute fill:#064e3b,stroke:#6ee7b7,color:#d1fae5
+  style Block fill:#4c0519,stroke:#fb7185,color:#ffe4e6`,
+  },
+  {
+    id: 'pipeline',
+    title: 'Security Validation Pipeline',
+    description: 'Every skill passes through 5 validation layers before merging — spec validation, convention checks, injection scanning, VirusTotal, and OpenSSF Scorecard.',
+    mermaid: `graph LR
+  PR["Pull Request"] --> S1["1. Spec Validation<br/>agentskills validate"]
+  S1 --> S2["2. Convention Check<br/>validate.sh"]
+  S2 --> S3["3. Security Audit<br/>skill_security_auditor.py"]
+  S3 --> S4["4. VirusTotal<br/>70+ engines"]
+  S4 --> S5["5. OpenSSF Scorecard<br/>Weekly assessment"]
+
+  S3 --> Checks["Injection Detection<br/>Credential Harvesting<br/>Obfuscation Scan<br/>Safety Tier Mismatch"]
+
+  S5 --> Pass{All Pass?}
+  Pass -->|Yes| Merge["✅ Merged"]
+  Pass -->|No| Reject["🛑 Blocked"]
+
+  style PR fill:#0f172a,stroke:#38bdf8,color:#e0f2fe
+  style S1 fill:#1e293b,stroke:#6ee7b7,color:#d1fae5
+  style S2 fill:#1e293b,stroke:#6ee7b7,color:#d1fae5
+  style S3 fill:#1e293b,stroke:#f59e0b,color:#fef3c7
+  style S4 fill:#1e293b,stroke:#f59e0b,color:#fef3c7
+  style S5 fill:#1e293b,stroke:#818cf8,color:#e0e7ff
+  style Checks fill:#451a03,stroke:#f59e0b,color:#fef3c7
+  style Merge fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Reject fill:#4c0519,stroke:#fb7185,color:#ffe4e6`,
+  },
+];
+---
+
+<BaseLayout title="NetSec Skills Suite Architecture — Vahagn Madatyan" description="Interactive architecture diagrams for the netsec-skills-suite — skill domains, decision flows, safety tiers, and security pipeline.">
+  <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+
+    <!-- Header -->
+    <a href="/architecture" class="inline-flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-500 transition-colors mb-6">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      Back to Architecture
+    </a>
+
+    <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+      NetSec Skills Suite
+    </h1>
+    <p class="mt-3 text-secondary-600 dark:text-secondary-400 leading-relaxed max-w-2xl">
+      Interactive architecture diagrams showing how 35+ agent skills are organized, how decisions flow through each domain, and how the security pipeline validates every skill.
+    </p>
+
+    <!-- Jump links -->
+    <nav class="mt-8 flex flex-wrap gap-2">
+      {sections.map((s) => (
+        <a
+          href={`#${s.id}`}
+          class="rounded-full px-4 py-1.5 text-sm font-medium bg-secondary-100 text-secondary-600 hover:bg-primary-100 hover:text-primary-700 dark:bg-white/[0.05] dark:text-secondary-300 dark:hover:bg-primary-500/10 dark:hover:text-primary-400 dark:ring-1 dark:ring-white/[0.06] transition-colors"
+        >
+          {s.title}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Diagram sections -->
+    <div class="mt-12 space-y-8">
+      {sections.map((section) => (
+        <section id={section.id} class="scroll-mt-20">
+          <div class="rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 dark:bg-secondary-900 dark:ring-secondary-800 overflow-hidden transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:hover:ring-primary-700">
+
+            <!-- Collapsible header -->
+            <button
+              data-collapse={section.id}
+              class="w-full flex items-center justify-between p-5 sm:p-6 text-left cursor-pointer group"
+            >
+              <div>
+                <h2 class="text-lg font-semibold tracking-tight text-secondary-900 dark:text-secondary-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  {section.title}
+                </h2>
+                <p class="mt-1 text-sm text-secondary-500 dark:text-secondary-400 leading-relaxed">
+                  {section.description}
+                </p>
+              </div>
+              <svg data-chevron={section.id} class="w-5 h-5 text-secondary-400 transition-transform duration-200 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Diagram container -->
+            <div data-panel={section.id} class="border-t border-secondary-200 dark:border-secondary-700">
+              <div class="diagram-wrapper relative bg-secondary-50 dark:bg-secondary-800/50 overflow-hidden">
+                <!-- Zoom controls -->
+                <div class="absolute top-3 right-3 z-10 flex gap-1">
+                  <button data-zoom-in={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Zoom in">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" /></svg>
+                  </button>
+                  <button data-zoom-out={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Zoom out">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" /></svg>
+                  </button>
+                  <button data-zoom-reset={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Reset zoom">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" /></svg>
+                  </button>
+                </div>
+                <!-- Diagram -->
+                <div
+                  data-diagram={section.id}
+                  class="p-6 overflow-auto cursor-grab active:cursor-grabbing"
+                  style="min-height: 300px;"
+                >
+                  <div class="diagram-inner transition-transform duration-150 origin-top-left">
+                    <pre class="mermaid flex justify-center text-sm">{section.mermaid}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- Footer CTA -->
+    <div class="mt-16 rounded-2xl bg-gradient-to-br from-primary-500/10 to-indigo-500/10 dark:from-primary-500/5 dark:to-indigo-500/5 ring-1 ring-primary-200 dark:ring-primary-800 p-8 text-center">
+      <h2 class="text-xl font-bold text-secondary-900 dark:text-secondary-100">Get Started</h2>
+      <p class="mt-2 text-secondary-600 dark:text-secondary-400">Install the full suite or browse individual skills.</p>
+      <div class="mt-4 flex flex-wrap justify-center gap-3">
+        <code class="rounded-lg bg-secondary-900 dark:bg-secondary-800 px-4 py-2 text-sm text-primary-400 font-mono">
+          npx skills add vahagn-madatyan/netsec-skills-suite
+        </code>
+      </div>
+      <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+        <a href="https://github.com/vahagn-madatyan/netsec-skills-suite" class="text-primary-500 hover:underline">GitHub</a>
+        <span class="text-secondary-300 dark:text-secondary-600">|</span>
+        <a href="https://clawhub.ai/u/vahagn-madatyan" class="text-primary-500 hover:underline">ClawHub</a>
+        <span class="text-secondary-300 dark:text-secondary-600">|</span>
+        <a href="/blog/netsec-skills-suite" class="text-primary-500 hover:underline">Blog Post</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  function initPage() {
+    const isDark = document.documentElement.classList.contains('dark');
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      flowchart: { curve: 'basis', padding: 15, htmlLabels: true },
+      themeVariables: isDark
+        ? { primaryColor: '#1e293b', primaryTextColor: '#e0f2fe', lineColor: '#475569', primaryBorderColor: '#38bdf8' }
+        : {},
+    });
+    mermaid.run({ querySelector: '.mermaid' });
+
+    // Collapse / expand
+    document.querySelectorAll<HTMLButtonElement>('[data-collapse]').forEach((btn) => {
+      const id = btn.dataset.collapse!;
+      const panel = document.querySelector(`[data-panel="${id}"]`) as HTMLElement;
+      const chevron = document.querySelector(`[data-chevron="${id}"]`) as HTMLElement;
+      if (!panel || !chevron) return;
+
+      btn.addEventListener('click', () => {
+        const isHidden = panel.classList.toggle('hidden');
+        chevron.style.transform = isHidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+      });
+    });
+
+    // Zoom controls
+    const zoomLevels: Record<string, number> = {};
+
+    function applyZoom(id: string) {
+      const diagram = document.querySelector(`[data-diagram="${id}"] .diagram-inner`) as HTMLElement;
+      if (!diagram) return;
+      const level = zoomLevels[id] ?? 1;
+      diagram.style.transform = `scale(${level})`;
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-zoom-in]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomIn!;
+        zoomLevels[id] = Math.min((zoomLevels[id] ?? 1) + 0.15, 2.5);
+        applyZoom(id);
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-zoom-out]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomOut!;
+        zoomLevels[id] = Math.max((zoomLevels[id] ?? 1) - 0.15, 0.4);
+        applyZoom(id);
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-zoom-reset]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomReset!;
+        zoomLevels[id] = 1;
+        applyZoom(id);
+      });
+    });
+
+    // Pan with mouse drag
+    document.querySelectorAll<HTMLElement>('[data-diagram]').forEach((container) => {
+      let isDown = false;
+      let startX = 0;
+      let startY = 0;
+      let scrollLeft = 0;
+      let scrollTop = 0;
+
+      container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - container.offsetLeft;
+        startY = e.pageY - container.offsetTop;
+        scrollLeft = container.scrollLeft;
+        scrollTop = container.scrollTop;
+      });
+
+      container.addEventListener('mouseleave', () => { isDown = false; });
+      container.addEventListener('mouseup', () => { isDown = false; });
+
+      container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const y = e.pageY - container.offsetTop;
+        container.scrollLeft = scrollLeft - (x - startX);
+        container.scrollTop = scrollTop - (y - startY);
+      });
+    });
+  }
+
+  initPage();
+  document.addEventListener('astro:after-swap', initPage);
+</script>

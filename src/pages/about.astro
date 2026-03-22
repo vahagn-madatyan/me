@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../components/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import avatar from '../assets/avatar.png';
 ---
 
 <BaseLayout title="About — Vahagn Madatyan" description="About Vahagn Madatyan — software developer, network engineer, and security architect.">
@@ -7,15 +9,26 @@ import BaseLayout from '../components/BaseLayout.astro';
 
     <!-- Hero / Intro -->
     <section>
-      <p class="text-sm font-medium tracking-widest uppercase font-code text-primary-500 dark:text-primary-400">
-        About
-      </p>
-      <h1 class="mt-2 text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
-        Vahagn Madatyan
-      </h1>
-      <p class="mt-1 text-lg text-primary-600 dark:text-primary-400 font-medium">
-        Software Developer · Network Engineer · Security Architect
-      </p>
+      <div class="flex items-center gap-6">
+        <Image
+          src={avatar}
+          alt="Vahagn Madatyan"
+          width={96}
+          height={96}
+          class="rounded-full ring-2 ring-primary-500/30 dark:ring-primary-400/20 shadow-lg"
+        />
+        <div>
+          <p class="text-sm font-medium tracking-widest uppercase font-code text-primary-500 dark:text-primary-400">
+            About
+          </p>
+          <h1 class="mt-1 text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+            Vahagn Madatyan
+          </h1>
+          <p class="mt-1 text-lg text-primary-600 dark:text-primary-400 font-medium">
+            Software Developer · Network Engineer · Security Architect
+          </p>
+        </div>
+      </div>
 
       <div class="mt-8 space-y-4 text-secondary-600 dark:text-secondary-400 leading-relaxed">
         <p>

@@ -24,3 +24,6 @@ Thumbs.db
 # Lighthouse reports
 lighthouse-report.*
 .agents/*
+
+# Cross-post distribution artifacts
+cross-posts/

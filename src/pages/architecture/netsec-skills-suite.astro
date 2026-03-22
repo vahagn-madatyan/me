@@ -433,7 +433,7 @@ const sections = [
   </div>
 </BaseLayout>
 
-<script>
+<script is:inline type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
   function initPage() {
@@ -449,10 +449,10 @@ const sections = [
     mermaid.run({ querySelector: '.mermaid' });
 
     // Collapse / expand
-    document.querySelectorAll<HTMLButtonElement>('[data-collapse]').forEach((btn) => {
-      const id = btn.dataset.collapse!;
-      const panel = document.querySelector(`[data-panel="${id}"]`) as HTMLElement;
-      const chevron = document.querySelector(`[data-chevron="${id}"]`) as HTMLElement;
+    document.querySelectorAll('[data-collapse]').forEach((btn) => {
+      const id = btn.dataset.collapse;
+      const panel = document.querySelector(`[data-panel="${id}"]`);
+      const chevron = document.querySelector(`[data-chevron="${id}"]`);
       if (!panel || !chevron) return;
 
       btn.addEventListener('click', () => {
@@ -462,44 +462,44 @@ const sections = [
     });
 
     // Zoom controls
-    const zoomLevels: Record<string, number> = {};
+    const zoomLevels = {};
 
-    function applyZoom(id: string) {
-      const diagram = document.querySelector(`[data-diagram="${id}"] .diagram-inner`) as HTMLElement;
+    function applyZoom(id) {
+      const diagram = document.querySelector(`[data-diagram="${id}"] .diagram-inner`);
       if (!diagram) return;
       const level = zoomLevels[id] ?? 1;
       diagram.style.transform = `scale(${level})`;
     }
 
-    document.querySelectorAll<HTMLButtonElement>('[data-zoom-in]').forEach((btn) => {
+    document.querySelectorAll('[data-zoom-in]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const id = btn.dataset.zoomIn!;
+        const id = btn.dataset.zoomIn;
         zoomLevels[id] = Math.min((zoomLevels[id] ?? 1) + 0.15, 2.5);
         applyZoom(id);
       });
     });
 
-    document.querySelectorAll<HTMLButtonElement>('[data-zoom-out]').forEach((btn) => {
+    document.querySelectorAll('[data-zoom-out]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const id = btn.dataset.zoomOut!;
+        const id = btn.dataset.zoomOut;
         zoomLevels[id] = Math.max((zoomLevels[id] ?? 1) - 0.15, 0.4);
         applyZoom(id);
       });
     });
 
-    document.querySelectorAll<HTMLButtonElement>('[data-zoom-reset]').forEach((btn) => {
+    document.querySelectorAll('[data-zoom-reset]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const id = btn.dataset.zoomReset!;
+        const id = btn.dataset.zoomReset;
         zoomLevels[id] = 1;
         applyZoom(id);
       });
     });
 
     // Pan with mouse drag
-    document.querySelectorAll<HTMLElement>('[data-diagram]').forEach((container) => {
+    document.querySelectorAll('[data-diagram]').forEach((container) => {
       let isDown = false;
       let startX = 0;
       let startY = 0;

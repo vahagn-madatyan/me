@@ -27,3 +27,5 @@ lighthouse-report.*
 
 # Cross-post distribution artifacts
 cross-posts/
+.playwright-mcp/*
+.DS_Store

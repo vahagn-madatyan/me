@@ -82,6 +82,10 @@ Cloudflare acquired Replicate in December 2025, bringing tens of thousands of co
 
 What this means in practice: you can train, fine-tune, and host models on Cloudflare's infrastructure. The model catalog — everything from Stable Diffusion variants to specialized NLP models — is now a first-party resource, not an external dependency. For developers who need models beyond what Workers AI offers natively, Replicate closes the gap without leaving the Cloudflare ecosystem.
 
+### Vectorize & AI Search
+
+**Vectorize** is Cloudflare's globally distributed vector database — store embeddings at the edge for low-latency semantic search, RAG pipelines, and recommendation systems. **AI Search** (formerly AutoRAG) is a fully managed retrieval-augmented generation platform that automatically crawls and indexes your content, with built-in AI model support and public REST API endpoints. Together, they close the loop: Workers AI generates embeddings, Vectorize stores them, and AI Search makes your content queryable with natural language — all without leaving the platform.
+
 ## Token for Granted: The Proof
 
 All of this comes together in the architecture. Token for Granted runs entirely on Cloudflare — a single Worker running TanStack Start with React 19 server-side rendering, bound to D1 for persistence, KV for caching, and Workers AI through AI Gateway for inference.

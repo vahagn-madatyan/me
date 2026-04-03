@@ -1,0 +1,427 @@
+---
+import BaseLayout from '../../components/BaseLayout.astro';
+
+const sections = [
+  {
+    id: 'overview',
+    title: 'System Architecture',
+    description: 'Single-deployment edge model — every request hits a Cloudflare Worker with bindings to D1, KV, and Workers AI. AI Gateway handles routing, budgets, and observability.',
+    mermaid: `graph TB
+  subgraph Client["Browser"]
+    UI["React 19 + Framer Motion"]
+  end
+
+  subgraph CF["Cloudflare Edge"]
+    Worker["Cloudflare Worker<br/>TanStack Start SSR"]
+
+    subgraph Storage["Storage Layer"]
+      D1["D1 Database<br/>SQLite"]
+      KV["KV Namespace<br/>Cache Store"]
+    end
+
+    subgraph AI["AI Layer"]
+      GW["AI Gateway<br/>Dynamic Routing<br/>$10/mo Budget Cap"]
+      WAI["Workers AI"]
+    end
+  end
+
+  UI -->|"HTTPS"| Worker
+  Worker -->|"SQL Queries"| D1
+  Worker -->|"Cache Read/Write<br/>SHA-256 Keys"| KV
+  Worker -->|"OpenAI-compat<br/>Endpoint"| GW
+  GW -->|"Primary:<br/>Llama 3.1 8B"| WAI
+  GW -->|"Fallback:<br/>Mistral 7B"| WAI
+  Worker -->|"Image Gen:<br/>Flux-1-Schnell"| WAI
+  Worker -->|"Deterministic<br/>Fallback"| Worker
+
+  style CF fill:#1a1a2e,stroke:#0f3460,color:#e94560
+  style Storage fill:#16213e,stroke:#0f3460,color:#e94560
+  style AI fill:#16213e,stroke:#0f3460,color:#e94560
+  style Client fill:#0f3460,stroke:#e94560,color:#e94560`,
+  },
+  {
+    id: 'request-lifecycle',
+    title: 'Request Lifecycle',
+    description: 'What happens when a user submits an asset for valuation — the critical path through every Cloudflare service.',
+    mermaid: `graph TD
+  Submit["User Submits Asset"] --> Validate["Zod Schema Validation"]
+  Validate --> Hash["SHA-256 Cache Key<br/>Web Crypto API"]
+  Hash --> CacheCheck{"KV Cache<br/>Lookup"}
+
+  CacheCheck -->|"HIT < 1hr"| Cached["Return Cached Response"]
+  CacheCheck -->|"MISS"| Gateway["AI Gateway"]
+
+  Gateway --> Route{"Model<br/>Available?"}
+  Route -->|"Primary"| Llama["Llama 3.1 8B"]
+  Route -->|"Fallback"| Mistral["Mistral 7B"]
+
+  Gateway -.->|"Failure / Budget"| Deterministic["Deterministic Fallback<br/>Hash-Based Pricing"]
+
+  Llama --> CacheWrite["Cache in KV<br/>TTL: 3600s"]
+  Mistral --> CacheWrite
+  CacheWrite --> Parse["Parse + Validate"]
+  Deterministic --> Parse
+
+  Parse --> Tokens["Token Pricing Engine<br/>19 Providers"]
+  Tokens --> ImageCheck{"Image<br/>Needed?"}
+  ImageCheck -->|"Yes"| ImgCache{"Image in<br/>KV Cache?"}
+  ImgCache -->|"HIT < 24hr"| UseImg["Use Cached Image"]
+  ImgCache -->|"MISS"| GenImg["Flux-1-Schnell<br/>Generate Image"]
+  GenImg --> ImgStore["Cache Image<br/>TTL: 86400s"]
+  ImageCheck -->|"No"| Persist
+  UseImg --> Persist["Write to D1"]
+  ImgStore --> Persist
+  Persist --> Response["Full Valuation Response"]
+  Cached --> Response
+
+  style Submit fill:#e94560,stroke:#0f3460,color:#fff
+  style Cached fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Deterministic fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Response fill:#064e3b,stroke:#34d399,color:#d1fae5`,
+  },
+  {
+    id: 'ai-pipeline',
+    title: 'AI Inference Pipeline',
+    description: 'AI Gateway provides dynamic routing with automatic fallback, budget enforcement, and request observability — all via an OpenAI-compatible endpoint.',
+    mermaid: `graph TD
+  Worker["Worker<br/>OpenAI SDK"] -->|"OpenAI-compat"| Gateway["AI Gateway"]
+
+  Gateway --> Routing["Dynamic Routing"]
+  Routing --> Primary["Primary: Llama 3.1 8B<br/>@cf/meta/llama-3.1-8b-instruct-fast"]
+  Routing --> Fallback["Fallback: Mistral 7B<br/>@cf/mistral/mistral-7b-instruct-v0.2"]
+
+  Gateway --> Budget["Budget Cap<br/>$10/month Hard Ceiling"]
+  Gateway --> Cache["Response Caching<br/>90% Latency Reduction"]
+  Gateway --> Observe["Observability<br/>Model · Latency · Tokens · Cost"]
+
+  Budget -.->|"Exhausted"| DeterFallback["Deterministic Fallback"]
+
+  Worker -->|"Direct Binding"| Flux["Flux-1-Schnell<br/>Image Generation"]
+
+  style Worker fill:#1a1a2e,stroke:#0f3460,color:#e94560
+  style Gateway fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Primary fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style Fallback fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style Flux fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style DeterFallback fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Budget fill:#4c0519,stroke:#fb7185,color:#ffe4e6`,
+  },
+  {
+    id: 'caching',
+    title: 'Caching Strategy',
+    description: 'Content-addressed caching with SHA-256 keys — different TTLs for text (1hr) and images (24hr), with deterministic fallback needing no cache at all.',
+    mermaid: `graph TD
+  Input["Input: description + category"] --> SHA["SHA-256 Hash<br/>crypto.subtle.digest"]
+  SHA --> Key["Cache Key:<br/>valuation:hex"]
+
+  Key --> TextCache{"Text Cache<br/>TTL: 1 hour"}
+  TextCache -->|"HIT"| Fast["< 5ms Response"]
+  TextCache -->|"MISS"| AICall["AI Inference"]
+  AICall --> Store["Store in KV"]
+
+  Key --> ImgCache{"Image Cache<br/>TTL: 24 hours"}
+  ImgCache -->|"HIT"| FastImg["Cached Image"]
+  ImgCache -->|"MISS"| GenImg["Flux-1-Schnell"]
+  GenImg --> StoreImg["Store in KV"]
+
+  SHA -.-> DetSeed["Deterministic Seed"]
+  DetSeed -.-> DetPrice["Hash-Based Pricing<br/>No Cache Needed"]
+
+  style Input fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe
+  style SHA fill:#1e293b,stroke:#94a3b8,color:#cbd5e1
+  style Fast fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style FastImg fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style DetPrice fill:#451a03,stroke:#fbbf24,color:#fef3c7`,
+  },
+  {
+    id: 'deterministic-fallback',
+    title: 'Deterministic Fallback',
+    description: 'When AI is completely unavailable, the system generates plausible valuations using the SHA-256 hash as a seed — same input always produces the same output.',
+    mermaid: `graph TD
+  Request["Valuation Request"] --> AI{"AI Available?"}
+
+  AI -->|"Yes"| AIResponse["AI-Generated<br/>Valuation"]
+  AI -->|"No: Budget Exhausted<br/>Gateway Down<br/>Model Error"| HashSeed["SHA-256 Hash<br/>as Seed"]
+
+  HashSeed --> Price["Derive Price<br/>Category-appropriate range"]
+  HashSeed --> Tier["Derive Tier<br/>S / A / B / C / D"]
+  HashSeed --> Confidence["Derive Confidence<br/>low / medium / high"]
+  HashSeed --> Tokens["Token Conversions<br/>19 Providers"]
+
+  Price --> Consistent["Consistent Output<br/>Same input = Same result"]
+  Tier --> Consistent
+  Confidence --> Consistent
+  Tokens --> Consistent
+
+  Consistent --> Marked["Marked as<br/>Deterministic Estimate"]
+  AIResponse --> Marked2["Marked as<br/>AI-Generated"]
+
+  style Request fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe
+  style AIResponse fill:#312e81,stroke:#818cf8,color:#e0e7ff
+  style HashSeed fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Consistent fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Marked fill:#064e3b,stroke:#6ee7b7,color:#d1fae5
+  style Marked2 fill:#312e81,stroke:#a78bfa,color:#ede9fe`,
+  },
+  {
+    id: 'data-model',
+    title: 'Data Model',
+    description: 'Single flat table in D1 (SQLite) — JSON columns for nested data, raw AI response storage for debugging.',
+    mermaid: `graph LR
+  subgraph D1["D1 Database — valuations table"]
+    Core["id · description<br/>category · item_name"]
+    Pricing["item_price<br/>price_confidence · tier"]
+    JSON["token_conversions (JSON)<br/>what_you_could_do (JSON)"]
+    AI["analysis · image_url<br/>ai_raw_response"]
+    Meta["auth_status<br/>created_at · updated_at"]
+  end
+
+  Core --> Pricing
+  Pricing --> JSON
+  JSON --> AI
+  AI --> Meta
+
+  style D1 fill:#1a1a2e,stroke:#0f3460,color:#e94560
+  style Core fill:#16213e,stroke:#38bdf8,color:#e0f2fe
+  style Pricing fill:#16213e,stroke:#38bdf8,color:#e0f2fe
+  style JSON fill:#16213e,stroke:#818cf8,color:#e0e7ff
+  style AI fill:#16213e,stroke:#fbbf24,color:#fef3c7
+  style Meta fill:#16213e,stroke:#94a3b8,color:#cbd5e1`,
+  },
+  {
+    id: 'cost',
+    title: 'Cost Architecture',
+    description: 'Full production AI app under $10/month — caching is the key cost optimization, AI Gateway budget cap is the safety net.',
+    mermaid: `graph LR
+  subgraph Free["Free Tier"]
+    Workers["Workers<br/>100K req/day"]
+    D1Free["D1<br/>5M reads/day"]
+    KVFree["KV<br/>100K reads/day"]
+    GWFree["AI Gateway<br/>Free proxy"]
+  end
+
+  subgraph Paid["~$0-5/month"]
+    WAI["Workers AI<br/>Inference"]
+  end
+
+  subgraph Safety["Safety Net"]
+    Cap["AI Gateway<br/>$10/mo Hard Cap"]
+    Fallback["Deterministic<br/>Fallback"]
+  end
+
+  Cap -->|"Budget Exhausted"| Fallback
+  WAI --> Cap
+
+  style Free fill:#064e3b,stroke:#34d399,color:#d1fae5
+  style Paid fill:#451a03,stroke:#fbbf24,color:#fef3c7
+  style Safety fill:#4c0519,stroke:#fb7185,color:#ffe4e6
+  style Fallback fill:#064e3b,stroke:#6ee7b7,color:#d1fae5`,
+  },
+];
+---
+
+<BaseLayout title="Token for Granted Architecture — Vahagn Madatyan" description="Interactive architecture diagrams for Token for Granted — Cloudflare edge AI, caching strategy, deterministic fallback, and cost architecture.">
+  <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+
+    <!-- Header -->
+    <a href="/architecture" class="inline-flex items-center gap-1 text-sm text-secondary-500 hover:text-primary-500 transition-colors mb-6">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      Back to Architecture
+    </a>
+
+    <h1 class="text-3xl font-bold tracking-tight text-secondary-900 dark:text-secondary-100 sm:text-4xl">
+      Token for Granted
+    </h1>
+    <p class="mt-3 text-secondary-600 dark:text-secondary-400 leading-relaxed max-w-2xl">
+      Interactive architecture diagrams showing how a full-stack AI application runs entirely on Cloudflare's edge — Workers, D1, KV, AI Gateway, and Workers AI — for under $10/month.
+    </p>
+
+    <div class="mt-4 flex flex-wrap gap-3">
+      <a
+        href="https://tokenforgranted.com"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-600 transition-colors dark:shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+        Live App
+      </a>
+      <a
+        href="https://tokenforgranted.com/architecture-viz"
+        class="inline-flex items-center gap-2 rounded-lg bg-secondary-100 px-5 py-2.5 text-sm font-medium text-secondary-700 hover:bg-secondary-200 transition-colors dark:bg-white/[0.05] dark:text-secondary-300 dark:hover:bg-white/[0.1] dark:ring-1 dark:ring-white/[0.06]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+        Architecture Viz on Site
+      </a>
+    </div>
+
+    <!-- Jump links -->
+    <nav class="mt-8 flex flex-wrap gap-2">
+      {sections.map((s) => (
+        <a
+          href={`#${s.id}`}
+          class="rounded-full px-4 py-1.5 text-sm font-medium bg-secondary-100 text-secondary-600 hover:bg-primary-100 hover:text-primary-700 dark:bg-white/[0.05] dark:text-secondary-300 dark:hover:bg-primary-500/10 dark:hover:text-primary-400 dark:ring-1 dark:ring-white/[0.06] transition-colors"
+        >
+          {s.title}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Diagram sections -->
+    <div class="mt-12 space-y-8">
+      {sections.map((section) => (
+        <section id={section.id} class="scroll-mt-20">
+          <div class="rounded-2xl bg-white shadow-sm ring-1 ring-secondary-200 dark:bg-secondary-900 dark:ring-secondary-800 overflow-hidden transition-all duration-300 hover:shadow-lg hover:ring-primary-300 dark:hover:ring-primary-700">
+
+            <button
+              data-collapse={section.id}
+              class="w-full flex items-center justify-between p-5 sm:p-6 text-left cursor-pointer group"
+            >
+              <div>
+                <h2 class="text-lg font-semibold tracking-tight text-secondary-900 dark:text-secondary-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  {section.title}
+                </h2>
+                <p class="mt-1 text-sm text-secondary-500 dark:text-secondary-400 leading-relaxed">
+                  {section.description}
+                </p>
+              </div>
+              <svg data-chevron={section.id} class="w-5 h-5 text-secondary-400 transition-transform duration-200 flex-shrink-0 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div data-panel={section.id} class="border-t border-secondary-200 dark:border-secondary-700">
+              <div class="diagram-wrapper relative bg-secondary-50 dark:bg-secondary-800/50 overflow-hidden">
+                <div class="absolute top-3 right-3 z-10 flex gap-1">
+                  <button data-zoom-in={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Zoom in">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" /></svg>
+                  </button>
+                  <button data-zoom-out={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Zoom out">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" /></svg>
+                  </button>
+                  <button data-zoom-reset={section.id} class="rounded-lg bg-white/90 dark:bg-secondary-700/90 p-1.5 text-secondary-500 hover:text-primary-500 ring-1 ring-secondary-200 dark:ring-secondary-600 transition-colors cursor-pointer" title="Reset zoom">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" /></svg>
+                  </button>
+                </div>
+                <div
+                  data-diagram={section.id}
+                  class="p-6 overflow-auto cursor-grab active:cursor-grabbing"
+                  style="min-height: 300px;"
+                >
+                  <div class="diagram-inner transition-transform duration-150 origin-top-left">
+                    <pre class="mermaid flex justify-center text-sm">{section.mermaid}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- Footer CTA -->
+    <div class="mt-16 rounded-2xl bg-gradient-to-br from-primary-500/10 to-indigo-500/10 dark:from-primary-500/5 dark:to-indigo-500/5 ring-1 ring-primary-200 dark:ring-primary-800 p-8 text-center">
+      <h2 class="text-xl font-bold text-secondary-900 dark:text-secondary-100">Try It</h2>
+      <p class="mt-2 text-secondary-600 dark:text-secondary-400">Submit any asset and see the AI valuation in action.</p>
+      <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+        <a href="https://tokenforgranted.com" class="text-primary-500 hover:underline">tokenforgranted.com</a>
+        <span class="text-secondary-300 dark:text-secondary-600">|</span>
+        <a href="/blog/ship-fast-ship-secure-building-ai-apps-on-cloudflare" class="text-primary-500 hover:underline">Blog Post</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  function initPage() {
+    const isDark = document.documentElement.classList.contains('dark');
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'default',
+      flowchart: { curve: 'basis', padding: 15, htmlLabels: true },
+      themeVariables: isDark
+        ? { primaryColor: '#1e293b', primaryTextColor: '#e0f2fe', lineColor: '#475569', primaryBorderColor: '#38bdf8' }
+        : {},
+    });
+    mermaid.run({ querySelector: '.mermaid' });
+
+    document.querySelectorAll('[data-collapse]').forEach((btn) => {
+      const id = btn.dataset.collapse;
+      const panel = document.querySelector(`[data-panel="${id}"]`);
+      const chevron = document.querySelector(`[data-chevron="${id}"]`);
+      if (!panel || !chevron) return;
+
+      btn.addEventListener('click', () => {
+        const isHidden = panel.classList.toggle('hidden');
+        chevron.style.transform = isHidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+      });
+    });
+
+    const zoomLevels = {};
+
+    function applyZoom(id) {
+      const diagram = document.querySelector(`[data-diagram="${id}"] .diagram-inner`);
+      if (!diagram) return;
+      const level = zoomLevels[id] ?? 1;
+      diagram.style.transform = `scale(${level})`;
+    }
+
+    document.querySelectorAll('[data-zoom-in]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomIn;
+        zoomLevels[id] = Math.min((zoomLevels[id] ?? 1) + 0.15, 2.5);
+        applyZoom(id);
+      });
+    });
+
+    document.querySelectorAll('[data-zoom-out]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomOut;
+        zoomLevels[id] = Math.max((zoomLevels[id] ?? 1) - 0.15, 0.4);
+        applyZoom(id);
+      });
+    });
+
+    document.querySelectorAll('[data-zoom-reset]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.zoomReset;
+        zoomLevels[id] = 1;
+        applyZoom(id);
+      });
+    });
+
+    document.querySelectorAll('[data-diagram]').forEach((container) => {
+      let isDown = false;
+      let startX = 0;
+      let startY = 0;
+      let scrollLeft = 0;
+      let scrollTop = 0;
+
+      container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - container.offsetLeft;
+        startY = e.pageY - container.offsetTop;
+        scrollLeft = container.scrollLeft;
+        scrollTop = container.scrollTop;
+      });
+
+      container.addEventListener('mouseleave', () => { isDown = false; });
+      container.addEventListener('mouseup', () => { isDown = false; });
+
+      container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const y = e.pageY - container.offsetTop;
+        container.scrollLeft = scrollLeft - (x - startX);
+        container.scrollTop = scrollTop - (y - startY);
+      });
+    });
+  }
+
+  initPage();
+  document.addEventListener('astro:after-swap', initPage);
+</script>
